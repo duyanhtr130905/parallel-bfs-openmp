@@ -3,13 +3,13 @@
 Theo quyết định 05/11/2026: repository public chính là
 https://github.com/duyanhtr130905/parallel-bfs-openmp . Chủ repo dùng feature branch;
 hai thành viên còn lại dùng fork. Mỗi fork có origin trỏ fork cá nhân và upstream
-trỏ canonical. Bản D của lead có origin trỏ canonical, chưa upload commit nào.
+trỏ canonical. Bản D của lead có origin trỏ canonical, PR #1 Draft đang sửa bootstrap.
 Ruleset main-pr-review đã Active; xem GITHUB_SETUP.md về CI và lần seed main đầu.
 Chưa có username hai thành viên nên chưa mời reviewer/cấp write hoặc tạo fork.
 
 1. Đồng bộ main sạch bằng fetch upstream và cập nhật fast-forward; giữ thay đổi
    đang làm trên branch riêng. Không reset hard, clean -fdx hoặc force push.
-2. Tạo branch `feat/tv1-csr-serial`, `feat/tv2-omp-basic`, `feat/tv3-omp-opt`;
+2. Tạo branch `feat/graph-serial-bfs`, `feat/parallel-bfs`, `feat/benchmark-report`;
    nhánh sửa lỗi `fix/<mo-ta>`, tài liệu `docs/<mo-ta>`.
 3. Commit nhỏ, rõ mục đích: `feat(graph): validate edge-list input`,
    `test(bfs): cover disconnected vertices`, `docs(report): describe methodology`.
@@ -29,3 +29,17 @@ PR thuật toán phải thêm kiểm thử thực: oracle tay + so serial, direc
 đỉnh cô lập, n=1, self-loop, cạnh trùng, chu trình, diamond nhiều tranh chấp,
 source khác 0, input sai, threads/schedule lặp nhiều lần. Thêm module/test vào
 Makefile một cách tường minh; không để file thuật toán tồn tại nhưng không được build.
+
+## Phân công cuối cùng — chủ dự án chọn 05/11/2026
+
+| Vai trò | Branch | Phạm vi |
+|---|---|---|
+| A — Graph & Sequential BFS | feat/graph-serial-bfs | CSR, edge-list parser, serial BFS, graph/oracle tests, lý thuyết BFS |
+| B — Parallel BFS & Optimization | feat/parallel-bfs | Top-down basic và optimized; synchronization/atomic visited/frontier; static/dynamic/guided; correctness/stress; thiết kế song song |
+| C — Benchmark & Report Integration | feat/benchmark-report | CLI, automation, protocol, raw CSV/JSONL/manifest, biểu đồ, LaTeX tiếng Việt, thực nghiệm/kết luận từ dữ liệu thật |
+
+A cung cấp graph + serial; B phụ thuộc graph API; C phụ thuộc cả ba BFS APIs.
+Cả ba có thể chuẩn bị độc lập sau bootstrap theo CONTRACT: A/B nhận tham số cuối
+`BFSMetrics *metrics`, C chuẩn bị caller/timing/serialization. Tích hợp theo
+A → B → C; benchmark chỉ sau correctness. B sở hữu basic lẫn optimized; C sở hữu
+CLI/benchmark/report. Đây là kế hoạch, chưa giao việc hoặc tạo fork.

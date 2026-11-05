@@ -1,39 +1,6 @@
-\documentclass[12pt,a4paper,oneside]{report}
-\usepackage{fontspec}
-\setmainfont{Latin Modern Roman}
-\usepackage[margin=2.5cm]{geometry}
-\usepackage{setspace}
-\usepackage{amsmath}
-\usepackage[unicode,hidelinks]{hyperref}
-\onehalfspacing
-\renewcommand{\contentsname}{Mục lục}
-\renewcommand{\listfigurename}{Danh mục hình}
-\renewcommand{\listtablename}{Danh mục bảng}
-\renewcommand{\bibname}{Tài liệu tham khảo}
-\renewcommand{\chaptername}{Chương}
-\renewcommand{\figurename}{Hình}
-\renewcommand{\tablename}{Bảng}
+\input{preamble}
 \begin{document}
-\begin{titlepage}
-\centering
-{\Large [TÊN TRƯỜNG]\\[0.5cm] [TÊN KHOA/BỘ MÔN]\par}
-\vspace{2cm}
-{\Large BÀI TẬP LỚN MÔN TÍNH TOÁN SONG SONG\par}
-\vspace{1cm}
-{\LARGE\bfseries Parallel Breadth-First Search Using OpenMP:\\
-Implementation, Optimization, and Performance Evaluation\par}
-\vspace{1cm}
-{\large Triển khai, tối ưu và đánh giá hiệu năng BFS song song\par}
-\vspace{1.5cm}
-Giảng viên hướng dẫn: [HỌ TÊN GIẢNG VIÊN]\\[0.6cm]
-Nhóm sinh viên:\\
-[THÀNH VIÊN 1 -- MSSV]\\
-[THÀNH VIÊN 2 -- MSSV]\\
-[THÀNH VIÊN 3 -- MSSV]
-\vfill
-[ĐỊA ĐIỂM], [THÁNG/NĂM]\\
-\textbf{Bản khung bootstrap -- chưa có kết quả thực nghiệm}
-\end{titlepage}
+\input{bia}
 \pagenumbering{roman}
 \chapter*{Tóm tắt}
 \addcontentsline{toc}{chapter}{Tóm tắt}

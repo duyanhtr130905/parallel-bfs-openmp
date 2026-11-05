@@ -1,3 +1,8 @@
+# Mẫu bàn giao lịch sử
+
+Nội dung dưới là draft trước publication. PR #1 và PROJECT_STATUS/ADR-0002/
+DELIVERY_PLAN là nguồn hiện tại; không dùng mẫu này để tạo PR mới.
+
 # Đề xuất PR — chưa tạo trên GitHub
 
 Title: Bootstrap C11/OpenMP BFS API, CLI scaffold và báo cáo tiếng Việt

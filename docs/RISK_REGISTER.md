@@ -2,9 +2,9 @@
 
 | Rủi ro | Owner/biện pháp |
 |---|---|
-| Race claim visited/frontier | TV2/TV3: review atomic/barrier + stress |
-| Parser mất isolated/size overflow | TV1: n tường minh, kiểm tra cấp phát |
-| Serial oracle sai | TV1: oracle tay độc lập |
+| Race claim visited/frontier | B: review atomic/barrier + stress |
+| Parser mất isolated/size overflow | A: n tường minh, kiểm tra cấp phát |
+| Serial oracle sai | A: oracle tay độc lập |
 | Đếm cạnh undirected sai | Lead: m là cung CSR, contract self-loop/duplicate |
 | Team thực khác request | Benchmark owner: instrument team tại vùng BFS |
 | Toolchain/LaTeX thiếu | Lead: ghi nhận môi trường, không tự cài |

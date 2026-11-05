@@ -43,3 +43,31 @@ Không coi speedup>1 là điều kiện correctness. Chưa đặt ngưỡng hi�
 
 Các file raw/figures chưa có. Chỉ thêm bảng/biểu đồ báo cáo từ mẫu có manifest
 và script tái tạo; biểu đồ phải có đơn vị, số lần lặp, source, cấu hình, độ biến thiên.
+
+## Metrics và bảo quản raw (owner C, B cung cấp team measurement)
+
+Caller truyền BFSMetrics riêng ở tham số cuối, chỉ nhận BFS_OK và actual>=1.
+Lỗi metrics=0 giữ log lỗi, không nhận mẫu thành công. A serial báo1; B đo team
+trong vùng BFS; team thay đổi giữa các vùng trả BFS_ERR_RUNTIME. Không dùng max
+threads/probe ngoài BFS. Timer ở caller theo CONTRACT/ADR-0002, không trong metrics.
+
+Mỗi phiên tạo thư mục mới `results/raw/<UTC-timestamp>-<short-sha>-<run-id>/`,
+kiểm tra chưa tồn tại và mở file exclusive-create, không truncate/ghi đè âm thầm.
+Giữ JSONL/CSV gốc, stderr/errors, warm-up và thứ tự mọi lần đo. CSV chuyển từ JSONL
+phải giữ JSONL và ghi script/version chuyển đổi; không sửa raw để làm đẹp.
+
+Manifest ghi schema/run-id/UTC, người hoặc role đo; commit SHA/dirty state/diff
+hash; lệnh, compiler/runtime/flags, máy và môi trường đã liệt kê; dataset URL/
+license/SHA-256/seed/n/m/source; requested/actual/schedule/warm-up/repetition/order/
+exit/validation status; mọi raw/log và SHA-256, đơn vị/schema. Mẫu lỗi giữ riêng
+có đánh dấu, không trộn timing hợp lệ. Không ghi token hoặc thông tin riêng máy.
+
+Giữ raw ít nhất đến chấm/bảo vệ và hết thời gian phúc khảo học phần. C quản lý
+bản sao dự phòng kèm manifest/hash ở kho nhóm được phép. Git không là bản lưu
+duy nhất; không tự động retention-delete. Giữ mọi outlier và giải thích loại mẫu.
+
+results/raw và figures vẫn ignore mặc định. Chỉ đưa tập nhỏ đã review có provenance
+vào Git qua `git add -f` từng file, kèm manifest/script/README giải thích lựa chọn;
+không add -f cả thư mục. Dataset/raw lớn lưu ngoài Git với locator ổn định và hash.
+Biểu đồ tái tạo bằng lệnh ghi trong manifest/README, kiểm hash input, ghi script
+SHA/dependencies/aggregation/filter/output. Chưa có benchmark hoặc kết quả giả.

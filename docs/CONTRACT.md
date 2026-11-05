@@ -1,6 +1,6 @@
 # Hợp đồng API v1 — CUỐI CÙNG cho đợt giao việc
 
-Ngày chốt: 05/11/2026. Nguồn chuẩn: tài liệu này và `include/*.h`.
+Ngày chốt: 05/11/2026; revision bootstrap theo ADR-0002, thay chữ ký trước implementation. Nguồn chuẩn: tài liệu này và `include/*.h`.
 Đổi API phải có PR riêng cập nhật đồng thời tài liệu, header và mọi bên gọi;
 không tự đổi chữ ký trong nhánh cá nhân. C11, OpenMP, không C++.
 
@@ -20,6 +20,7 @@ typedef enum {
     BFS_SCHEDULE_GUIDED = 2
 } BFSSchedule;
 typedef struct { int threads; BFSSchedule schedule; } BFSConfig;
+typedef struct { int threads_actual; } BFSMetrics;
 
 BFSStatus graph_from_edges(uint32_t vertex_count, const Edge *edges,
                           size_t input_edge_count, GraphMode mode, CSRGraph *out);
@@ -27,11 +28,11 @@ BFSStatus graph_read_edge_list(const char *path, uint32_t vertex_count,
                               GraphMode mode, CSRGraph *out);
 void graph_free(CSRGraph *graph);
 BFSStatus bfs_serial(const CSRGraph *graph, uint32_t source,
-                     int32_t *distance, const BFSConfig *config);
+                     int32_t *distance, const BFSConfig *config, BFSMetrics *metrics);
 BFSStatus bfs_parallel_basic(const CSRGraph *graph, uint32_t source,
-                             int32_t *distance, const BFSConfig *config);
+                             int32_t *distance, const BFSConfig *config, BFSMetrics *metrics);
 BFSStatus bfs_parallel_optimized(const CSRGraph *graph, uint32_t source,
-                                 int32_t *distance, const BFSConfig *config);
+                                 int32_t *distance, const BFSConfig *config, BFSMetrics *metrics);
 ```
 
 ## CSR và ownership
@@ -69,8 +70,8 @@ trả RANGE. Không mở/đọc/đóng file được trả IO. Builder đóng fi
 
 ## BFS
 
-- graph, distance, config không NULL. source < n; config.threads >= 1 và enum hợp lệ.
-- Caller cấp phát distance đủ n int32_t, không alias bất kỳ buffer graph/config.
+- graph, distance, config, metrics không NULL. source < n; config.threads >= 1 và enum hợp lệ.
+- Caller cấp phát distance đủ n int32_t, không alias bất kỳ buffer graph/config/metrics.
   Output không cần khởi tạo; mỗi lần thành công phải ghi đầy đủ n phần tử.
 - Khi OK: distance[source]=0; unreachable=-1; mọi đỉnh khác là số cạnh ngắn nhất.
   Không yêu cầu parent hoặc thứ tự duyệt giống nhau. Không có parent trong API v1.
@@ -80,9 +81,19 @@ trả RANGE. Không mở/đọc/đóng file được trả IO. Builder đóng fi
   thuật toán serial. Hai phiên bản OpenMP dùng threads làm số luồng yêu cầu,
   schedule cho vòng phân phối frontier, chunk mặc định OpenMP (không có chunk CLI).
   Nếu có nhiều vòng khác loại, phải mô tả vòng nào áp dụng schedule trong PR.
-- Tắt dynamic team cho phiên benchmark; team thực tế vẫn có thể khác do runtime.
-  API v1 không trả team size: benchmark tương lai phải instrument riêng ngay trong
-  vùng parallel xử lý BFS. Không suy số luồng thực tế từ omp_get_max_threads().
+- Caller sở hữu `BFSMetrics`; không alias graph/config/distance/scratch và không
+  chia sẻ metrics giữa các lời gọi đồng thời. Nếu metrics khác NULL, hàm đặt
+  threads_actual=0 trước kiểm tra đối số; khi lỗi giá trị này vẫn 0, không xuất mẫu.
+  Chỉ khi BFS_OK mới công bố giá trị >=1; serial luôn ghi 1.
+- Hai hàm OpenMP lấy omp_get_num_threads() trong single của chính từng parallel
+  region xử lý BFS; barrier bảo đảm quan sát an toàn. Mọi team xử lý BFS trong một
+  lời gọi phải có cùng kích thước. Nếu team thay đổi giữa các vùng, trả
+  BFS_ERR_RUNTIME, giữ metrics=0 và không xuất kết quả thành công. Dùng cùng một
+  persistent team là lựa chọn đơn giản. Trường hợp không mở vùng song song vì
+  không có công việc phải báo 1 (thực thi serial), không giả báo config.threads.
+- Tắt dynamic team cho phiên benchmark; team thực tế vẫn có thể khác request.
+  Không suy threads_actual từ omp_get_max_threads(), config hoặc probe bên ngoài.
+  Metrics chỉ chứa team size, không chứa thời gian. Xem ADR-0002.
 - Không gọi từ vùng parallel bên ngoài trong API v1. Không dùng trạng thái global
   mutable; mọi thay đổi OpenMP ICV phải được khôi phục trước khi trả về.
 - Caller phải cung cấp CSR thỏa invariants, capacity/pointer hợp lệ; C không thể
@@ -128,7 +139,8 @@ Một JSON object một dòng stdout cho mỗi BFS thành công, locale số C, 
 `runtime_seconds` số thực hữu hạn >=0, `threads_requested` nguyên >=1,
 `threads_actual` nguyên >=1, `schedule` enum CLI (serial ghi "none"),
 `vertices`=n, `edges`=m cung CSR, `source`=S, `reachable` số phần tử distance>=0,
-`directed` boolean. Không in mẫu số liệu giả. Thiếu team measurement thì chưa được
+`directed` boolean. Không in mẫu số liệu giả. CLI lấy threads_actual từ BFSMetrics của lời gọi BFS_OK tương ứng.
+Thiếu team measurement thì chưa được
 phát result thành công. Log chẩn đoán chỉ stderr.
 
 Đo wall-clock `omp_get_wtime()` trên cùng master thread trước/sau một lời gọi BFS.

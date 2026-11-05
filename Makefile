@@ -12,7 +12,7 @@ EXEEXT := .exe
 endif
 BIN := build/bfs$(EXEEXT)
 
-.PHONY: all build test test-bfs check-scaffold check-openmp report clean help
+.PHONY: all build test test-bfs check-scaffold check-api check-openmp report clean help
 all: build
 build: $(BIN)
 $(BIN): src/main.c include/bfs.h include/graph.h include/status.h
@@ -20,14 +20,18 @@ $(BIN): src/main.c include/bfs.h include/graph.h include/status.h
 	$(CC) $(CPPFLAGS) $(CFLAGS) src/main.c $(LDFLAGS) $(LDLIBS) -o $(BIN)
 check-scaffold:
 	$(PYTHON) scripts/check_scaffold.py
-test: build check-scaffold
+check-api:
+	$(CC) $(CPPFLAGS) $(CFLAGS) -Werror -fsyntax-only tests/api_contract.c
+test: build check-scaffold check-api
 	$(PYTHON) tests/test_cli.py --binary $(BIN)
+	$(PYTHON) tests/test_clean.py
 test-bfs:
 	$(PYTHON) -c "import sys; sys.exit('NOT IMPLEMENTED: BFS correctness tests await real modules.')"
 check-openmp:
 	$(PYTHON) -c "from pathlib import Path; Path('build').mkdir(exist_ok=True)"
 	$(CC) $(CFLAGS) tests/openmp_probe.c $(LDFLAGS) $(LDLIBS) -o build/openmp_probe$(EXEEXT)
-	./build/openmp_probe$(EXEEXT)
+	./build/openmp_probe$(EXEEXT) --strict
+	$(PYTHON) tests/test_openmp_probe.py build/openmp_probe$(EXEEXT)
 report:
 	cd report && xelatex -interaction=nonstopmode -halt-on-error main.tex
 	cd report && bibtex main

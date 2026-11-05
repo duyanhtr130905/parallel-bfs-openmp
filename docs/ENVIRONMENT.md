@@ -1,3 +1,8 @@
+# Ghi chú hiện tại
+
+Phần dưới là khảo sát lịch sử. PR #1 Draft đã publish; CI là nơi kiểm chứng
+Windows UCRT64/OpenMP và XeLaTeX trong phiên sửa review. Xem PROJECT_STATUS.
+
 # Khảo sát môi trường — 05/11/2026 (Asia/Saigon)
 
 Workspace ban đầu: `C:\Users\PC\OneDrive\Documents\ChatGPT\Tính toán song song`.

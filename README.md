@@ -11,15 +11,17 @@ CLI chỉ kiểm tra đối số và từ chối thực thi bằng exit 3. Khôn
 
 ## Build trong MSYS2 UCRT64
 
-Mở đúng terminal UCRT64; dùng GCC của `/ucrt64/bin`, không compiler MSYS `/usr/bin`.
+Cài đủ dependency theo quyền của người dùng: GCC, libgomp, Python và UCRT64 Make
+(`mingw-w64-ucrt-x86_64-{gcc,libgomp,python,make}`). UCRT64 Make có tên
+`mingw32-make`; các target giống `make` trên Linux. Mở đúng terminal UCRT64; dùng GCC của `/ucrt64/bin`, không compiler MSYS `/usr/bin`.
 Trong đường dẫn có khoảng trắng, luôn quote đường dẫn:
 
 ```sh
 cd '/d/Code/parallel-bfs-openmp'
 gcc --version
-make build
-make check-openmp
-make test
+mingw32-make build
+mingw32-make check-openmp
+mingw32-make test
 ./build/bfs.exe --help
 ./build/bfs.exe --graph datasets/small/disconnected.edgelist --vertices 6 --source 0 --algo omp-basic --threads 2 --schedule static --directed
 ```
@@ -51,7 +53,7 @@ https://github.com/duyanhtr130905/parallel-bfs-openmp .
 Chủ repo dùng branch, hai thành viên còn lại fork, PR về canonical/main.
 
 Repository local vẫn chưa có commit trên chore/bootstrap-contracts; chưa push,
-chưa có main ref trên GitHub. Ruleset main-pr-review đã Active trước lần upload đầu.
+main baseline và PR #1 Draft đã có trên GitHub. Ruleset main-pr-review đã Active trước lần upload đầu.
 CI và PR template mới chuẩn bị local, chưa có CI run. Mọi upload/PR/merge cần xác nhận.
 Main sau tích hợp sẽ là nguồn chuẩn; PR mở và công việc chỉ ở local chưa được gọi hoàn thành.
 
@@ -60,3 +62,17 @@ Review đủ 42 file, findings P0-P3 và evidence: [REVIEW_20261105](docs/REVIEW
 Clang C11 CLI và 31+24 ca CLI đã PASS, không phải correctness/performance BFS.
 [Thiết lập GitHub](docs/GITHUB_SETUP.md) ghi chính xác phần đã bật và bước tiếp theo.
 Mẫu PR bootstrap vẫn ở docs/BOOTSTRAP_PR.md.
+
+## Phân công cuối cùng — chủ dự án chọn 05/11/2026
+
+| Vai trò | Branch | Phạm vi |
+|---|---|---|
+| A — Graph & Sequential BFS | feat/graph-serial-bfs | CSR, edge-list parser, serial BFS, graph/oracle tests, lý thuyết BFS |
+| B — Parallel BFS & Optimization | feat/parallel-bfs | Top-down basic và optimized; synchronization/atomic visited/frontier; static/dynamic/guided; correctness/stress; thiết kế song song |
+| C — Benchmark & Report Integration | feat/benchmark-report | CLI, automation, protocol, raw CSV/JSONL/manifest, biểu đồ, LaTeX tiếng Việt, thực nghiệm/kết luận từ dữ liệu thật |
+
+A cung cấp graph + serial; B phụ thuộc graph API; C phụ thuộc cả ba BFS APIs.
+Cả ba có thể chuẩn bị độc lập sau bootstrap theo CONTRACT: A/B nhận tham số cuối
+`BFSMetrics *metrics`, C chuẩn bị caller/timing/serialization. Tích hợp theo
+A → B → C; benchmark chỉ sau correctness. B sở hữu basic lẫn optimized; C sở hữu
+CLI/benchmark/report. Đây là kế hoạch, chưa giao việc hoặc tạo fork.

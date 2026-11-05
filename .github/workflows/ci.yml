@@ -24,15 +24,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Compile and test the real scaffold
-        run: make CC=gcc PYTHON=python3 test check-openmp
-      - name: Require a real two-thread OpenMP team
-        env:
-          OMP_DYNAMIC: 'FALSE'
-          OMP_THREAD_LIMIT: '2'
-        run: |
-          output=$(./build/openmp_probe)
-          echo "$output"
-          [[ "$output" == *"team=2 "* ]]
+        run: make CC=gcc PYTHON=python3 build test check-openmp
 
   windows:
     name: bootstrap-windows-ucrt64
@@ -47,21 +39,30 @@ jobs:
           msystem: UCRT64
           update: true
           install: >-
-            make
+            mingw-w64-ucrt-x86_64-make
             mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-libgomp
             mingw-w64-ucrt-x86_64-python
+      - name: Verify UCRT64 toolchain and OpenMP library ownership
+        shell: msys2 {0}
+        run: |
+          test "$MSYSTEM" = UCRT64
+          test "$(command -v gcc)" = /ucrt64/bin/gcc
+          test "$(command -v python)" = /ucrt64/bin/python
+          test "$(command -v mingw32-make)" = /ucrt64/bin/mingw32-make
+          pacman -Q mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-libgomp mingw-w64-ucrt-x86_64-make mingw-w64-ucrt-x86_64-python
+          gcc -dumpmachine
+          gcc -print-prog-name=ld
+          gcc -print-search-dirs
+          for lib in libgomp.dll.a libgomp.a; do
+            path=$(gcc -print-file-name="$lib")
+            test "$path" != "$lib"
+            test -f "$path"
+            pacman -Qo "$path"
+          done
       - name: Compile and test on the target platform
         shell: msys2 {0}
-        run: make CC=gcc PYTHON=python test check-openmp
-      - name: Require a real two-thread OpenMP team
-        shell: msys2 {0}
-        env:
-          OMP_DYNAMIC: 'FALSE'
-          OMP_THREAD_LIMIT: '2'
-        run: |
-          output=$(./build/openmp_probe.exe)
-          echo "$output"
-          [[ "$output" == *"team=2 "* ]]
+        run: mingw32-make CC=gcc PYTHON=python build test check-openmp
 
   report:
     name: report-xelatex
@@ -77,3 +78,13 @@ jobs:
           sudo apt-get install -y --no-install-recommends texlive-xetex texlive-latex-extra texlive-fonts-recommended
       - name: Compile the real report
         run: make report
+      - name: Preserve report for PDF inspection
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: bootstrap-report-${{ github.sha }}
+          path: |
+            report/main.pdf
+            report/main.log
+            report/main.bbl
+            report/main.toc
+          if-no-files-found: error

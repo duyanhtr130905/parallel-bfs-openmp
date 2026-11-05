@@ -14,12 +14,20 @@ typedef struct {
     BFSSchedule schedule;
 } BFSConfig;
 
-/* All versions use the same signature. Caller owns distance[n]. */
+typedef struct {
+    int threads_actual; /* 0 on failure; measured team size on success. */
+} BFSMetrics;
+
+/* API v1 bootstrap revision (ADR-0002). Non-NULL caller-owned metrics.
+ * Reset threads_actual to 0 before validation; publish only on BFS_OK.
+ * Serial reports 1. Parallel measures inside each BFS work region; changing
+ * team sizes across regions is BFS_ERR_RUNTIME, never a guessed maximum.
+ * Caller owns distance[n] and separate non-aliasing metrics for every call. */
 BFSStatus bfs_serial(const CSRGraph *graph, uint32_t source,
-                     int32_t *distance, const BFSConfig *config);
+                     int32_t *distance, const BFSConfig *config, BFSMetrics *metrics);
 BFSStatus bfs_parallel_basic(const CSRGraph *graph, uint32_t source,
-                             int32_t *distance, const BFSConfig *config);
+                             int32_t *distance, const BFSConfig *config, BFSMetrics *metrics);
 BFSStatus bfs_parallel_optimized(const CSRGraph *graph, uint32_t source,
-                                 int32_t *distance, const BFSConfig *config);
+                                 int32_t *distance, const BFSConfig *config, BFSMetrics *metrics);
 
 #endif
