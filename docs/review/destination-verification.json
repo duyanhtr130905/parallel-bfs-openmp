@@ -1,0 +1,75 @@
+{
+  "source_untouched": true,
+  "new_files": [
+    ".github/pull_request_template.md",
+    ".github/workflows/ci.yml",
+    "docs/github/main-ruleset.json",
+    "docs/GITHUB_SETUP.md",
+    "docs/review/github-readback.json",
+    "docs/review/migration-manifest.json",
+    "docs/review/verification.json",
+    "docs/REVIEW_20261105.md"
+  ],
+  "updated_files": [
+    "README.md",
+    "AGENTS.md",
+    "docs/CONTRIBUTING.md",
+    "docs/PROJECT_STATUS.md",
+    "docs/ENVIRONMENT.md",
+    ".techlead/project.yaml"
+  ],
+  "remote": "origin\thttps://github.com/duyanhtr130905/parallel-bfs-openmp.git (fetch)\norigin\thttps://github.com/duyanhtr130905/parallel-bfs-openmp.git (push)\n",
+  "git_status": "# branch.oid (initial)\n# branch.head chore/bootstrap-contracts\n? .github/pull_request_template.md\n? .github/workflows/ci.yml\n? .gitignore\n? .techlead/project.yaml\n? AGENTS.md\n? Makefile\n? README.md\n? datasets/README.md\n? datasets/small/disconnected.edgelist\n? datasets/small/disconnected.expected.txt\n? docs/ARCHITECTURE.md\n? docs/BOOTSTRAP_PR.md\n? docs/CONTRACT.md\n? docs/CONTRIBUTING.md\n? docs/DELIVERY_PLAN.md\n? docs/ENVIRONMENT.md\n? docs/EXPERIMENT_PROTOCOL.md\n? docs/FILES.md\n? docs/GITHUB_SETUP.md\n? docs/PROJECT_CHARTER.md\n? docs/PROJECT_STATUS.md\n? docs/REFERENCES_AUDIT.md\n? docs/REQUIREMENTS.md\n? docs/REVIEW_20261105.md\n? docs/RISK_REGISTER.md\n? docs/TEST_PLAN.md\n? docs/adr/ADR-0001-technology-stack.md\n? docs/github/main-ruleset.json\n? docs/review/github-readback.json\n? docs/review/migration-manifest.json\n? docs/review/verification.json\n? include/bfs.h\n? include/graph.h\n? include/status.h\n? report/chapters/chapter1.tex\n? report/chapters/chapter2.tex\n? report/chapters/chapter3.tex\n? report/chapters/chapter4.tex\n? report/chapters/chapter5.tex\n? report/chapters/chapter6.tex\n? report/figures/.gitkeep\n? report/main.tex\n? report/references.bib\n? results/figures/.gitkeep\n? results/raw/.gitkeep\n? scripts/check_scaffold.py\n? scripts/clean.py\n? src/main.c\n? tests/openmp_probe.c\n? tests/test_cli.py\n",
+  "checks": [
+    {
+      "command": [
+        "C:\\tools\\ghc-9.8.2\\mingw\\bin\\clang.exe",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-Werror",
+        "-Iinclude",
+        "src/main.c",
+        "-o",
+        "C:\\Users\\PC\\OneDrive\\Documents\\ChatGPT\\Tính toán song song\\output\\review-20261105\\destination-cli.exe"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python",
+        "tests/test_cli.py",
+        "--binary",
+        "C:\\Users\\PC\\OneDrive\\Documents\\ChatGPT\\Tính toán song song\\output\\review-20261105\\destination-cli.exe"
+      ],
+      "exit": 0,
+      "stdout": "PASS: 31 CLI cases; BFS correctness/performance NOT TESTED\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python",
+        "scripts/check_scaffold.py"
+      ],
+      "exit": 0,
+      "stdout": "PASS: scaffold dependencies and hand-specified fixture checked; C/BFS/LaTeX NOT executed\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "fsck",
+        "--full"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": "notice: No default references\n"
+    }
+  ],
+  "committed": false,
+  "pushed": false
+}
