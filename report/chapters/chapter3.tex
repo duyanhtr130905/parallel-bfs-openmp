@@ -1,0 +1,15 @@
+\chapter{Thiết kế và triển khai thuật toán BFS song song}
+\section{Hợp đồng dữ liệu và API}
+Đồ thị CSR là dữ liệu bất biến dùng chung. Số đỉnh được truyền tường minh để
+giữ đỉnh cô lập. Distance có kiểu int32, nguồn bằng 0 và unreachable bằng $-1$.
+Số cạnh báo cáo là số cung thực lưu trong CSR; cạnh vô hướng không phải self-loop
+được lưu ở cả hai chiều. Hợp đồng chi tiết nằm trong docs/CONTRACT.md của mã nguồn.
+\section{BFS tuần tự}
+[CHƯA TRIỂN KHAI: thành viên phụ trách bổ sung thuật toán, giả mã và kiểm thử.]
+\section{OpenMP cơ bản và tối ưu}
+[CHƯA TRIỂN KHAI: mô tả claim visited, frontier, barrier giữa các mức;
+giải thích an toàn bộ nhớ và lựa chọn static/dynamic/guided sau khi có code.]
+\section{Nguồn tham khảo và giới hạn sử dụng}
+Repository ParallelBFS được dùng làm nguồn khảo sát~\cite{parallelbfs}.
+Bootstrap chưa audit thuật toán tại một commit cụ thể và không sao chép code
+hoặc sử dụng số liệu README làm kết quả nhóm.

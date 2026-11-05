@@ -1,0 +1,27 @@
+\documentclass[14pt,a4paper,oneside]{extreport}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\usepackage[left=30mm,right=20mm,top=25mm,bottom=25mm,headheight=18pt]{geometry}
+\usepackage{setspace}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx,booktabs,array}
+\usepackage{titlesec}
+\titleformat{\chapter}[block]{\bfseries\centering\fontsize{18}{22}\selectfont}{Chương \thechapter.}{1em}{}
+\titlespacing*{\chapter}{0pt}{0pt}{1em}
+\titleformat{\section}{\bfseries\fontsize{16}{20}\selectfont}{\thesection}{1em}{}
+\titleformat{\subsection}{\bfseries\fontsize{15}{18}\selectfont}{\thesubsection}{1em}{}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small BFS song song với OpenMP}
+\fancyfoot[C]{\thepage}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\thepage}\renewcommand{\headrulewidth}{0pt}}
+\usepackage[unicode,hidelinks]{hyperref}
+\onehalfspacing
+\renewcommand{\contentsname}{Mục lục}
+\renewcommand{\listfigurename}{Danh mục hình}
+\renewcommand{\listtablename}{Danh mục bảng}
+\renewcommand{\bibname}{Tài liệu tham khảo}
+\renewcommand{\chaptername}{Chương}
+\renewcommand{\figurename}{Hình}
+\renewcommand{\tablename}{Bảng}

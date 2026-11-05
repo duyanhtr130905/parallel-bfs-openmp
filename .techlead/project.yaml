@@ -1,0 +1,18 @@
+name: parallel-bfs-openmp
+scale: small
+mode: existing-project-delivery
+milestone: bootstrap-review-request-changes
+language: C11
+parallelism: OpenMP CPU
+platform: Windows MSYS2 UCRT64 GCC
+report: Vietnamese LaTeX
+contract: docs/CONTRACT.md
+status: docs/PROJECT_STATUS.md
+implementation_authorized: scaffold-only
+external_writes_authorized: existing-draft-pr-normal-push-and-update-only
+canonical_repository: https://github.com/duyanhtr130905/parallel-bfs-openmp
+canonical_worktree: D:/Code/parallel-bfs-openmp
+review: docs/REVIEW_20261105.md
+github_setup: docs/GITHUB_SETUP.md
+github_ruleset_id: 26620761
+source_published: true

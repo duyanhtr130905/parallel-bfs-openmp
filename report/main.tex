@@ -1,0 +1,38 @@
+\input{preamble}
+\begin{document}
+\input{bia}
+\pagenumbering{roman}
+\chapter*{Tóm tắt}
+\addcontentsline{toc}{chapter}{Tóm tắt}
+Đề tài hướng tới xây dựng và đánh giá thuật toán tìm kiếm theo chiều rộng trên
+CPU đa nhân bằng C11 và OpenMP. Bản hiện tại chỉ xác lập hợp đồng dữ liệu CSR,
+giao diện thuật toán, quy trình kiểm thử và phương pháp đo thời gian.
+Chưa triển khai BFS và chưa thu thập số liệu. Phần kết quả và kết luận về hiệu
+năng sẽ được viết sau khi có thực nghiệm tái lập và kiểm chứng tính đúng đắn.
+\begingroup
+\small
+\singlespacing
+\tableofcontents
+\endgroup
+\clearpage
+\listoffigures
+\clearpage
+\listoftables
+\clearpage
+\pagenumbering{arabic}
+\include{chapters/chapter1}
+\include{chapters/chapter2}
+\include{chapters/chapter3}
+\include{chapters/chapter4}
+\include{chapters/chapter5}
+\include{chapters/chapter6}
+\nocite{trobec2018,parallelbfs,svdtemplate}
+\bibliographystyle{plain}
+\phantomsection
+\addcontentsline{toc}{chapter}{Tài liệu tham khảo}
+\begingroup
+\small
+\raggedright
+\bibliography{references}
+\endgroup
+\end{document}
