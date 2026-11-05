@@ -18,3 +18,8 @@ Tách preamble/bia/main theo mẫu, sáu chương tiếng Việt. Không thêm c
 Trường/khoa/giảng viên/ba sinh viên/MSSV/địa điểm/thời gian giữ placeholder.
 `make report` chạy XeLaTeX, BibTeX, hai lượt XeLaTeX. PDF/log/bbl/toc lưu artifact
 CI để mở kiểm tra; compile không tự chứng minh layout đã xem.
+
+Mục lục dùng cỡ small (12pt) và single spacing để tránh trang thừa chỉ có vài
+dòng trong khung; body vẫn 14pt/1.5. Bibliography small/raggedright để URL đọc
+được và tránh khoảng trắng giãn quá mức. Đã mở PDF CI đầu: bìa đủ ba sinh viên,
+các chương và citation có mặt; bản chỉnh mục lục phải được CI/render lại.

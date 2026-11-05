@@ -6,7 +6,8 @@
   Multiprocessors Using OpenMP. Chưa đọc toàn văn; không trích trang/câu chưa xem.
 - https://github.com/minhhhduc/svd/tree/main/LATEX_template và main.tex:
   đã xem danh sách file và trình tự bìa, tóm tắt, mục lục, danh mục hình/bảng,
-  sáu chương, bibliography. Chỉ tham khảo tổ chức; nội dung báo cáo mới do nhóm viết.
+  sáu chương, bibliography. Đã khảo sát thêm preamble.tex/bia.tex và áp dụng style thích hợp; xem REPORT_DESIGN.md.
+  Nội dung báo cáo mới do nhóm viết, không sao chép nội dung SVD.
 - https://github.com/chibinz/ParallelBFS : đã xem metadata và cây thư mục;
   chưa audit mã thuật toán. Không sao chép code hay số liệu README.
   Trước tham khảo implementation phải pin SHA, kiểm tra giấy phép, condition

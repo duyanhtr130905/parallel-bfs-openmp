@@ -44,3 +44,11 @@ Toàn bộ là file mới; không sửa file dự án có sẵn. Không gồm me
 - `src/main.c`
 - `tests/openmp_probe.c`
 - `tests/test_cli.py`
+
+## Bổ sung phiên sửa review PR #1
+
+- docs/REPORT_DESIGN.md
+- docs/adr/ADR-0002-caller-owned-bfs-metrics.md
+- docs/review/REVIEW_FIXES_20261105.md
+- report/preamble.tex, report/bia.tex
+- tests/api_contract.c, tests/test_openmp_probe.py, tests/test_clean.py
