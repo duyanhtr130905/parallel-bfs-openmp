@@ -22,7 +22,7 @@ check-scaffold:
 	$(PYTHON) scripts/check_scaffold.py
 check-api:
 	$(CC) $(CPPFLAGS) $(CFLAGS) -Werror -fsyntax-only tests/api_contract.c
-test: build check-scaffold check-api
+test: build check-scaffold check-api test-tools
 	$(PYTHON) tests/test_cli.py --binary $(BIN)
 	$(PYTHON) tests/test_clean.py
 test-bfs:
@@ -40,5 +40,9 @@ report:
 clean:
 	$(PYTHON) scripts/clean.py
 help:
-	@echo "build: bootstrap CLI; test: CLI checks only; test-bfs: unavailable"
+	@echo "build: bootstrap CLI; test: CLI + scaffold/API + test-tools; test-bfs: unavailable"
 	@echo "check-scaffold; check-openmp; report: XeLaTeX + BibTeX; clean: known outputs"
+
+.PHONY: test-tools
+test-tools:
+	$(PYTHON) -m unittest discover -s tests -p test_experiment_tools.py -v

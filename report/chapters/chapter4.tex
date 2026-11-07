@@ -1,14 +1,58 @@
 \chapter{Môi trường và phương pháp thực nghiệm}
-\section{Môi trường}
-[BỔ SUNG: CPU, RAM, Windows build, GCC, OpenMP, flags, power mode và affinity
-của máy chạy thực nghiệm; dùng nhật ký môi trường thực tế.]
-\section{Dữ liệu và kiểm chứng}
-[BỔ SUNG: provenance, giấy phép, SHA-256, số đỉnh, số dòng cạnh, số cung CSR,
-source và oracle; so toàn bộ distance trước khi nhận mẫu benchmark.]
-\section{Phương pháp đo}
-Đo wall-clock quanh một lời gọi BFS bằng omp\_get\_wtime trên cùng thread.
-Không tính đọc file, dựng CSR, cấp phát output, kiểm chứng hoặc ghi kết quả;
-có tính khởi tạo distance và bộ nhớ tạm bên trong BFS.
-Dự kiến một lần warm-up và ít nhất mười mẫu cho mỗi cấu hình, lưu toàn bộ mẫu.
-Đối chiếu cùng dữ liệu và source, ghi số luồng yêu cầu và thực tế.
-Quy trình chuẩn được quản lý tại docs/EXPERIMENT\_PROTOCOL.md.
+\section{Thiết kế và điều kiện bắt đầu}
+Thực nghiệm dự kiến so sánh Serial BFS, OpenMP Basic và OpenMP Optimized trên cùng đồ thị CSR, cùng nguồn và cùng quy tắc biểu diễn cạnh. Biến độc lập là phiên bản thuật toán, số luồng yêu cầu, chính sách lập lịch và cấu trúc/kích thước đồ thị. Đại lượng quan sát là tính đúng đắn, thời gian wall-clock, speedup, efficiency và độ biến thiên. Mỗi tổ hợp đồ thị, nguồn, thuật toán, số luồng và schedule là một cấu hình đo riêng; không gộp các nguồn thành các lần lặp của cùng một cấu hình.
+
+Chỉ đo sau khi loader, serial và hai bản OpenMP đã merge, được review và vượt kiểm thử tính đúng đắn trên chính commit dùng để đo. CLI hiện tại chưa gọi BFS nên không được dùng để thu thời gian. Quy trình chi tiết và hợp đồng được quản lý tại \texttt{docs/EXPERIMENT\_PROTOCOL.md} và \texttt{docs/CONTRACT.md}. Chương này mô tả phương pháp dự kiến, chưa xác nhận thực nghiệm đã diễn ra.
+
+\section{Môi trường và thông tin cần ghi nhận}
+CPU, RAM, hệ điều hành và compiler của máy đo \textbf{chưa xác minh}. Bảng~\ref{tab:environment-plan} chỉ ghi những trường phải thu thập; không suy cấu hình từ tên máy hoặc máy chạy CI.
+\begin{table}[htbp]
+\centering\small
+\caption{Thông tin môi trường cần xác minh trước đo (chưa có giá trị).}
+\label{tab:environment-plan}
+\begin{tabular}{p{0.30\textwidth}p{0.58\textwidth}}
+\toprule
+Nhóm thông tin & Nội dung cần ghi \\
+\midrule
+Phần cứng & Model CPU; lõi vật lý/luồng logic; RAM \\
+Phần mềm & Windows build; GCC và runtime; giá trị \texttt{\_OPENMP}; cờ biên dịch/liên kết \\
+Điều kiện chạy & Nguồn điện; power mode; tải nền; affinity hoặc unset \\
+Mã và cấu hình & Commit SHA, dirty state; lệnh; số luồng yêu cầu/thực tế; schedule \\
+\bottomrule
+\end{tabular}
+\end{table}
+Dự kiến thử $1,2,4,\ldots$ trong giới hạn số luồng logic đã xác minh, bổ sung mốc số lõi vật lý nếu khác. Không dùng quá số luồng logic cho phép so sánh chính. Tắt dynamic team bằng \texttt{OMP\_DYNAMIC=FALSE}; ghi giá trị thực của \texttt{OMP\_PROC\_BIND} và \texttt{OMP\_PLACES}, kể cả khi chưa đặt. Không giả định runtime hỗ trợ mọi chính sách affinity. Số luồng thực tế lấy từ \texttt{BFSMetrics} đo bên trong vùng xử lý BFS, không suy từ số luồng yêu cầu.
+
+\section{Lựa chọn đồ thị và nguồn}
+Tập tối thiểu gồm path, star và grid hai chiều, với vài kích thước tăng dần phù hợp bộ nhớ máy. Path tạo nhiều tầng hẹp, thích hợp khảo sát giới hạn song song theo tầng. Star có bậc rất không đều; nguồn ở tâm và ở lá tạo các mức công việc khác nhau, giúp kiểm tra ảnh hưởng của vị trí nguồn. Grid có cấu trúc đều hơn và frontier thay đổi dần theo tầng, cung cấp đối chứng cho hai trường hợp trên. Đồ thị ngẫu nhiên với seed cố định có thể bổ sung để khảo sát phân bố bậc khác; chỉ thêm dữ liệu công khai khi đã kiểm tra giấy phép, nguồn tải và dung lượng. Đây là lựa chọn thiết kế, chưa có dataset đã được chốt.
+
+Đồ thị nhỏ dùng kiểm chứng bằng tay; đồ thị lớn hơn dùng đánh giá thời gian. Dữ liệu tự sinh phục vụ thực nghiệm phải ghi rõ tự sinh, thuật toán sinh và tham số; thời gian thu được vẫn phải do chương trình thực chạy. Không sử dụng dữ liệu thời gian giả. Kích thước cụ thể được chốt sau kiểm tra tài nguyên, trước khi xem kết quả so sánh. Danh sách nguồn được cố định trước đo: ít nhất một nguồn cho mỗi đồ thị và nguồn bổ sung có chủ đích để kiểm tra độ nhạy; không chỉ chọn nguồn đem lại speedup tốt.
+
+Mỗi dataset cần URL hoặc lệnh sinh, giấy phép nếu có, SHA-256, seed, số đỉnh, số dòng cạnh đầu vào và số cung CSR, hướng cạnh, nguồn và số đỉnh tới được. Số đỉnh phải tường minh để giữ isolates. Với vô hướng, cạnh không phải self-loop được lưu hai chiều; self-loop lưu một cung, cạnh trùng được giữ. Vì vậy số dòng đầu vào không được dùng thay số cung CSR khi so sánh khối lượng công việc.
+
+\section{Kiểm chứng tính đúng đắn}
+Serial trước hết phải khớp khoảng cách tính tay trên đồ thị nhỏ; không mặc định serial là oracle đúng. Bộ trường hợp gồm một đỉnh, không cạnh, path, star, diamond, chu trình, đồ thị rời rạc/đỉnh cô lập, self-loop và cạnh trùng, cả có hướng/vô hướng và nhiều nguồn. Sau đó so mọi phần tử distance của từng bản OpenMP với serial đã xác minh, gồm nguồn bằng 0 và unreachable bằng $-1$. Số đỉnh tới được bằng nhau chưa đủ chứng minh mảng khoảng cách bằng nhau.
+
+Lặp kiểm thử qua số luồng và static/dynamic/guided để phát hiện lỗi không ổn định; đồng thời review atomic claim, công bố distance, barrier giữa tầng và dung lượng frontier. Test lặp thành công không chứng minh tuyệt đối không có race. Kiểm tra input lỗi, overflow, ownership và việc CSR không bị sửa là các kiểm thử riêng. Khi lỗi trạng thái, metrics không hợp lệ hoặc distance sai, giữ log và không nhận thời gian đó vào thống kê thành công. Validation được thực hiện ngoài khoảng đo, không làm thay đổi đầu ra trước khi đối chiếu.
+
+\section{Đo thời gian và tổ chức lần chạy}
+Dùng \texttt{omp\_get\_wtime()} ngay trước và sau một lời gọi BFS trên cùng luồng gọi. Hàm trả wall-clock theo giây; đặc tả không bảo đảm đồng hồ nhất quán giữa các luồng~\cite{openmpwtime}. Đặt $t_i=t_{\mathrm{end}}-t_{\mathrm{start}}$. Khoảng đo bao gồm khởi tạo distance, cấp phát/giải phóng scratch và đồng bộ nằm trong BFS; loại đọc file, dựng CSR, cấp phát output của caller, kiểm chứng và ghi kết quả. Không trừ overhead ước lượng khỏi mẫu đo.
+
+Mỗi cấu hình có một warm-up không đưa vào thống kê và ít nhất 10 mẫu đo. Đảo thứ tự cấu hình bằng seed cố định, lưu thứ tự thực tế để giảm sai lệch do nhiệt và tải nền. Dùng cùng chính sách warm-up cho mọi thuật toán; không gọi đây là phép đo cold-cache. Nếu mẫu quá ngắn so với độ phân giải đồng hồ hoặc overhead, ghi hạn chế và chọn thêm kích thước lớn hơn, không gán thời gian bằng một giá trị tùy ý.
+
+Mỗi mẫu thành công lưu JSONL schema v1; serial ghi schedule là \texttt{none}, số luồng thực tế là 1. Mẫu lỗi, stderr, warm-up và thứ tự chạy vẫn được lưu. Mỗi phiên dùng thư mục mới, không ghi đè raw. Manifest liên kết SHA mã, lệnh, metadata môi trường/dataset, trạng thái kiểm chứng, chỉ số lần lặp và SHA-256 các tệp. Chỉ sinh bảng/biểu đồ từ raw đã đối chiếu manifest, bằng lệnh có thể chạy lại.
+
+\section{Thống kê và chỉ số hiệu năng}
+Với mỗi cấu hình hợp lệ, báo số mẫu, median, min, max và khoảng tứ phân vị $IQR=Q_3-Q_1$. Quy ước tính phân vị dự kiến là nội suy tuyến tính tại chỉ số $(N-1)q$ trên dãy tăng dần (đánh số từ 0); script phân tích sau này phải giữ quy ước này. Không âm thầm bỏ outlier; lỗi hoặc lần chạy bị gián đoạn được ghi riêng cùng lý do. IQR mô tả độ phân tán, không được trình bày như khoảng tin cậy.
+
+Gọi $\widetilde T_s$ là median serial và $\widetilde T_{a,p}$ là median bản OpenMP $a$ có team thực tế ổn định $p$ trên cùng đồ thị, nguồn và build:
+\[
+S_{a,p}=\frac{\widetilde T_s}{\widetilde T_{a,p}},\qquad
+E_{a,p}=\frac{S_{a,p}}{p}.
+\]
+Efficiency có thể biểu diễn phần trăm bằng $100E_{a,p}$. Đây là tỉ số các median, không phải median các tỉ số ghép cặp. Nếu median bằng 0 hoặc team thay đổi, đánh dấu không so sánh hoặc tách nhóm đủ mẫu; không chia cho 0 hay lấy số luồng yêu cầu thay thế. Scaling so với OpenMP một luồng là $\widetilde T_{a,1}/\widetilde T_{a,p}$, một đại lượng riêng không thay speedup so serial.
+
+\section{Tính công bằng và giới hạn}
+Giữ cùng CSR semantics, dataset, nguồn, compiler, flags tối ưu và ranh giới timer. Khảo sát static/dynamic/guided trên cùng ma trận cấu hình; không chọn schedule tốt nhất sau đo mà bỏ các trường hợp chậm. Đo tuần tự từng cấu hình, hạn chế tải nền và giữ điều kiện nguồn điện ổn định. Nếu điều kiện thay đổi đáng kể, tách phiên và ghi nhận thay vì gộp vô điều kiện.
+
+Kết quả trên một máy và số ít cấu trúc không đại diện mọi CPU hoặc đồ thị. SMT, cache, băng thông bộ nhớ, nhiệt và tải nền có thể ảnh hưởng thời gian. Nhiều lần lặp trong một phiên không thay cho tái lập trên máy khác. Timer tổng không đủ tách định lượng thời gian barrier, contention hay cache miss; các giải thích này chỉ là giả thuyết phù hợp thiết kế nếu chưa có đo bổ sung. Tên bản tối ưu không bảo đảm tăng tốc; slowdown cũng là kết quả cần trình bày trung thực.
