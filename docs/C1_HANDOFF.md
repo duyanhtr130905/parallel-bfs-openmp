@@ -7,7 +7,7 @@
 - **Đã triển khai** `generate_graph.py` (path/star/grid), `benchmark.py` (runner/schema/raw/manifest), `analyze_results.py` (thống kê/speedup/efficiency), `plot_results.py` (tối đa bốn nhóm). Hướng dẫn tại EXPERIMENT_TOOLS.md. Không mở rộng công cụ thêm trong cleanup.
 - `make test` chạy CLI, scaffold/API và `test-tools`; plotting smoke test riêng dùng matplotlib trong venv. Các fixture synthetic chỉ dùng trong tests/temp, không phải số liệu báo cáo.
 - Review COMMENT độc lập tại `7b49886d14d3dba82bc23c764229e8bfd51bd680` chấp nhận gate hiện tại của C độc lập, yêu cầu cleanup bìa/help/handoff. Không phải GitHub approval cuối cho toàn vai trò C.
-- Cleanup: đổi nhãn bìa thành “Bản báo cáo trung gian”, giữ nguyên thông tin chưa xác minh; cập nhật help và tách lịch sử dưới đây. Giữ nội dung học thuật đã đạt.
+- Cleanup lịch sử 5c2853f đã cập nhật help và tách trạng thái. Yêu cầu hình thức tiếp theo bỏ toàn bộ nhãn trạng thái trên bìa; quy cách mới tại REPORT_DESIGN.md.
 - **Dừng triển khai C độc lập sau cleanup.** C2 vẫn BLOCKED: cần A (#3) CSR/serial/oracle/Chương 2 và B (#4) hai bản OpenMP/correctness/Chương 3 được review và merge. Không coi issue OPEN hay CI bootstrap là bằng chứng BFS. Chưa hoàn thành toàn #5.
 
 ## Bằng chứng và giới hạn hiện hành
@@ -17,7 +17,7 @@
 - Chưa có BFS correctness, CLI tích hợp hoặc benchmark thật. Runner kiểm metadata/schema và tham chiếu evidence/log, không chứng minh toàn mảng distance. Trước đo phải xác nhận gate A/B, máy/build và giữ log thật theo protocol.
 
 ## Thông tin cần từ người dùng/nhóm
-- Bìa: tên trường, khoa/bộ môn, giảng viên; họ tên và MSSV chính xác của ba thành viên, thứ tự trình bày; địa điểm và tháng/năm. Chưa điền khi chưa xác minh.
+- Bìa đã xác nhận: ĐHQG Hà Nội / Trường ĐH Khoa học Tự nhiên; Trần Duy Anh — 23001828, Lê Huy Anh Dũng — 23001846, Nguyễn Anh Đức — 23001865, đúng thứ tự; Hà Nội – 2026 và logo HUS người dùng cung cấp. Còn thiếu tên giảng viên, xác nhận mã học phần nếu muốn ghi; không tự thêm khoa/bộ môn.
 - Máy đo: model CPU, số lõi vật lý/luồng logic, RAM, OS/build, GCC và runtime OpenMP/version/flags, nguồn điện/power mode, affinity và tải nền; xác nhận máy dự kiến dùng và khả năng chạy đo sau bàn giao A/B.
 - Thời hạn: ngày/giờ nộp chính thức, múi giờ, ngày bảo vệ nếu có; yêu cầu định dạng/nơi nộp và giới hạn trang nếu học phần quy định.
 - Từ A/B: commit/PR merged, log correctness, tài liệu/hình/giả mã/nguồn thực đã đọc. Sau đó mới chốt ma trận path/star/grid vừa tài nguyên, kích thước/nguồn/threads/schedule trước đo thật.

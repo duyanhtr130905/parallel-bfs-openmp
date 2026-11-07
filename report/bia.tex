@@ -1,39 +1,38 @@
 \begin{titlepage}
 \thispagestyle{empty}
 \centering
-\setlength{\fboxsep}{12pt}
-\fbox{\begin{minipage}[t][0.89\textheight][t]{0.91\textwidth}
+\setlength{\fboxrule}{1.2pt}
+\setlength{\fboxsep}{15pt}
+\noindent\fbox{%
+\begin{minipage}[t][0.94\textheight][t]{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}
 \centering
-\vspace{0.4cm}
-{\large\bfseries [TÊN TRƯỜNG]\par}
-\medskip
-{\large [TÊN KHOA/BỘ MÔN]\par}
-\vspace{1.4cm}
-{\large\bfseries BÀI TẬP LỚN\par}
-{\large MÔN TÍNH TOÁN SONG SONG\par}
+\singlespacing
+\vspace{0.3cm}
+{\fontsize{13}{16}\selectfont\bfseries
+ĐẠI HỌC QUỐC GIA HÀ NỘI\par
+TRƯỜNG ĐẠI HỌC KHOA HỌC TỰ NHIÊN\par}
+\vspace{1.3cm}
+\includegraphics[height=5.1cm,keepaspectratio]{images/HUS.png}\par
+\vspace{1.1cm}
+{\fontsize{18}{23}\selectfont\bfseries
+Triển khai, tối ưu và đánh giá hiệu năng\par
+BFS song song với OpenMP\par}
+\vspace{1.3cm}
+{\fontsize{14}{18}\selectfont\bfseries
+Học phần: Tính toán song song\par}
+\vspace{0.3cm}
+{\fontsize{13}{17}\selectfont\bfseries
+Giảng viên hướng dẫn: [TÊN GIẢNG VIÊN]\par}
 \vspace{1cm}
-{\fontsize{20}{25}\selectfont\bfseries
-Triển khai, tối ưu và đánh giá hiệu năng BFS song song với OpenMP\par}
-\vspace{0.6cm}
-{\small Parallel Breadth-First Search Using OpenMP\par}
-\vspace{1cm}
-{\normalsize Giảng viên hướng dẫn:\par}
-{\normalsize [HỌ TÊN GIẢNG VIÊN]\par}
-\vspace{0.7cm}
-{\normalsize Nhóm sinh viên:\par}
-\medskip
-{\small
-\begin{tabular}{@{}ll@{}}
-\textbf{Họ và tên} & \textbf{Mã số sinh viên} \\
-{[THÀNH VIÊN 1]} & {[MSSV 1]} \\
-{[THÀNH VIÊN 2]} & {[MSSV 2]} \\
-{[THÀNH VIÊN 3]} & {[MSSV 3]}
+{\fontsize{14}{19}\selectfont
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{@{}l@{\hspace{1.2cm}}l@{}}
+Trần Duy Anh & 23001828 \\
+Lê Huy Anh Dũng & 23001846 \\
+Nguyễn Anh Đức & 23001865
 \end{tabular}\par}
 \vfill
-{\small\bfseries Bản báo cáo trung gian\par}
-{\small Chưa có kết quả thực nghiệm\par}
-\medskip
-{\normalsize [ĐỊA ĐIỂM], [THÁNG/NĂM]\par}
-\vspace{0.4cm}
+{\fontsize{14}{18}\selectfont\bfseries Hà Nội -- 2026\par}
+\vspace{0.3cm}
 \end{minipage}}
 \end{titlepage}

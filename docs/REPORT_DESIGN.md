@@ -23,3 +23,10 @@ Mục lục dùng cỡ small (12pt) và single spacing để tránh trang thừa
 dòng trong khung; body vẫn 14pt/1.5. Bibliography small/raggedright để URL đọc
 được và tránh khoảng trắng giãn quá mức. Đã mở PDF CI đầu: bìa đủ ba sinh viên,
 các chương và citation có mặt; bản chỉnh mục lục phải được CI/render lại.
+
+## Chuẩn hóa hình thức bìa — 07/11/2026
+Đọc trực tiếp `LATEX_template/bia.tex`, `preamble.tex`, `main.tex` của mẫu SVD theo yêu cầu mới. Bìa BFS dùng hai dòng trường đã xác nhận cỡ 13pt đậm, logo HUS gốc từ người dùng (185×238 PNG có alpha), chiều cao 5.1cm giữ tỷ lệ, tên đề tài 18pt đậm hai dòng, học phần 14pt, giảng viên 13pt, bảng sinh viên 14pt theo đúng thứ tự đã xác nhận và Hà Nội – 2026. Không còn nhãn trạng thái nội bộ trên bìa. Chưa xác minh tên giảng viên và mã MAT3148 nên giữ [TÊN GIẢNG VIÊN], không ghi mã học phần hoặc khoa/bộ môn.
+
+Khung 1.2pt, padding 15pt như mẫu; dùng fbox/minipage đã có thay vì thêm fancybox, tính chiều rộng trừ khung/padding để giữ trong lề A4. Khoảng cách dọc điều chỉnh cho tiêu đề BFS và ba sinh viên thay vì hai của mẫu; không ép width/height logo đồng thời như mẫu (tránh méo tỷ lệ).
+
+Giữ Latin Modern Roman, họ serif LaTeX gần Computer Modern mặc định của mẫu; không đổi Times New Roman. Giữ extreport 14pt, A4 oneside, giãn 1.5, lề 30/20/25/25mm, headings 18/16/15pt; bổ sung spacing section/subsection đúng mẫu. XeLaTeX/BibTeX giữ nguyên. Mục lục small/single và header ngắn hiện có được giữ để đọc rõ, tránh tràn; không bê toàn bộ preamble hay Biber/T5 của mẫu. Không sửa nội dung khoa học sáu chương. Kiểm chứng PDF/CI cuối được ghi tại PR #7.
