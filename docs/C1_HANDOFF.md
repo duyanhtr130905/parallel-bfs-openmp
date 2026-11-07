@@ -27,3 +27,16 @@ Không tìm thấy PDF trong workspace khi tìm đệ quy. Không giả định 
 Local: `python scripts/check_scaffold.py` PASS; `git diff --check` PASS; kiểm tra khóa citation và số ngoặc LaTeX PASS (chỉ static). Không có XeLaTeX/BibTeX/Make trên PATH; biên dịch local BLOCKED, dùng job report-xelatex của PR. PDF visual QA chờ artifact CI. Không có benchmark/BFS correctness test nào được chạy trong C1 tài liệu.
 
 CI commit 8071bd0: cả ba job PASS, run https://github.com/duyanhtr130905/parallel-bfs-openmp/actions/runs/42346860168 (PR merge ref c22e143). PDF 20 trang đã render và xem toàn bộ; phát hiện một dòng tràn ở Chương 5, sửa câu và rút mục ghi nhận Chương 6 thành paragraph để tránh trang thưa. Bản sửa cần CI/PDF mới; kết quả cuối ghi trong PR.
+
+## Tiếp tục vai trò C — bản trung gian ngày 07/11/2026
+Quyết định mới: dùng duy nhất PR #7 và nhánh docs/c1-academic-report cho toàn vai trò C; không yêu cầu approval cuối trước khi đủ việc. Đã đọc review COMMENT tại 6c09a55 (C1 interim accepted, chưa final), issue #5 và xác minh live #3/#4 OPEN, canonical chỉ có PR #1/#6 merged, #7 draft. origin/main vẫn 7a1b855, không có thay đổi để merge. Giữ snapshot cũ.
+
+Đã thêm generator path/star/grid deterministic, runner/schema validator, analysis median/Q1/Q3/IQR/speedup/efficiency và plotting tối đa 4 nhóm; hướng dẫn và gate tại EXPERIMENT_TOOLS.md. Test synthetic chỉ ở tests và thư mục temp; không benchmark scaffold. Makefile nối test-tools vào make test, CI hiện hữu chạy trên Linux/Windows. Không đổi API/CLI/A/B.
+
+Đã tự review C1, làm rõ so Basic/Optimized, phân biệt đóng góp dự kiến/thực tế, sửa abstract, thêm label bảng và khung giả thuyết/caption; không viết lại toàn bộ. Đã nghiên cứu đủ main/preamble/abstract/sáu chương SVD, ghi ở SVD_PRESENTATION_NOTES.md. Chưa sao chép hình/số liệu/chuyên môn/CPU.
+
+Local unit tests stdlib PASS (4 nhóm, nhiều subcases); lần đầu lỗi quyền temp của môi trường, đặt TEMP/TMP vào build và chạy lại PASS. Scaffold/API static PASS; diff check PASS. Plot smoke test riêng dùng matplotlib trong venv build, không cài hệ thống; kết quả cuối và CI/PDF ở PR body. Không coi các test này là BFS correctness.
+
+BLOCKED: CLI tích hợp, benchmark thật, bảng môi trường/dataset cuối, Chương 5/6 kết quả và abstract cuối phụ thuộc #3/#4 merge + correctness trên commit đo. Bìa thiếu thông tin trường/khoa/giảng viên/MSSV/quy định nộp đã xác minh. Chưa hoàn thành toàn vai trò C, không đóng #5 hoặc Ready for Review. Bước tiếp theo khi đủ dependency: fetch/merge main an toàn vào đúng nhánh này, kiểm A/B, nối CLI, test thật rồi đo theo hướng dẫn; không chờ vô hạn trong phiên.
+
+Plot smoke test PASS: 1 test sinh 4 PDF synthetic trong temp bằng matplotlib 3.11.2 (venv build/plot-venv), không lưu vào results hoặc báo cáo. Không yêu cầu/cấp human approval trong phiên tiếp tục.

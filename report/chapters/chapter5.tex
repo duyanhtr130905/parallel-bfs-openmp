@@ -8,6 +8,7 @@ Bảng dự kiến có các cột: nhóm oracle, hướng cạnh, nguồn, phiê
 \begin{table}[htbp]
 \centering\small
 \caption{Cấu trúc bảng thời gian dự kiến; chưa có số liệu.}
+\label{tab:results-schema}
 \begin{tabular}{p{0.31\textwidth}p{0.57\textwidth}}
 \toprule
 Nhóm cột & Nội dung sẽ điền từ raw \\
@@ -28,3 +29,8 @@ Dự kiến tối đa bốn nhóm biểu đồ: (1) median thời gian theo số
 Phân tích path, star và grid theo cùng câu hỏi: frontier tạo đủ việc cho các luồng hay không, tăng kích thước có thay đổi quan hệ giữa chi phí xử lý và đồng bộ hay không, đổi nguồn ảnh hưởng thế nào. Đối chiếu basic với optimized tại cùng team/schedule để đánh giá lợi ích và chi phí phụ. Nếu chỉ có timer tổng, không khẳng định đã đo riêng overhead barrier hoặc khởi tạo luồng.
 \section{Trả lời câu hỏi nghiên cứu và giới hạn}
 Với mỗi câu hỏi Chương 1, dẫn bảng/hình và phạm vi cấu hình hỗ trợ nhận định; trình bày cả trường hợp chậm hơn serial. Tách quan sát định lượng khỏi giải thích giả thuyết. Chưa có số liệu nên chưa trả lời câu hỏi tăng tốc. Cuối chương nêu mẫu lỗi, độ biến thiên, ảnh hưởng chọn nguồn và giới hạn suy rộng từ một máy.
+
+\section{Khung đối chiếu giả thuyết với bằng chứng}
+Câu hỏi correctness cần bảng oracle và đối chiếu distance, tách khỏi Bảng~\ref{tab:results-schema}. Câu hỏi khả năng mở rộng cần đối chiếu path (frontier hẹp), star (bậc lệch) và grid (frontier phát triển theo tầng), giữ nguyên nguồn trong mỗi đường biểu diễn. Câu hỏi tối ưu và scheduling cần so Basic/Optimized tại cùng số luồng thực tế và cùng schedule, sau đó đổi schedule trong từng phiên bản. Chênh lệch nhỏ hơn mức biến thiên phải được diễn giải thận trọng.
+
+Các caption dự kiến sử dụng dạng: ``Median thời gian BFS (giây) theo số luồng thực tế trên [dataset, nguồn]; dải biểu diễn $Q_1$--$Q_3$, [số mẫu] lần đo. Nguồn: raw/manifest [mã phiên].'' Hai caption còn lại lần lượt thay đại lượng bằng speedup so serial và efficiency, nêu rõ không phải khoảng tin cậy. Khi có dữ liệu, các hình sẽ mang label thống nhất \texttt{fig:runtime}, \texttt{fig:speedup}, \texttt{fig:efficiency}, \texttt{fig:scheduling}; chưa tạo môi trường figure rỗng để tránh hình giả trong danh mục.

@@ -4,11 +4,9 @@
 \pagenumbering{roman}
 \chapter*{Tóm tắt}
 \addcontentsline{toc}{chapter}{Tóm tắt}
-Đề tài hướng tới xây dựng và đánh giá thuật toán tìm kiếm theo chiều rộng trên
-CPU đa nhân bằng C11 và OpenMP. Bản hiện tại chỉ xác lập hợp đồng dữ liệu CSR,
-giao diện thuật toán, quy trình kiểm thử và phương pháp đo thời gian.
-Chưa triển khai BFS và chưa thu thập số liệu. Phần kết quả và kết luận về hiệu
-năng sẽ được viết sau khi có thực nghiệm tái lập và kiểm chứng tính đúng đắn.
+Báo cáo nghiên cứu BFS trên CPU đa nhân với ba phiên bản dự kiến: tuần tự, OpenMP cơ bản và OpenMP tối ưu. Trọng tâm là bảo toàn khoảng cách ngắn nhất, khảo sát khả năng mở rộng theo cấu trúc đồ thị và đánh giá tác động của tổ chức frontier cùng chính sách lập lịch. Phương pháp so sánh dùng cùng CSR và nguồn, đo wall-clock quanh lời gọi BFS, báo median, khoảng tứ phân vị, speedup và efficiency theo số luồng thực tế.
+
+Bản trung gian hiện đã xây dựng phần mở đầu, phương pháp thực nghiệm và bộ công cụ Python phục vụ sinh dữ liệu, lưu phép đo và phân tích. Mã BFS của A/B chưa được tích hợp trên main; chưa có kết quả thực nghiệm. Do đó, các chương kết quả và kết luận hiện chỉ trình bày cấu trúc phân tích, chưa khẳng định lợi ích hiệu năng.
 \begingroup
 \small
 \singlespacing
