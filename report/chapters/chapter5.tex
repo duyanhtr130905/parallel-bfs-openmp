@@ -1,9 +1,30 @@
 \chapter{Kết quả thực nghiệm và đánh giá}
-\textbf{Chưa có kết quả thực nghiệm.} Không có bảng hoặc biểu đồ số liệu trong bản khung.
-\section{Kết quả tính đúng đắn}
-[CHỜ: oracle tay, so distance với serial, nhiều source/threads/schedule, lỗi input.]
-\section{Thời gian, speedup và efficiency}
-[CHỜ: dữ liệu raw, manifest, script tái tạo, median và IQR của từng cấu hình.]
-\section{Thảo luận và giới hạn}
-[CHỜ: chi phí đồng bộ, mất cân bằng tải, kích thước frontier, băng thông bộ nhớ,
-sự biến thiên thời gian và giới hạn suy rộng từ một máy thử nghiệm.]
+\textbf{Trạng thái C1: chưa đo thực nghiệm.} Các bảng dưới đây là thiết kế nội dung cần báo cáo, không chứa kết quả đo. Chỉ điền khi có raw, manifest và kiểm chứng trên commit đo.
+\section{Dữ liệu và điều kiện thực chạy}
+Cần dẫn mã phiên, SHA commit, máy đo, lệnh tái tạo và bảng dataset cuối cùng. Nêu mọi khác biệt với kế hoạch Chương 4 và lý do; phân biệt dữ liệu tự sinh và dữ liệu công khai.
+\section{Kết quả kiểm chứng}
+Bảng dự kiến có các cột: nhóm oracle, hướng cạnh, nguồn, phiên bản, threads/schedule, số lần kiểm, kết quả và liên kết log. Đánh giá riêng serial so oracle tay và parallel so toàn bộ distance. Chưa có log nên chưa đánh dấu PASS. Nêu lỗi phát hiện, cách sửa và commit kiểm lại nếu có; không suy correctness từ thời gian chạy.
+\section{Thời gian và khả năng mở rộng}
+\begin{table}[htbp]
+\centering\small
+\caption{Cấu trúc bảng thời gian dự kiến; chưa có số liệu.}
+\begin{tabular}{p{0.31\textwidth}p{0.57\textwidth}}
+\toprule
+Nhóm cột & Nội dung sẽ điền từ raw \\
+\midrule
+Đầu vào & Dataset, $n$, số cung CSR, nguồn, reachable \\
+Cấu hình & Thuật toán, schedule, threads yêu cầu/thực tế \\
+Thời gian (giây) & Số mẫu hợp lệ, median, min, max, $Q_1$, $Q_3$, IQR \\
+Hiệu năng & Speedup so serial, efficiency theo team thực tế \\
+Truy xuất & Mã phiên, tệp raw, manifest và SHA \\
+\bottomrule
+\end{tabular}
+\end{table}
+Bảng chi tiết có thể tách theo dataset/nguồn để tránh quá rộng. Serial được trình bày một baseline chung cho mỗi đầu vào, không nhân bản thành các kết quả độc lập theo schedule.
+
+Dự kiến tối đa bốn nhóm biểu đồ: (1) median thời gian theo số luồng thực tế, có dải $Q_1$--$Q_3$; (2) speedup so serial, kèm đường lý tưởng $S=p$ làm mốc tham chiếu; (3) efficiency theo số luồng; (4) so sánh thời gian các schedule cho basic và optimized trên cấu hình cố định. Trục phải ghi đơn vị; chú thích ghi dataset, nguồn, số lần lặp và build. Không vẽ đường hoặc điểm giả trong C1. Dải IQR của thời gian không tự biến thành khoảng tin cậy của speedup.
+
+\section{Ảnh hưởng của cấu trúc, kích thước và lập lịch}
+Phân tích path, star và grid theo cùng câu hỏi: frontier tạo đủ việc cho các luồng hay không, tăng kích thước có thay đổi quan hệ giữa chi phí xử lý và đồng bộ hay không, đổi nguồn ảnh hưởng thế nào. Đối chiếu basic với optimized tại cùng team/schedule để đánh giá lợi ích và chi phí phụ. Nếu chỉ có timer tổng, không khẳng định đã đo riêng overhead barrier hoặc khởi tạo luồng.
+\section{Trả lời câu hỏi nghiên cứu và giới hạn}
+Với mỗi câu hỏi Chương 1, dẫn bảng/hình và phạm vi cấu hình hỗ trợ nhận định; trình bày cả trường hợp chậm hơn serial. Tách quan sát định lượng khỏi giải thích giả thuyết. Chưa có số liệu nên chưa trả lời câu hỏi tăng tốc. Cuối chương nêu mẫu lỗi, độ biến thiên, ảnh hưởng chọn nguồn và giới hạn suy rộng từ một máy.
