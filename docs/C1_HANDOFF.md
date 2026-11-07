@@ -25,3 +25,5 @@ Không tìm thấy PDF trong workspace khi tìm đệ quy. Không giả định 
 
 ## Kiểm chứng
 Local: `python scripts/check_scaffold.py` PASS; `git diff --check` PASS; kiểm tra khóa citation và số ngoặc LaTeX PASS (chỉ static). Không có XeLaTeX/BibTeX/Make trên PATH; biên dịch local BLOCKED, dùng job report-xelatex của PR. PDF visual QA chờ artifact CI. Không có benchmark/BFS correctness test nào được chạy trong C1 tài liệu.
+
+CI commit 8071bd0: cả ba job PASS, run https://github.com/duyanhtr130905/parallel-bfs-openmp/actions/runs/42346860168 (PR merge ref c22e143). PDF 20 trang đã render và xem toàn bộ; phát hiện một dòng tràn ở Chương 5, sửa câu và rút mục ghi nhận Chương 6 thành paragraph để tránh trang thưa. Bản sửa cần CI/PDF mới; kết quả cuối ghi trong PR.
