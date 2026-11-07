@@ -42,3 +42,10 @@ python scripts/check_scaffold.py
 build/analysis-venv/Scripts/python -m unittest discover -s tests -p test_plot_tools.py -v
 ```
 Nếu môi trường hạn chế quyền thư mục temp, đặt TEMP/TMP vào thư mục build đã tạo trong workspace cho phiên lệnh. Test không phải BFS correctness hay benchmark. Cần kiểm lại CLI/timer/actual-team và full-distance validation sau A/B trước khi dùng đo thật.
+
+## Đối chiếu với protocol và Chương 4 (cleanup 07/11/2026)
+Giữ cùng dataset/source/build cho ba thuật toán; `threads_requested` xác định cấu hình, `threads_actual` dùng tính efficiency. Runner thực hiện một warm-up và ít nhất 10 mẫu, analysis dùng nội suy (N-1)q, median serial làm baseline. Đây là phần đã hiện thực của phương pháp Chương 4; timer C `omp_get_wtime()` vẫn thuộc CLI C2 chưa tích hợp, runner không dùng thời gian subprocess thay timer BFS.
+
+Stdout gốc schema CONTRACT được giữ nguyên trong từng tệp `.stdout`; `raw.jsonl` nội bộ bọc mỗi result bằng `{index, result}` để đối chiếu manifest, không thay schema stdout của binary. Warm-up và lỗi ở manifest/stdout/stderr, không vào thống kê measured. Analysis hiện từ chối cả phiên có lỗi hoặc actual team không ổn định; protocol cho phép tách nhóm nhưng công cụ hiện tại chọn từ chối, không tự tách hay bỏ mẫu.
+
+Protocol là yêu cầu hồ sơ đo đầy đủ: người đo còn phải xác minh nguồn/giấy phép hoặc lệnh sinh, môi trường, người/role đo, nguồn dữ liệu và nơi sao lưu/retention. Không coi metadata tự khai hay schema PASS là correctness. Chưa có hồ sơ đo thật; các trường máy và số liệu trong báo cáo tiếp tục để chưa xác minh.

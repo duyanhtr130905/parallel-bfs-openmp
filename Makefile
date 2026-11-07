@@ -40,7 +40,7 @@ report:
 clean:
 	$(PYTHON) scripts/clean.py
 help:
-	@echo "build: bootstrap CLI; test: CLI checks only; test-bfs: unavailable"
+	@echo "build: bootstrap CLI; test: CLI + scaffold/API + test-tools; test-bfs: unavailable"
 	@echo "check-scaffold; check-openmp; report: XeLaTeX + BibTeX; clean: known outputs"
 
 .PHONY: test-tools
