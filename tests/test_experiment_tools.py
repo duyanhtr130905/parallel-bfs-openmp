@@ -87,20 +87,20 @@ class ToolsTests(unittest.TestCase):
                             schedule='none' if algo=='serial' else schedule)
                 return subprocess.CompletedProcess(cmd,0,json.dumps(r).encode(),b'')
             args=(binary,root/'data/dataset.json',root/'env.json',root/'evidence.json',root/'raw',[1,2])
-            with patch('benchmark.git',side_effect=lambda *a: 'test-sha' if a[0]=='rev-parse' else ''),patch('benchmark.subprocess.run',side_effect=fake):
+            with patch('benchmark.git',side_effect=lambda *a: 'test-sha' if a[0]=='rev-parse' else ''),patch('benchmark.execute_binary',side_effect=fake):
                 out,errors=run(*args)
             self.assertEqual(errors,0)
             summary=analyze(out);self.assertEqual(len(summary['rows']),13)
             self.assertTrue(all(r['samples']==10 for r in summary['rows']))
             with (out/'raw.jsonl').open('a') as f:f.write('{}\n')
             with self.assertRaises(ValueError):analyze(out)
-            with patch('benchmark.git',side_effect=lambda *a: 'test-sha' if a[0]=='rev-parse' else ''),patch('benchmark.subprocess.run',return_value=subprocess.CompletedProcess([],3,b'',b'not implemented')):
+            with patch('benchmark.git',side_effect=lambda *a: 'test-sha' if a[0]=='rev-parse' else ''),patch('benchmark.execute_binary',return_value=subprocess.CompletedProcess([],3,b'',b'not implemented')):
                 out,errors=run(*args)
             self.assertEqual(errors,143)
             self.assertTrue(all(not s['valid'] for s in json.loads((out/'manifest.json').read_text())['samples']))
             self.assertEqual((out/'raw.jsonl').read_text(),'')
             with self.assertRaises(ValueError):analyze(out)
-            with patch('benchmark.git',side_effect=lambda *a: 'test-sha' if a[0]=='rev-parse' else ''),patch('benchmark.subprocess.run',side_effect=subprocess.TimeoutExpired('test',.01,output=b'partial',stderr=b'timeout')):
+            with patch('benchmark.git',side_effect=lambda *a: 'test-sha' if a[0]=='rev-parse' else ''),patch('benchmark.execute_binary',side_effect=subprocess.TimeoutExpired('test',.01,output=b'partial',stderr=b'timeout')):
                 out,errors=run(*args)
             self.assertEqual(errors,143)
             self.assertEqual((out/'00000.stdout').read_bytes(),b'partial')

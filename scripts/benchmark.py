@@ -8,6 +8,7 @@ from pathlib import Path
 import platform
 import random
 import subprocess
+from subprocess import run as execute_binary
 import sys
 import uuid
 from generate_graph import sha256
@@ -129,7 +130,7 @@ def run(binary, dataset, environment, evidence, output, threads, repeats=10, see
                         omp_num_threads=p, valid=False)
             stdout, stderr = b"", b""
             try:
-                proc = subprocess.run(cmd, capture_output=True, timeout=timeout, env=env)
+                proc = execute_binary(cmd, capture_output=True, timeout=timeout, env=env)
                 stdout, stderr = proc.stdout, proc.stderr
                 item["exit"] = proc.returncode
                 if proc.returncode:

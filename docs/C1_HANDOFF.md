@@ -40,3 +40,5 @@ Local unit tests stdlib PASS (4 nhóm, nhiều subcases); lần đầu lỗi quy
 BLOCKED: CLI tích hợp, benchmark thật, bảng môi trường/dataset cuối, Chương 5/6 kết quả và abstract cuối phụ thuộc #3/#4 merge + correctness trên commit đo. Bìa thiếu thông tin trường/khoa/giảng viên/MSSV/quy định nộp đã xác minh. Chưa hoàn thành toàn vai trò C, không đóng #5 hoặc Ready for Review. Bước tiếp theo khi đủ dependency: fetch/merge main an toàn vào đúng nhánh này, kiểm A/B, nối CLI, test thật rồi đo theo hướng dẫn; không chờ vô hạn trong phiên.
 
 Plot smoke test PASS: 1 test sinh 4 PDF synthetic trong temp bằng matplotlib 3.11.2 (venv build/plot-venv), không lưu vào results hoặc báo cáo. Không yêu cầu/cấp human approval trong phiên tiếp tục.
+
+CI Linux tại 4ddb1cb phát hiện mock subprocess lan sang platform.platform() (Linux dùng subprocess đọc processor). Sửa bằng alias execute_binary riêng và patch đúng alias, không mock module subprocess toàn cục. Cần CI mới xác nhận; ghi kết quả cuối tại PR body.
