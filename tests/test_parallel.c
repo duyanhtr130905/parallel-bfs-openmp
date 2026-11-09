@@ -419,6 +419,14 @@ static void test_invalid_arguments(void)
                       BFS_ERR_ARGUMENT,
                   "%s: missing row_offsets was not rejected", name);
 
+        CSRGraph missing_columns = {4u, 1u, fixture.row_offsets, NULL};
+        metrics.threads_actual = 77;
+        CHECK_MSG(function(&missing_columns, 0u, distance, &good, &metrics) ==
+                      BFS_ERR_ARGUMENT,
+                  "%s: missing col_indices with edges was not rejected", name);
+        CHECK_MSG(metrics.threads_actual == 0,
+                  "%s: metrics not reset for missing col_indices", name);
+
         metrics.threads_actual = 77;
         CHECK_MSG(function(&fixture.graph, 0u, distance, &good, &metrics) == BFS_OK,
                   "%s: valid call failed", name);
