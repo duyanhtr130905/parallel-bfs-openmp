@@ -262,6 +262,13 @@ static void run_fixture(const char *name, const Fixture *fixture,
                                   name, implementations[impl].name,
                                   schedule_name((BFSSchedule)schedule),
                                   metrics.threads_actual);
+                        if (config.threads == 1) {
+                            CHECK_MSG(metrics.threads_actual == 1,
+                                      "%s/%s/%s: requested 1 thread but actual=%d",
+                                      name, implementations[impl].name,
+                                      schedule_name((BFSSchedule)schedule),
+                                      metrics.threads_actual);
+                        }
                         CHECK_MSG(metrics.threads_actual <= config.threads,
                                   "%s/%s/%s: actual %d > requested %d",
                                   name, implementations[impl].name,
@@ -560,6 +567,50 @@ static void test_cycle_and_duplicates(void)
     fixture_free(&duplicate_fixture);
 }
 
+static void test_contention(void)
+{
+    /* Wide bipartite layer: every one of `hubs` level-1 vertices points to all
+     * `targets` level-2 vertices, so each target is claimed `hubs` times in a
+     * single level.  This exercises the atomic visit claim under contention
+     * and a large next frontier. */
+    enum { hubs = 64, targets = 256 };
+    const uint32_t n = (uint32_t)(1 + hubs + targets);
+    const size_t edge_count = (size_t)hubs + (size_t)hubs * (size_t)targets;
+    Edge *edges = (Edge *)malloc(edge_count * sizeof(*edges));
+    CHECK_MSG(edges != NULL, "contention edges allocation failed");
+    if (edges == NULL) {
+        return;
+    }
+
+    size_t k = 0u;
+    for (uint32_t h = 0u; h < (uint32_t)hubs; ++h) {
+        edges[k].src = 0u;
+        edges[k].dst = 1u + h;
+        ++k;
+    }
+    for (uint32_t h = 0u; h < (uint32_t)hubs; ++h) {
+        for (uint32_t t = 0u; t < (uint32_t)targets; ++t) {
+            edges[k].src = 1u + h;
+            edges[k].dst = 1u + (uint32_t)hubs + t;
+            ++k;
+        }
+    }
+    CHECK_MSG(k == edge_count, "contention fixture produced %zu of %zu edges", k,
+              edge_count);
+
+    Fixture fixture;
+    CHECK_MSG(fixture_build(&fixture, n, edges, k, GRAPH_DIRECTED),
+              "contention fixture could not be built");
+    if (fixture.graph.row_offsets == NULL) {
+        free(edges);
+        return;
+    }
+    const uint32_t sources[] = {0u};
+    run_fixture("contention", &fixture, sources, 1u, 1);
+    fixture_free(&fixture);
+    free(edges);
+}
+
 static uint32_t next_random(uint32_t *state)
 {
     *state = *state * UINT32_C(1664525) + UINT32_C(1013904223);
@@ -623,6 +674,7 @@ int main(void)
     test_star();
     test_diamond();
     test_cycle_and_duplicates();
+    test_contention();
     test_random_graphs();
     test_invalid_arguments();
 
