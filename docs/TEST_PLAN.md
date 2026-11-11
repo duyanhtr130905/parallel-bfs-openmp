@@ -1,11 +1,36 @@
 # Kế hoạch kiểm thử
 
-Hiện có kiểm tra cấu trúc Python, CLI thực khi build được và OpenMP toolchain probe.
-Chưa có implementation/test correctness BFS. `make test-bfs` phải báo thiếu và lỗi.
+Các kiểm tra được chia theo module để không nhầm CLI scaffold với correctness
+của BFS. Role A đã nối test graph và serial vào `make test-bfs`; các module B/C
+sẽ mở rộng target này khi được tích hợp.
 
-Gate tiếp theo: A kiểm tra parser (n tường minh/isolated, format/range/overflow,
-ownership/free/error); serial đối chiếu oracle tay; B đối chiếu toàn bộ distance
-qua nhiều threads/schedule trên fixture và random graph seed cố định. Thêm test
-không thay đổi CSR, cấp phát thất bại nếu có injection, stress diamond/high-degree.
-Race cần review mô hình bộ nhớ; việc lặp test không thay cho review.
-Benchmark chỉ sau correctness và độc lập với thời gian validation.
+## Role A: CSR và BFS tuần tự
+
+`make test-bfs` phải build và chạy thật `build/test_graph` cùng
+`build/test_serial`. Bộ test của A dùng expected distances viết độc lập và
+kiểm tra:
+
+- CSR directed/undirected, self-loop, cạnh trùng, đỉnh cô lập và đồ thị rỗng;
+- edge-list LF/CRLF, comment toàn dòng, dòng cuối không newline, BOM, comment
+  cuối dòng, token sai, ID ngoài phạm vi và số vượt `UINT32_MAX`;
+- BFS n=1, no-edge, path, star, diamond, cycle, source khác 0, directed và
+  undirected;
+- `NULL`, enum/config sai, reset metrics khi lỗi, `threads_actual=1` khi thành
+  công, CSR bất biến và `graph_free` gọi lặp lại.
+
+## Role B: BFS OpenMP
+
+B phải đối chiếu toàn bộ mảng distance với serial đã xác minh trên fixture và
+random graph seed cố định, với nhiều threads và schedule static/dynamic/guided.
+Phạm vi gồm disconnected/isolated, duplicate/self-loop, high degree, frontier
+lớn, đồng bộ claim visited, barrier theo level và team size thực tế.
+
+## Role C: CLI và benchmark
+
+C kiểm tra tích hợp CLI, JSONL/schema/status/exit codes, timing boundary và
+parser dữ liệu lỗi. Benchmark chỉ chạy sau correctness trên cùng commit đo;
+không coi CLI scaffold hoặc probe OpenMP là bằng chứng BFS correctness.
+
+Race cần review mô hình bộ nhớ; việc lặp test không thay cho review. Benchmark
+phải độc lập với thời gian validation và có provenance theo
+`docs/EXPERIMENT_PROTOCOL.md`.

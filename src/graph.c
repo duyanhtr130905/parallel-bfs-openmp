@@ -144,10 +144,10 @@ static int line_space(int character)
     return character == ' ' || character == '\t';
 }
 
-static int parse_uint32_token(const char **input, uint32_t *value)
+static BFSStatus parse_uint32_token(const char **input, uint32_t *value)
 {
     // Parser Role A chỉ chấp nhận chữ số thập phân không dấu.
-    // Dấu cộng/trừ, token rỗng và số vượt uint32_t đều bị từ chối.
+    // Sai lexical là FORMAT; số hợp lệ về dạng nhưng vượt uint32_t là RANGE.
     const unsigned char *cursor = (const unsigned char *)*input;
     uintmax_t parsed = 0;
     size_t digits = 0;
@@ -155,21 +155,21 @@ static int parse_uint32_token(const char **input, uint32_t *value)
     while (*cursor >= '0' && *cursor <= '9') {
         uintmax_t digit = (uintmax_t)(*cursor - (unsigned char)'0');
         if (parsed > (UINT32_MAX - digit) / 10U) {
-            return 0;
+            return BFS_ERR_RANGE;
         }
         parsed = parsed * 10U + digit;
         ++cursor;
         ++digits;
     }
     if (digits == 0) {
-        return 0;
+        return BFS_ERR_FORMAT;
     }
     *value = (uint32_t)parsed;
     *input = (const char *)cursor;
-    return 1;
+    return BFS_OK;
 }
 
-static int parse_edge_line(const char *line, Edge *edge, int *is_comment)
+static BFSStatus parse_edge_line(const char *line, Edge *edge, int *is_comment)
 {
     // Mỗi dòng hợp lệ có đúng hai token: src dst.
     // Dòng trống và comment toàn dòng được bỏ qua; comment cuối dòng không hợp lệ.
@@ -181,28 +181,34 @@ static int parse_edge_line(const char *line, Edge *edge, int *is_comment)
     }
     if (*cursor == '\0') {
         *is_comment = 1;
-        return 1;
+        return BFS_OK;
     }
     if (*cursor == '#') {
         *is_comment = 1;
-        return 1;
+        return BFS_OK;
     }
-    if (!parse_uint32_token(&cursor, &edge->src)) {
-        return 0;
+    {
+        BFSStatus status = parse_uint32_token(&cursor, &edge->src);
+        if (status != BFS_OK) {
+            return status;
+        }
     }
     if (!line_space((unsigned char)*cursor)) {
-        return 0;
+        return BFS_ERR_FORMAT;
     }
     while (line_space((unsigned char)*cursor)) {
         ++cursor;
     }
-    if (!parse_uint32_token(&cursor, &edge->dst)) {
-        return 0;
+    {
+        BFSStatus status = parse_uint32_token(&cursor, &edge->dst);
+        if (status != BFS_OK) {
+            return status;
+        }
     }
     while (line_space((unsigned char)*cursor)) {
         ++cursor;
     }
-    return *cursor == '\0';
+    return *cursor == '\0' ? BFS_OK : BFS_ERR_FORMAT;
 }
 
 static BFSStatus read_line(FILE *file, char **line, size_t *capacity)
@@ -285,10 +291,11 @@ BFSStatus graph_read_edge_list(const char *path, uint32_t vertex_count,
             status = BFS_OK;
             break;
         }
-        if (status != BFS_OK || !parse_edge_line(line, &edge, &is_comment)) {
-            if (status == BFS_OK) {
-                status = BFS_ERR_FORMAT;
-            }
+        if (status != BFS_OK) {
+            break;
+        }
+        status = parse_edge_line(line, &edge, &is_comment);
+        if (status != BFS_OK) {
             break;
         }
         if (is_comment || line[0] == '\0') {

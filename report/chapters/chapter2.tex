@@ -15,12 +15,21 @@ CSR, thay vì số dòng của file đầu vào.
 
 \begin{figure}[ht]
 \centering
-\fbox{\begin{minipage}{0.72\textwidth}
-\centering
-\texttt{0 -- 1 -- 3}\\[2pt]
-\texttt{| \\/}\\[-1pt]
-\texttt{2 --+} \qquad \texttt{4 (cô lập)} \qquad \texttt{5 (cô lập)}
-\end{minipage}}
+\setlength{\unitlength}{1mm}
+\begin{picture}(125,42)
+  \put(12,29){\circle*{3}} \put(9,23){\makebox(6,4){0}}
+  \put(43,29){\circle*{3}} \put(40,23){\makebox(6,4){1}}
+  \put(43,9){\circle*{3}}  \put(40,3){\makebox(6,4){2}}
+  \put(74,19){\circle*{3}} \put(71,13){\makebox(6,4){3}}
+  \put(103,29){\circle*{3}} \put(100,23){\makebox(6,4){4}}
+  \put(103,9){\circle*{3}}  \put(100,3){\makebox(6,4){5}}
+  \put(15,29){\vector(1,0){25}}
+  \put(15,28){\vector(1,-1){25}}
+  \put(46,29){\vector(1,-1){24}}
+  \put(46,9){\vector(1,1){24}}
+  \put(94,29){\makebox(16,4){cô lập}}
+  \put(94,9){\makebox(16,4){cô lập}}
+\end{picture}
 \caption{Ví dụ đồ thị sáu đỉnh dùng để minh họa BFS; cạnh được hiểu là có
 hướng theo các cung $0\to1$, $0\to2$, $1\to3$, $2\to3$ nếu chọn chế độ có
 hướng. Hình do nhóm tự xây dựng.}
@@ -42,6 +51,20 @@ và đưa $v$ vào cuối hàng đợi. Một đỉnh chỉ được đưa vào 
 tiên, vì vậy lần gán đầu tiên của $d[v]$ là khoảng cách ngắn nhất từ $s$ đến
 $v$ trong đồ thị không trọng số.
 
+Giả mã tuần tự của BFS được dùng làm oracle trong phần kiểm thử:
+
+\begin{verbatim}
+BFS(G, s):
+    for mỗi v thuộc V: distance[v] <- -1
+    distance[s] <- 0; Q <- hàng đợi chứa s
+    while Q không rỗng:
+        u <- lấy phần tử đầu Q
+        for mỗi v trong danh sách kề của u:
+            if distance[v] = -1:
+                distance[v] <- distance[u] + 1
+                thêm v vào cuối Q
+\end{verbatim}
+
 Để chứng minh tính đúng đắn, gọi $L_k$ là lớp các đỉnh có khoảng cách $k$ từ
 $s$. BFS bắt đầu với $L_0=\{s\}$. Khi xử lý toàn bộ $L_k$, mọi đỉnh chưa thăm
 kề với một đỉnh trong $L_k$ được đưa vào $L_{k+1}$. Không có đỉnh nào có thể
@@ -51,6 +74,19 @@ không xuất hiện trong lớp nào được ghi là không tới được, v�
 $-1$ trong API của nhóm.
 
 Với ví dụ ở Hình~\ref{fig:chapter2-example}, chọn nguồn $0$ cho kết quả:
+
+\begin{table}[ht]
+\centering
+\caption{Các frontier của BFS theo từng mức}
+\label{tab:chapter2-frontier}
+\begin{tabular}{c|c|c}
+Mức & Frontier được xử lý & Đỉnh mới phát hiện\\
+\midrule
+$L_0$ & \{0\} & \{1,2\}\\
+$L_1$ & \{1,2\} & \{3\}\\
+$L_2$ & \{3\} & \{\}\
+\end{tabular}
+\end{table}
 
 \begin{table}[ht]
 \centering

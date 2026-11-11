@@ -29,9 +29,11 @@ BFSStatus bfs_serial(const CSRGraph *graph, uint32_t source,
         return BFS_ERR_ARGUMENT;
     }
     if (graph->vertex_count == 0 || graph->vertex_count > INT32_MAX ||
-        source >= graph->vertex_count || config->threads < 1 ||
-        !valid_schedule(config->schedule)) {
+        source >= graph->vertex_count) {
         return BFS_ERR_RANGE;
+    }
+    if (config->threads < 1 || !valid_schedule(config->schedule)) {
+        return BFS_ERR_ARGUMENT;
     }
 
     vertex_count = (size_t)graph->vertex_count;
