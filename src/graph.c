@@ -228,6 +228,11 @@ static BFSStatus read_line(FILE *file, char **line, size_t *capacity)
             }
             break;
         }
+        if (character == '\0') {
+            // NUL là byte dữ liệu bất hợp lệ trong edge-list; không để nó
+            // trở thành terminator và làm phần còn lại của dòng bị bỏ qua.
+            return BFS_ERR_FORMAT;
+        }
         if (length >= SIZE_MAX - 1 || length + 1 >= *capacity) {
             size_t new_capacity;
             char *new_line;

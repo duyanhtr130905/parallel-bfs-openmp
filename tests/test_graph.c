@@ -117,6 +117,17 @@ static void test_empty_and_range_edge_lists(void)
 
     file = fopen(path, "wb");
     assert(file != NULL);
+    {
+        const unsigned char nul_line[] = {'0', ' ', '1', '\0', ' ', '2', '\n'};
+        assert(fwrite(nul_line, 1, sizeof(nul_line), file) == sizeof(nul_line));
+    }
+    assert(fclose(file) == 0);
+    assert(graph_read_edge_list(path, 3, GRAPH_DIRECTED, &graph) ==
+           BFS_ERR_FORMAT);
+    assert(graph.vertex_count == 0);
+
+    file = fopen(path, "wb");
+    assert(file != NULL);
     fputs("4294967296 0\n", file);
     assert(fclose(file) == 0);
     assert(graph_read_edge_list(path, 3, GRAPH_DIRECTED, &graph) ==

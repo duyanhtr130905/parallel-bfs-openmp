@@ -1,7 +1,24 @@
 #include "bfs.h"
 
 #include <assert.h>
+#include <stdint.h>
 #include <stdio.h>
+
+static uint64_t csr_checksum(const CSRGraph *graph)
+{
+    uint64_t checksum = UINT64_C(1469598103934665603);
+    size_t i;
+
+    for (i = 0; i <= (size_t)graph->vertex_count; ++i) {
+        checksum ^= (uint64_t)graph->row_offsets[i];
+        checksum *= UINT64_C(1099511628211);
+    }
+    for (i = 0; i < graph->edge_count; ++i) {
+        checksum ^= (uint64_t)graph->col_indices[i];
+        checksum *= UINT64_C(1099511628211);
+    }
+    return checksum;
+}
 
 static void test_serial_distances(void)
 {
@@ -11,9 +28,12 @@ static void test_serial_distances(void)
     BFSConfig config = {4, BFS_SCHEDULE_STATIC};
     BFSMetrics metrics = {99};
     CSRGraph graph = {0};
+    uint64_t checksum_before;
+    uint64_t checksum_after;
     size_t i;
 
     assert(graph_from_edges(6, edges, 5, GRAPH_DIRECTED, &graph) == BFS_OK);
+    checksum_before = csr_checksum(&graph);
     for (config.schedule = BFS_SCHEDULE_STATIC;
          config.schedule <= BFS_SCHEDULE_GUIDED;
          config.schedule = (BFSSchedule)(config.schedule + 1)) {
@@ -22,6 +42,8 @@ static void test_serial_distances(void)
         for (i = 0; i < 6; ++i) {
             assert(distance[i] == expected[i]);
         }
+        checksum_after = csr_checksum(&graph);
+        assert(checksum_after == checksum_before);
     }
     graph_free(&graph);
 }
@@ -91,6 +113,16 @@ static void test_small_graph_oracles(void)
     assert(bfs_serial(&graph, 0, distance, &config, &metrics) == BFS_OK);
     assert(distance[0] == one_vertex_expected[0]);
     graph_free(&graph);
+
+    {
+        const int32_t no_edge_expected[] = {0, -1, -1};
+        assert(graph_from_edges(3, NULL, 0, GRAPH_DIRECTED, &graph) == BFS_OK);
+        assert(bfs_serial(&graph, 0, distance, &config, &metrics) == BFS_OK);
+        for (i = 0; i < 3; ++i) {
+            assert(distance[i] == no_edge_expected[i]);
+        }
+        graph_free(&graph);
+    }
 }
 
 static void test_serial_errors(void)
@@ -118,12 +150,18 @@ static void test_serial_errors(void)
     assert(bfs_serial(&graph, 0, distance, &config, &metrics) ==
            BFS_ERR_ARGUMENT);
     assert(metrics.threads_actual == 0);
+    metrics.threads_actual = 42;
     assert(bfs_serial(NULL, 0, distance, &config, &metrics) ==
            BFS_ERR_ARGUMENT);
+    assert(metrics.threads_actual == 0);
+    metrics.threads_actual = 42;
     assert(bfs_serial(&graph, 0, NULL, &config, &metrics) ==
            BFS_ERR_ARGUMENT);
+    assert(metrics.threads_actual == 0);
+    metrics.threads_actual = 42;
     assert(bfs_serial(&graph, 0, distance, NULL, &metrics) ==
            BFS_ERR_ARGUMENT);
+    assert(metrics.threads_actual == 0);
     graph_free(&graph);
 }
 

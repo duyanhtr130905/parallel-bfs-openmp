@@ -10,13 +10,14 @@ sẽ mở rộng target này khi được tích hợp.
 `build/test_serial`. Bộ test của A dùng expected distances viết độc lập và
 kiểm tra:
 
-- CSR directed/undirected, self-loop, cạnh trùng, đỉnh cô lập và đồ thị rỗng;
+- CSR directed/undirected, self-loop, cạnh trùng, đỉnh cô lập, đồ thị rỗng và
+  no-edge n=3 với expected distance `{0,-1,-1}`;
 - edge-list LF/CRLF, comment toàn dòng, dòng cuối không newline, BOM, comment
   cuối dòng, token sai, ID ngoài phạm vi và số vượt `UINT32_MAX`;
 - BFS n=1, no-edge, path, star, diamond, cycle, source khác 0, directed và
   undirected;
 - `NULL`, enum/config sai, reset metrics khi lỗi, `threads_actual=1` khi thành
-  công, CSR bất biến và `graph_free` gọi lặp lại.
+  công, checksum CSR trước/sau BFS để kiểm tra bất biến và `graph_free` gọi lặp lại.
 
 ## Role B: BFS OpenMP
 
