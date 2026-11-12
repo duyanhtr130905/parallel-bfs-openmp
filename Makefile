@@ -17,9 +17,9 @@ SERIAL_TEST := build/test_serial$(EXEEXT)
 .PHONY: all build test test-bfs check-scaffold check-api check-openmp report clean help
 all: build
 build: $(BIN)
-$(BIN): src/main.c include/bfs.h include/graph.h include/status.h
+$(BIN): src/main.c src/graph.c src/bfs_serial.c include/bfs.h include/graph.h include/status.h
 	$(PYTHON) -c "from pathlib import Path; Path('build').mkdir(exist_ok=True)"
-	$(CC) $(CPPFLAGS) $(CFLAGS) src/main.c $(LDFLAGS) $(LDLIBS) -o $(BIN)
+	$(CC) $(CPPFLAGS) $(CFLAGS) src/main.c src/graph.c src/bfs_serial.c $(LDFLAGS) $(LDLIBS) -o $(BIN)
 $(GRAPH_TEST): src/graph.c tests/test_graph.c include/graph.h include/status.h
 	$(PYTHON) -c "from pathlib import Path; Path('build').mkdir(exist_ok=True)"
 	$(CC) $(CPPFLAGS) $(CFLAGS) src/graph.c tests/test_graph.c $(LDFLAGS) $(LDLIBS) -o $(GRAPH_TEST)
@@ -30,7 +30,7 @@ check-scaffold:
 	$(PYTHON) scripts/check_scaffold.py
 check-api:
 	$(CC) $(CPPFLAGS) $(CFLAGS) -Werror -fsyntax-only tests/api_contract.c
-test: build check-scaffold check-api test-bfs test-tools
+test: build check-scaffold check-api test-bfs test-tools test-cli-validation
 	$(PYTHON) tests/test_cli.py --binary $(BIN)
 	$(PYTHON) tests/test_clean.py
 test-bfs: $(GRAPH_TEST) $(SERIAL_TEST)
@@ -49,9 +49,16 @@ report:
 clean:
 	$(PYTHON) scripts/clean.py
 help:
-	@echo "build: bootstrap CLI; test: CLI + graph/serial correctness + tools"
+	@echo "build: serial CLI; test: CLI + graph/serial correctness + tools"
 	@echo "check-scaffold; check-openmp; report: XeLaTeX + BibTeX; clean: known outputs"
 
 .PHONY: test-tools
 test-tools:
 	$(PYTHON) -m unittest discover -s tests -p test_experiment_tools.py -v
+
+.PHONY: test-cli-validation
+test-cli-validation: build/test_cli_validation$(EXEEXT)
+	./build/test_cli_validation$(EXEEXT)
+build/test_cli_validation$(EXEEXT): tests/test_cli_validation.c src/main.c src/graph.c src/bfs_serial.c include/bfs.h include/graph.h include/status.h
+	$(PYTHON) -c "from pathlib import Path; Path('build').mkdir(exist_ok=True)"
+	$(CC) $(CPPFLAGS) $(CFLAGS) tests/test_cli_validation.c src/graph.c src/bfs_serial.c $(LDFLAGS) $(LDLIBS) -o $@

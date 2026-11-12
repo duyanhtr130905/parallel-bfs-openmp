@@ -1,3 +1,11 @@
+# Cập nhật 12/11/2026
+
+PR #8 đã merge; C đang tích hợp serial thật trong cùng Draft PR #7.
+Giới hạn chờ cả A/B ở phần lịch sử bên dưới đã được người dùng cho phép tách
+thành bước serial-only sau #8. Full integration/benchmark vẫn chờ #9 merge.
+Xem PROJECT_STATUS.md và C2_INTEGRATION_HANDOFF.md để tiếp tục.
+Không có số liệu benchmark mới; không thay nội dung chương A/B trong phiên này.
+
 # Bàn giao C — trạng thái trung gian, cập nhật 07/11/2026
 
 ## Trạng thái hiện hành — chốt phần C độc lập
