@@ -4,8 +4,10 @@ C11/OpenMP CPU, cùng CSR loader cho Serial, Basic và Optimized. A/B đã merge
 CLI tích hợp đang ở **Draft PR #7**, nhánh `docs/c1-academic-report`.
 **Chưa có benchmark hiệu năng hoặc báo cáo kết quả cuối**. GCC/libgomp UCRT64
 16.2.0, Make 4.4.1 và Python 3.14.10 đã cài; local correctness và pilot PASS.
-Đang xử lý giới hạn đồng hồ OpenMP Windows (bước 1 ms, serial path trả 0) trước
-phiên đo chính thức. Xem [hồ sơ máy đo](docs/EXPERIMENT_20261112_PREPARATION.md).
+Đã duyệt QPC trên Windows để tránh đồng hồ OpenMP bước 1 ms; Linux giữ
+omp_get_wtime. Ma trận chốt trước đo: [9 dataset/source](docs/experiment-20261112-matrix.json),
+1/2/4/8 luồng, ba schedule, warm-up1 +10 mẫu/config.
+Xem [hồ sơ máy đo](docs/EXPERIMENT_20261112_PREPARATION.md).
 Không dùng timing CI làm số đo.
 
 Đọc [hồ sơ nghiệm thu](docs/ROLE_C_ACCEPTANCE.md), [trạng thái](docs/PROJECT_STATUS.md),

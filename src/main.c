@@ -3,11 +3,11 @@
 #include <inttypes.h>
 #include <limits.h>
 #include <math.h>
-#include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "bfs.h"
+#include "wall_timer.h"
 
 static int number(const char *s, uintmax_t limit, uintmax_t *out)
 {
@@ -118,7 +118,8 @@ int main(int argc, char **argv)
         int32_t *distance = NULL;
         unsigned char *witness = NULL;
         BFSStatus status;
-        double start, elapsed;
+        WallTimer timer;
+        double elapsed;
         size_t reachable = 0;
         int result = 4;
 
@@ -134,9 +135,15 @@ int main(int argc, char **argv)
             status = BFS_ERR_MEMORY;
             goto cleanup;
         }
-        start = omp_get_wtime();
+        if (!wall_timer_start(&timer)) {
+            status = BFS_ERR_RUNTIME;
+            goto cleanup;
+        }
         status = bfs(&g, (uint32_t)source, distance, &config, &metrics);
-        elapsed = omp_get_wtime() - start;
+        if (!wall_timer_stop(&timer, &elapsed)) {
+            status = BFS_ERR_RUNTIME;
+            goto cleanup;
+        }
         if (status != BFS_OK) {
             if (status == BFS_ERR_NOT_IMPLEMENTED) result = 3;
             goto cleanup;

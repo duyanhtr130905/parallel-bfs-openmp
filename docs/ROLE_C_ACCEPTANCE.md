@@ -5,8 +5,8 @@
 Xem [hồ sơ chuẩn bị thực nghiệm](EXPERIMENT_20261112_PREPARATION.md): toolchain
 UCRT64 đã cài theo ủy quyền mới, local correctness và CI e2f37ff PASS;
 hai lỗi analyzer/plotter đã sửa và test. Pilot chỉ dùng chọn tải, chưa phải kết quả
-chính thức. Blocker hiện tại là timer OpenMP Windows bước 1 ms; chờ chủ dự án
-quyết định phương án đo trước khi chốt ma trận. Tên giảng viên đã xác nhận.
+chính thức. Chủ dự án đã duyệt QPC Windows để giải quyết bước1ms của OpenMP;
+xem ADR-0003 và ma trận9 jobs đã chốt trước đo. Tên giảng viên đã xác nhận.
 Các ghi nhận thiếu toolchain bên dưới là lịch sử trước phiên cài đặt này.
 
 ## Phạm vi và trạng thái

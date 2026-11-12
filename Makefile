@@ -19,7 +19,7 @@ PARALLEL_TEST_BIN := build/test_parallel$(EXEEXT)
 all: build
 build: $(BIN)
 BFS_SOURCES := src/graph.c src/bfs_serial.c src/bfs_parallel_basic.c src/bfs_parallel_optimized.c
-$(BIN): src/main.c $(BFS_SOURCES) include/bfs.h include/graph.h include/status.h
+$(BIN): src/main.c src/wall_timer.h $(BFS_SOURCES) include/bfs.h include/graph.h include/status.h
 	$(PYTHON) -c "from pathlib import Path; Path('build').mkdir(exist_ok=True)"
 	$(CC) $(CPPFLAGS) $(CFLAGS) src/main.c $(BFS_SOURCES) $(LDFLAGS) $(LDLIBS) -o $(BIN)
 $(GRAPH_TEST): src/graph.c tests/test_graph.c include/graph.h include/status.h
@@ -37,7 +37,7 @@ check-scaffold:
 	$(PYTHON) scripts/check_scaffold.py
 check-api:
 	$(CC) $(CPPFLAGS) $(CFLAGS) -Werror -fsyntax-only tests/api_contract.c
-test: build check-scaffold check-api test-bfs test-parallel test-tools test-cli-validation test-integration test-cli-failures
+test: build check-scaffold check-api test-bfs test-parallel test-tools test-cli-validation test-integration test-cli-failures test-timer
 	$(PYTHON) tests/test_cli.py --binary $(BIN)
 	$(PYTHON) tests/test_clean.py
 test-bfs: $(GRAPH_TEST) $(SERIAL_TEST)
@@ -71,7 +71,7 @@ test-plots:
 .PHONY: test-cli-validation
 test-cli-validation: build/test_cli_validation$(EXEEXT)
 	./build/test_cli_validation$(EXEEXT)
-build/test_cli_validation$(EXEEXT): tests/test_cli_validation.c src/main.c $(BFS_SOURCES) include/bfs.h include/graph.h include/status.h
+build/test_cli_validation$(EXEEXT): tests/test_cli_validation.c src/main.c src/wall_timer.h $(BFS_SOURCES) include/bfs.h include/graph.h include/status.h
 	$(PYTHON) -c "from pathlib import Path; Path('build').mkdir(exist_ok=True)"
 	$(CC) $(CPPFLAGS) $(CFLAGS) tests/test_cli_validation.c $(BFS_SOURCES) $(LDFLAGS) $(LDLIBS) -o $@
 
@@ -83,6 +83,13 @@ build/test_integration$(EXEEXT): tests/test_integration.c $(BFS_SOURCES) include
 	$(CC) $(CPPFLAGS) $(CFLAGS) -Werror tests/test_integration.c $(BFS_SOURCES) $(LDFLAGS) $(LDLIBS) -o $@
 test-cli-failures: build/cli_fault_backend$(EXEEXT)
 	$(PYTHON) tests/test_cli_failures.py build/cli_fault_backend$(EXEEXT)
-build/cli_fault_backend$(EXEEXT): tests/cli_fault_backend.c src/main.c src/graph.c include/bfs.h include/graph.h include/status.h
+build/cli_fault_backend$(EXEEXT): tests/cli_fault_backend.c src/main.c src/wall_timer.h src/graph.c include/bfs.h include/graph.h include/status.h
 	$(PYTHON) -c "from pathlib import Path; Path('build').mkdir(exist_ok=True)"
 	$(CC) $(CPPFLAGS) $(CFLAGS) -Werror tests/cli_fault_backend.c src/graph.c $(LDFLAGS) $(LDLIBS) -o $@
+
+.PHONY: test-timer
+test-timer: build/test_wall_timer$(EXEEXT)
+	./build/test_wall_timer$(EXEEXT)
+build/test_wall_timer$(EXEEXT): tests/test_wall_timer.c src/wall_timer.h
+	$(PYTHON) -c "from pathlib import Path; Path('build').mkdir(exist_ok=True)"
+	$(CC) $(CPPFLAGS) $(CFLAGS) tests/test_wall_timer.c $(LDFLAGS) $(LDLIBS) -o $@

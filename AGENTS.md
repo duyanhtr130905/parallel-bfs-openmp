@@ -89,7 +89,9 @@ và kiểm tra giấy phép; không chép nội dung nghiên cứu của templat
   mô tả rõ trong PR. Atomic visited claim, publish distance, barrier theo level và
   frontier capacity/overflow cần review mô hình bộ nhớ; không trộn truy cập thường
   và atomic đồng thời lên cùng location.
-- C đo `omp_get_wtime()` trên cùng thread ngay trước/sau BFS: gồm init distance và
+- C đo wall-clock trên cùng caller thread ngay trước/sau BFS: Windows dùng QPC
+  theo ADR-0003 được chủ dự án duyệt 12/11/2026; Linux dùng `omp_get_wtime()`.
+  Gồm init distance và
   scratch trong BFS; loại I/O, dựng CSR, cấp phát output, validation và serialization.
   JSONL schema v1 chỉ xuất trên stdout khi BFS_OK + metrics hợp lệ; diagnostics ở
   stderr, lỗi không có result. Giữ exit codes CLI 0/2/3/4 khác status API.

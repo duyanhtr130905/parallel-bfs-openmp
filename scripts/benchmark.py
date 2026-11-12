@@ -78,7 +78,7 @@ def run(binary, dataset, environment, evidence, output, threads, repeats=10, see
         raise ValueError("dataset hash mismatch")
     envmeta = strict_json(Path(environment).read_text(encoding="utf-8"))
     required = ("cpu", "physical_cores", "logical_cores", "ram_bytes", "os", "compiler",
-                "flags", "openmp", "runtime", "power", "background_load", "source", "reachable")
+                "flags", "openmp", "runtime", "timer", "power", "background_load", "source", "reachable")
     if any(k not in envmeta or envmeta[k] in (None, "") for k in required):
         raise ValueError("incomplete verified environment")
     for key in ("physical_cores", "logical_cores", "ram_bytes", "reachable"):
@@ -99,6 +99,8 @@ def run(binary, dataset, environment, evidence, output, threads, repeats=10, see
     if git("status", "--porcelain"):
         raise ValueError("commit code before official measurements")
     binary = str(Path(binary).resolve())
+    if proof.get('binary_sha256') != sha256(binary):
+        raise ValueError('correctness evidence binary hash mismatch')
     now = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     out = Path(output) / f"{now}-{head[:8]}-{uuid.uuid4().hex[:8]}"
     out.mkdir(parents=True, exist_ok=False)

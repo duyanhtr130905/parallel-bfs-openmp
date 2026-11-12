@@ -12,11 +12,14 @@ test/CI, pilot và nơi giữ bằng chứng: [hồ sơ chuẩn bị](EXPERIMENT
   so schedule tại cùng actual team. Không sửa module A/B.
 - Pilot 28 calls PASS, RAM quan sát tối đa khoảng 36,4 MiB. Đồng hồ OpenMP
   Windows có bước 1 ms và serial path trả 0. Chưa thu raw benchmark chính thức.
-- Đang chờ quyết định người dùng về QPC Windows so với yêu cầu omp_get_wtime;
-  chưa thay timer/quy trình. Không suy speedup từ baseline 0.
+- Người dùng đã duyệt QPC Windows; timer/protocol/CONTRACT và test timer đã cập
+  nhật, BFS A/B/API giữ nguyên. QPC pilot28 calls PASS; serial path8192 đo được
+  52,7 microsecond thay vì0 ở pilot cũ. Không trộn hai pilot vào benchmark.
+- Chốt trước đo [ma trận9 jobs](experiment-20261112-matrix.json): 225 cấu hình,
+  225 warm-up và2250 mẫu chính thức, seed2026, threads1/2/4/8, ba schedule.
 - Tên giảng viên Nguyễn Hải Vinh đã được xác nhận và điền bìa. PDF cuối chưa build.
 
-Tiếp theo: quyết định timer → chốt ma trận và kiểm chứng đúng commit đo →
+Tiếp theo: kiểm chứng/CI đúng commit đo đã chốt ma trận →
 benchmark/backup/phân tích/biểu đồ → hoàn tất LaTeX và xem toàn bộ PDF → CI/review.
 PATH User/Machine và power plan giữ nguyên. Bằng chứng cài/pilot có backup ổ D.
 

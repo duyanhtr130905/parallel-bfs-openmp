@@ -77,9 +77,11 @@ Các khoảng này chỉ để chọn tải an toàn, không suy kết luận th
 Probe độc lập xác nhận `omp_get_wtick()=0.001 s`, bước dương quan sát nhỏ nhất
 `0.000999927520752 s`; serial path8192 nhận 0 s. QPC frequency thực tế 10 MHz.
 Không gán epsilon, sửa raw hoặc tính speedup từ baseline bằng 0.
-Đã hỏi chủ dự án cho phép dùng QueryPerformanceCounter trên Windows hay giữ
-omp_get_wtime và công bố các chỉ số không xác định. Chưa tự thay timer hoặc
-quy trình khi quyết định này chưa được trả lời.
+Chủ dự án đã trả lời cho phép dùng QueryPerformanceCounter trên Windows.
+Đã cập nhật timer caller, CONTRACT/protocol/ADR-0003; Linux giữ omp_get_wtime,
+không đổi module BFS A/B. Test timer30ms và toàn bộ correctness PASS trước commit.
+Pilot QPC riêng28 calls PASS; serial path8192=52,7 microsecond, peak RAM<40MiB.
+Không dùng thời gian pilot cho thống kê chính thức.
 
 Runner dùng tiến trình mới cho mỗi warm-up/mẫu. Phải diễn giải đây là thời gian
 một lời gọi độc lập gồm khởi tạo team/runtime trong BFS; warm-up không làm nóng
@@ -94,5 +96,9 @@ team của tiến trình đo kế tiếp. Process launch/I/O/CSR/validation ở 
   có hash của file preparation/pilot; chưa có raw chính thức.
 - Tên giảng viên được người dùng cung cấp: Nguyễn Hải Vinh; đã điền bìa.
 
-Tiếp theo: quyết định timer → chốt/commit ma trận trước đo → kiểm thử/CI đúng
+Ma trận đã chốt tại `docs/experiment-20261112-matrix.json`: 9 dataset/source,
+225 cấu hình, 225 warm-up và2250 mẫu chính thức. Không mở rộng12 threads,
+random/layered hoặc chọn lại tham số sau khi xem số liệu chính thức.
+
+Tiếp theo: commit timer/ma trận trước đo → kiểm thử/CI đúng
 commit đo → thu raw/manifest/backup → phân tích/biểu đồ và báo cáo cuối.

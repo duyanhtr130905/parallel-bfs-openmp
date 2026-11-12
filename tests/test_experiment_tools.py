@@ -84,10 +84,10 @@ class ToolsTests(unittest.TestCase):
             binary=root/'fake';binary.write_bytes(b'test only')
             environment=dict(cpu='test',physical_cores=2,logical_cores=2,ram_bytes=1000,
                              os='test',compiler='test',flags='test',openmp='test',runtime='test',
-                             power='test',background_load='test',source=0,reachable=4)
+                             timer='synthetic test only',power='test',background_load='test',source=0,reachable=4)
             (root/'env.json').write_text(json.dumps(environment))
             (root/'correctness.log').write_text('synthetic test log only')
-            (root/'evidence.json').write_text(json.dumps(dict(commit='test-sha',status='PASS',command='synthetic test only',log=str(root/'correctness.log'))))
+            (root/'evidence.json').write_text(json.dumps(dict(commit='test-sha',status='PASS',command='synthetic test only',log=str(root/'correctness.log'),binary_sha256=sha256(binary))))
             def fake(cmd,**kw):
                 algo=cmd[cmd.index('--algo')+1];p=int(cmd[cmd.index('--threads')+1]);schedule=cmd[cmd.index('--schedule')+1]
                 r=synthetic(algorithm=algo,threads_requested=p,threads_actual=p,
@@ -99,6 +99,10 @@ class ToolsTests(unittest.TestCase):
             self.assertEqual(errors,0)
             summary=analyze(out);self.assertEqual(len(summary['rows']),13)
             self.assertTrue(all(r['samples']==10 for r in summary['rows']))
+            binary.write_bytes(b'changed after correctness')
+            with patch('benchmark.git',side_effect=lambda *a: 'test-sha' if a[0]=='rev-parse' else ''), self.assertRaises(ValueError):
+                run(*args)
+            binary.write_bytes(b'test only')
             manifest_path = out/'manifest.json'
             original = json.loads(manifest_path.read_text())
             # Removing an entire group from both raw and manifest must fail,

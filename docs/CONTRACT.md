@@ -143,7 +143,11 @@ Một JSON object một dòng stdout cho mỗi BFS thành công, locale số C, 
 Thiếu team measurement thì chưa được
 phát result thành công. Log chẩn đoán chỉ stderr.
 
-Đo wall-clock `omp_get_wtime()` trên cùng master thread trước/sau một lời gọi BFS.
+Đo wall-clock trên cùng caller thread trước/sau một lời gọi BFS. Windows dùng
+`QueryPerformanceCounter` (QPC), đổi hiệu tick sang giây bằng tần số đã kiểm;
+Linux dùng `omp_get_wtime()`. Chủ dự án đã duyệt ngoại lệ Windows ngày 12/11/2026
+vì libgomp UCRT64 có bước 1 ms làm serial path nhận 0. Metadata phải ghi timer,
+tần số/độ phân giải; không trộn các timer/build trong một session. Xem ADR-0003.
 Không gồm đọc file, dựng CSR, cấp phát output, kiểm chứng và ghi kết quả;
 có gồm khởi tạo distance và cấp phát scratch bên trong hàm BFS.
 Chi tiết lặp đo/so sánh trong EXPERIMENT_PROTOCOL.md.
