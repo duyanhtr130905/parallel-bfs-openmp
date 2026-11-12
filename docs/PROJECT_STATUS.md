@@ -3,7 +3,8 @@
 PR #9 đã merge `0b0c71fb1ead16285dd66b056830e7ff83385456`, Đức approve đúng
 HEAD1048833, CLEAN, threads resolved, đủ checks; main CI43176595134 PASS.
 Merge main vào chính nhánh `docs/c1-academic-report` bằng2656448; giữ Draft #7.
-CLI đã link cả ba BFS thật, giữ API/timing/metrics/schema; không sửa module A/B.
+CLI đã link cả ba BFS thật, giữ API/timing/metrics/schema; không sửa mã module A/B. Polish học thuật tối thiểu: nhãn hình Chương2,
+khởi tạo visited/diễn giải prefix Chương3; xem ROLE_C_ACCEPTANCE.md.
 Thêm oracle Floyd–Warshall từ input edges, 1296 calls, full distance/CSR byte
 comparison; fault CLI15 cases; requested4/actual1; giữ tests A/B/C.
 Tools bổ sung scaling vs omp1 và checkpoint incomplete; report abstract/1/4/5/6

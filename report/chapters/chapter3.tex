@@ -52,6 +52,7 @@ một đỉnh.
 \hspace{0.6cm}\=\hspace{0.7cm}\=\hspace{0.7cm}\=\hspace{0.7cm}\=\hspace{0.7cm}\=\kill
 \textbf{Thuật toán 3.1} BFS song song cơ bản\\
 \> $d[v] \gets -1$ với mọi $v$; $d[s] \gets 0$\\
+\> visited[$v$] $\gets 0$ với mọi $v$; visited[$s$] $\gets 1$\\
 \> $F \gets \{s\}$\\
 \> \textbf{while} $F \neq \emptyset$ \textbf{do}\\
 \> \> $F' \gets \emptyset$; $c \gets 0$\\
@@ -84,7 +85,7 @@ vào \texttt{L[t]} của mình. Cuối mức, mỗi luồng báo số phần t�
 \texttt{single} tính tổng tiền tố để xác định vị trí bắt đầu của từng bộ đệm
 trong frontier kế tiếp. Sau barrier, mỗi luồng tự sao chép đoạn của mình vào
 \texttt{next} tại vị trí tương ứng. Nhờ đó, số thao tác nguyên tử trên một biến
-đếm chung giảm từ ``mỗi đỉnh mới'' xuống còn ``mỗi mức''.
+đếm chung được loại bỏ; thay vào đó là phép cộng tiền tố tuần tự trong vùng \texttt{single} ở mỗi mức.
 
 \begin{quote}
 \small
@@ -92,6 +93,7 @@ trong frontier kế tiếp. Sau barrier, mỗi luồng tự sao chép đoạn c�
 \hspace{0.6cm}\=\hspace{0.7cm}\=\hspace{0.7cm}\=\hspace{0.7cm}\=\hspace{0.7cm}\=\kill
 \textbf{Thuật toán 3.2} BFS song song với bộ đệm cục bộ\\
 \> $d[v] \gets -1$ với mọi $v$; $d[s] \gets 0$; $F \gets \{s\}$\\
+\> visited[$v$] $\gets 0$ với mọi $v$; visited[$s$] $\gets 1$\\
 \> \textbf{while} $F \neq \emptyset$ \textbf{do}\\
 \> \> mỗi luồng $t$: $L_t \gets \emptyset$\\
 \> \> \textbf{parallel for} $u \in F$ với schedule đã chọn\\

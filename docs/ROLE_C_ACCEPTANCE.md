@@ -8,7 +8,7 @@ APPROVED đúng HEAD `1048833f783b396ac7dd50d557bb7402521b647d`, các thread
 resolved, CLEAN và ba required checks SUCCESS. Main sau merge PASS tại
 [43176595134](https://github.com/duyanhtr130905/parallel-bfs-openmp/actions/runs/43176595134).
 Merge main vào C: `2656448`, giải conflict Makefile giữ toàn bộ test A/B/C.
-Không sửa implementation A/B, header hoặc semantics API v1.
+Không sửa implementation A/B, header hoặc semantics API v1. Chỉ sửa Chương2 vị trí nhãn cô lập; Chương3 bổ sung khởi tạo visited vào hai giả mã và làm rõ optimized dùng prefix single, không dùng atomic counter mỗi mức.
 
 CLI gọi ba hàm thật qua con trỏ hàm, cùng loader CSR; timer chỉ quanh BFS.
 Validation toàn distance bằng bất đẳng thức cạnh và predecessor giảm khoảng
@@ -101,8 +101,7 @@ Giữ backup raw ở kho nhóm được phép đến hết chấm/phúc khảo; 
 
 ## Báo cáo và checklist review độc lập
 
-Đã cập nhật abstract, Chương 1/4/5/6 theo trạng thái tích hợp và blocker; giữ
-nguyên Chương 2/3 của A/B, bibliography hợp nhất có cả beamer2012/openmp52.
+Đã cập nhật abstract, Chương 1/4/5/6 theo trạng thái tích hợp và blocker; giữ thiết kế và mã A/B; chỉnh tối thiểu nhãn hình/giả mã như nêu trên. Bibliography hợp nhất có cả beamer2012/openmp52.
 Bản PDF hiện là **bản tích hợp để review**, chưa phải báo cáo hiệu năng cuối.
 Chương 5 chưa có bảng/đồ thị đo thật; Chương 6 không kết luận tăng tốc.
 
@@ -115,3 +114,14 @@ Chương 5 chưa có bảng/đồ thị đo thật; Chương 6 không kết lu�
 - [ ] Reviewer độc lập nghiệm thu; sau đó mới approval/merge PR #7 do người có quyền.
 
 Issue #5 vẫn OPEN; không tự approve hoặc merge PR #7.
+
+## Bằng chứng trước lần polish PDF cuối
+
+Commit `d8c39da279be305d20667e81c4ff23e88640393b` PASS đủ 3 jobs trên
+[PR run43182035650](https://github.com/duyanhtr130905/parallel-bfs-openmp/actions/runs/43182035650)
+và [push run43182026201](https://github.com/duyanhtr130905/parallel-bfs-openmp/actions/runs/43182026201).
+Log xác nhận Linux/Windows chạy đủ 1296 integration calls, 15 faults, 70 CLI,
+A/B tests và OpenMP probe; Linux plot smoke PASS. PDF31 trang được render và xem
+đủ trước polish: phát hiện2 overfull hbox Chương5, TOC tràn một dòng sang trang
+riêng, nhãn cô lập chạm đỉnh. Đã chỉnh tối thiểu và cần CI/PDF mới trên final HEAD.
+Giảng viên còn `[TÊN GIẢNG VIÊN]` chưa được cung cấp, không tự điền.
