@@ -1,67 +1,47 @@
 # Parallel BFS Using OpenMP
 
-Bài tập lớn nhóm 3 sinh viên — C11/OpenMP trên CPU, Windows/MSYS2 UCRT64.
-**Trạng thái: BOOTSTRAP. Chưa có loader CSR hoặc bất kỳ thuật toán BFS nào.**
-CLI chỉ kiểm tra đối số và từ chối thực thi bằng exit 3. Không có benchmark/result.
+C11/OpenMP CPU, cùng CSR loader cho Serial, Basic và Optimized. A/B đã merge;
+CLI tích hợp đang ở **Draft PR #7**, nhánh `docs/c1-academic-report`.
+**Chưa có benchmark hiệu năng hoặc báo cáo kết quả cuối**: máy khảo sát thiếu
+GCC/OpenMP và Make. Không dùng timing CI làm số đo.
 
-Đọc [CONTRACT](docs/CONTRACT.md) trước khi viết module; đó là API v1 cuối cùng.
-[Kiến trúc](docs/ARCHITECTURE.md), [đóng góp](docs/CONTRIBUTING.md),
-[protocol thực nghiệm](docs/EXPERIMENT_PROTOCOL.md), [kế hoạch](docs/DELIVERY_PLAN.md),
-[môi trường](docs/ENVIRONMENT.md), [trạng thái kiểm chứng](docs/PROJECT_STATUS.md).
+Đọc [hồ sơ nghiệm thu](docs/ROLE_C_ACCEPTANCE.md), [trạng thái](docs/PROJECT_STATUS.md),
+[API v1](docs/CONTRACT.md) và [protocol](docs/EXPERIMENT_PROTOCOL.md).
 
-## Build trong MSYS2 UCRT64
+## Build và test
 
-Cài đủ dependency theo quyền của người dùng: GCC, libgomp, Python và UCRT64 Make
-(`mingw-w64-ucrt-x86_64-{gcc,libgomp,python,make}`). UCRT64 Make có tên
-`mingw32-make`; các target giống `make` trên Linux. Mở đúng terminal UCRT64; dùng GCC của `/ucrt64/bin`, không compiler MSYS `/usr/bin`.
-Trong đường dẫn có khoảng trắng, luôn quote đường dẫn:
+Cần GCC + libgomp, GNU Make và Python3. Windows dùng MSYS2 UCRT64 đã cài đủ
+`mingw-w64-ucrt-x86_64-{gcc,libgomp,python,make}`; không tự cài hoặc đổi PATH hệ thống.
 
 ```sh
-cd '/d/Code/parallel-bfs-openmp'
-gcc --version
-mingw32-make build
-mingw32-make check-openmp
-mingw32-make test
-./build/bfs.exe --help
-./build/bfs.exe --graph datasets/small/disconnected.edgelist --vertices 6 --source 0 --algo omp-basic --threads 2 --schedule static --directed
+# Linux; Windows UCRT64 dùng mingw32-make và PYTHON=python
+make CC=gcc PYTHON=python3 build test check-openmp
+make CC=gcc PYTHON=python3 test-bfs test-parallel test-integration test-cli-failures
+./build/bfs --graph datasets/small/disconnected.edgelist --vertices 6 --source 0 --algo omp-opt --threads 4 --schedule guided --directed
 ```
 
-Lệnh cuối phải exit 3 với NOT_IMPLEMENTED, stdout trống; không phải chạy BFS thành công.
-Makefile dùng Python 3 (`PYTHON=python3` nếu terminal chỉ có python3).
-Nếu dùng PowerShell/native Make, truyền đầy đủ đường dẫn compiler hoặc mở UCRT64;
-không sửa PATH toàn hệ thống. Công cụ thiếu phải được người dùng cho phép cài riêng.
+Lệnh CLI thành công xuất một JSONL schema v1; thời gian chỉ gồm lời gọi BFS,
+actual team lấy từ metrics. Error diagnostics ở stderr; không xuất result sai.
+Test tools không phải benchmark; fixtures synthetic không dùng làm số liệu báo cáo.
+`make test-plots` cần matplotlib, chạy riêng trên Linux CI bằng môi trường tạm.
+`make clean` chỉ xóa known outputs, giữ PDF/datasets/results.
 
-`make test` kiểm tra CLI thật (help, validate input, từ chối module chưa có).
-`make test-bfs` cố ý thất bại vì chưa có bộ kiểm thử/thuật toán BFS.
-`python scripts/check_scaffold.py` chỉ kiểm tra dependency khung báo cáo và oracle fixture;
-`make clean` chỉ xóa danh sách file build/LaTeX đã biết, không đụng datasets/results.
+## Báo cáo và thực nghiệm
 
-## Báo cáo tiếng Việt
+`make report`: XeLaTeX → BibTeX → XeLaTeX hai lần, output `report/main.pdf`.
+CI lưu PDF artifact theo SHA để tải và xem. Báo cáo tích hợp sáu chương, Chương5/6
+chưa có kết quả đo thật; không phải bản cuối để nộp.
 
-Trong UCRT64 có XeLaTeX và BibTeX trên PATH: `make report`.
-Hoặc tại `report/`: `xelatex -halt-on-error main.tex`, `bibtex main`, rồi chạy
-XeLaTeX thêm hai lần. Cần fontspec, geometry, hyperref, setspace, amsmath và
-font Latin Modern Roman có dấu tiếng Việt. Có thể dùng một TeX distribution đã
-cài; bootstrap không tự cài. Output `report/main.pdf` bị gitignore.
-Khung đủ sáu chương, placeholder trường/giảng viên/thành viên; chưa có kết quả.
+Lệnh pilot, metadata/evidence, raw retention, hash, analysis và plotting nằm trong
+[ROLE_C_ACCEPTANCE.md](docs/ROLE_C_ACCEPTANCE.md). Runner cần working tree sạch,
+correctness log đúng SHA và môi trường đã xác minh. Không overwrite session cũ.
 
-## Git và nơi làm việc chính
+## Quy trình Git
 
-Bản làm việc: `D:\Code\parallel-bfs-openmp`. Bản OneDrive được giữ làm snapshot,
-không phát triển song song ở cả hai nơi. Origin trỏ repository public chính:
-https://github.com/duyanhtr130905/parallel-bfs-openmp .
-Chủ repo dùng branch, hai thành viên còn lại fork, PR về canonical/main.
-
-Repository local vẫn chưa có commit trên chore/bootstrap-contracts; chưa push,
-main baseline và PR #1 Draft đã có trên GitHub. Ruleset main-pr-review đã Active trước lần upload đầu.
-CI và PR template mới chuẩn bị local, chưa có CI run. Mọi upload/PR/merge cần xác nhận.
-Main sau tích hợp sẽ là nguồn chuẩn; PR mở và công việc chỉ ở local chưa được gọi hoàn thành.
-
-Review đủ 42 file, findings P0-P3 và evidence: [REVIEW_20261105](docs/REVIEW_20261105.md).
-**REQUEST_CHANGES**: lỗi placeholder bìa LaTeX P1 còn mở; GCC/Make/OpenMP/PDF chưa xác minh.
-Clang C11 CLI và 31+24 ca CLI đã PASS, không phải correctness/performance BFS.
-[Thiết lập GitHub](docs/GITHUB_SETUP.md) ghi chính xác phần đã bật và bước tiếp theo.
-Mẫu PR bootstrap vẫn ở docs/BOOTSTRAP_PR.md.
+Canonical https://github.com/duyanhtr130905/parallel-bfs-openmp .
+Giữ feature branch và Draft #7; không force push, direct push main, tự approve,
+merge #7 hoặc đóng Issue #5 khi benchmark/report chưa đạt. AGENTS.md là quy trình
+chung; hồ sơ bootstrap cũ trong docs là lịch sử, không phải trạng thái hiện tại.
 
 ## Phân công cuối cùng — chủ dự án chọn 05/11/2026
 
@@ -75,4 +55,4 @@ A cung cấp graph + serial; B phụ thuộc graph API; C phụ thuộc cả ba 
 Cả ba có thể chuẩn bị độc lập sau bootstrap theo CONTRACT: A/B nhận tham số cuối
 `BFSMetrics *metrics`, C chuẩn bị caller/timing/serialization. Tích hợp theo
 A → B → C; benchmark chỉ sau correctness. B sở hữu basic lẫn optimized; C sở hữu
-CLI/benchmark/report. Đây là kế hoạch, chưa giao việc hoặc tạo fork.
+CLI/benchmark/report. Trạng thái triển khai và bằng chứng hiện hành xem hồ sơ nghiệm thu.

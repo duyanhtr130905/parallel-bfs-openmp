@@ -3,7 +3,7 @@ CC = gcc
 endif
 PYTHON ?= python
 CPPFLAGS += -Iinclude
-CFLAGS ?= -O2 -Wall -Wextra -Wpedantic
+CFLAGS ?= -O2 -Wall -Wextra -Wpedantic -Werror
 CFLAGS += -std=c11 -fopenmp
 LDLIBS += -fopenmp
 EXEEXT :=
@@ -18,9 +18,10 @@ PARALLEL_TEST_BIN := build/test_parallel$(EXEEXT)
 .PHONY: all build test test-bfs test-parallel check-scaffold check-api check-openmp report clean help
 all: build
 build: $(BIN)
-$(BIN): src/main.c src/graph.c src/bfs_serial.c include/bfs.h include/graph.h include/status.h
+BFS_SOURCES := src/graph.c src/bfs_serial.c src/bfs_parallel_basic.c src/bfs_parallel_optimized.c
+$(BIN): src/main.c $(BFS_SOURCES) include/bfs.h include/graph.h include/status.h
 	$(PYTHON) -c "from pathlib import Path; Path('build').mkdir(exist_ok=True)"
-	$(CC) $(CPPFLAGS) $(CFLAGS) src/main.c src/graph.c src/bfs_serial.c $(LDFLAGS) $(LDLIBS) -o $(BIN)
+	$(CC) $(CPPFLAGS) $(CFLAGS) src/main.c $(BFS_SOURCES) $(LDFLAGS) $(LDLIBS) -o $(BIN)
 $(GRAPH_TEST): src/graph.c tests/test_graph.c include/graph.h include/status.h
 	$(PYTHON) -c "from pathlib import Path; Path('build').mkdir(exist_ok=True)"
 	$(CC) $(CPPFLAGS) $(CFLAGS) src/graph.c tests/test_graph.c $(LDFLAGS) $(LDLIBS) -o $(GRAPH_TEST)
@@ -36,7 +37,7 @@ check-scaffold:
 	$(PYTHON) scripts/check_scaffold.py
 check-api:
 	$(CC) $(CPPFLAGS) $(CFLAGS) -Werror -fsyntax-only tests/api_contract.c
-test: build check-scaffold check-api test-bfs test-parallel test-tools test-cli-validation
+test: build check-scaffold check-api test-bfs test-parallel test-tools test-cli-validation test-integration test-cli-failures
 	$(PYTHON) tests/test_cli.py --binary $(BIN)
 	$(PYTHON) tests/test_clean.py
 test-bfs: $(GRAPH_TEST) $(SERIAL_TEST)
@@ -55,7 +56,7 @@ report:
 clean:
 	$(PYTHON) scripts/clean.py
 help:
-	@echo "build: serial CLI; test: CLI + graph/serial + parallel correctness + tools"
+	@echo "build: three BFS algorithms; test: CLI + graph/serial + parallel correctness + tools"
 	@echo "test-bfs: sequential correctness (A); test-parallel: OpenMP BFS checks (B)"
 	@echo "check-scaffold; check-openmp; report: XeLaTeX + BibTeX; clean: known outputs"
 
@@ -63,9 +64,25 @@ help:
 test-tools:
 	$(PYTHON) -m unittest discover -s tests -p test_experiment_tools.py -v
 
+.PHONY: test-plots
+test-plots:
+	$(PYTHON) -m unittest discover -s tests -p test_plot_tools.py -v
+
 .PHONY: test-cli-validation
 test-cli-validation: build/test_cli_validation$(EXEEXT)
 	./build/test_cli_validation$(EXEEXT)
-build/test_cli_validation$(EXEEXT): tests/test_cli_validation.c src/main.c src/graph.c src/bfs_serial.c include/bfs.h include/graph.h include/status.h
+build/test_cli_validation$(EXEEXT): tests/test_cli_validation.c src/main.c $(BFS_SOURCES) include/bfs.h include/graph.h include/status.h
 	$(PYTHON) -c "from pathlib import Path; Path('build').mkdir(exist_ok=True)"
-	$(CC) $(CPPFLAGS) $(CFLAGS) tests/test_cli_validation.c src/graph.c src/bfs_serial.c $(LDFLAGS) $(LDLIBS) -o $@
+	$(CC) $(CPPFLAGS) $(CFLAGS) tests/test_cli_validation.c $(BFS_SOURCES) $(LDFLAGS) $(LDLIBS) -o $@
+
+.PHONY: test-integration test-cli-failures
+test-integration: build/test_integration$(EXEEXT)
+	./build/test_integration$(EXEEXT)
+build/test_integration$(EXEEXT): tests/test_integration.c $(BFS_SOURCES) include/bfs.h include/graph.h include/status.h
+	$(PYTHON) -c "from pathlib import Path; Path('build').mkdir(exist_ok=True)"
+	$(CC) $(CPPFLAGS) $(CFLAGS) -Werror tests/test_integration.c $(BFS_SOURCES) $(LDFLAGS) $(LDLIBS) -o $@
+test-cli-failures: build/cli_fault_backend$(EXEEXT)
+	$(PYTHON) tests/test_cli_failures.py build/cli_fault_backend$(EXEEXT)
+build/cli_fault_backend$(EXEEXT): tests/cli_fault_backend.c src/main.c src/graph.c include/bfs.h include/graph.h include/status.h
+	$(PYTHON) -c "from pathlib import Path; Path('build').mkdir(exist_ok=True)"
+	$(CC) $(CPPFLAGS) $(CFLAGS) -Werror tests/cli_fault_backend.c src/graph.c $(LDFLAGS) $(LDLIBS) -o $@

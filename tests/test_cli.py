@@ -1,4 +1,4 @@
-"""Real serial CLI integration; smoke timings are not benchmark results."""
+"""Real three-algorithm CLI integration; smoke timings are not benchmark results."""
 import argparse
 import sys
 import tempfile
@@ -6,6 +6,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from benchmark import validate
 import subprocess
+import os
 
 p = argparse.ArgumentParser()
 p.add_argument('--binary', required=True)
@@ -19,7 +20,8 @@ for algo in ('serial', 'omp-basic', 'omp-opt'):
     for schedule in ('static', 'dynamic', 'guided'):
         args = base.copy()
         args[7] = algo
-        cases.append((args + ['--threads', '2', '--schedule', schedule], 0 if algo == 'serial' else 3))
+        for threads in (1, 2, 4, 8):
+            cases.append((args + ['--threads', str(threads), '--schedule', schedule], 0))
 for extra in (['--directed'], ['--undirected'], ['--unknown'], ['--help'],
               ['--threads', '0'], ['--threads', '-1'], ['--threads', '2147483648'],
               ['--threads', '2x'], ['--schedule', 'auto'], ['--threads']):
@@ -41,10 +43,13 @@ for args, expected in cases:
         assert result.stderr, args
     if expected == 0 and args != ['--help']:
         record = validate(result.stdout)
-        assert record['algorithm'] == 'serial'
+        assert record['algorithm'] == args[7]
+        assert record['schedule'] == ('none' if args[7] == 'serial' else args[args.index('--schedule')+1])
+        if args[7] == 'serial' or '--threads' not in args:
+            assert record['threads_actual'] == 1
         assert record['vertices'] == 6 and record['edges'] == (5 if '--directed' in args else 9)
         assert record['reachable'] == 4 and record['source'] == 0
-        assert record['threads_requested'] == (2 if '--threads' in args else 1)
+        assert record['threads_requested'] == (int(args[args.index('--threads')+1]) if '--threads' in args else 1)
         assert result.stderr == ''
     if expected == 3:
         assert 'NOT_IMPLEMENTED' in result.stderr, args
@@ -79,4 +84,12 @@ with tempfile.TemporaryDirectory(prefix='bfs-cli-') as directory:
     result = subprocess.run([binary, *args], capture_output=True, text=True, timeout=10)
     assert result.returncode == 4 and not result.stdout and result.stderr
     extra_count += 1
-print(f'PASS: {len(cases) + extra_count} CLI cases; serial integration only, no comparison benchmark')
+for algo in ('omp-basic', 'omp-opt'):
+    args = base.copy()
+    args[7] = algo
+    result = subprocess.run([binary, *args, '--threads', '4'], capture_output=True,
+        text=True, timeout=10, env=dict(os.environ, OMP_THREAD_LIMIT='1', OMP_DYNAMIC='FALSE'))
+    assert result.returncode == 0, result.stderr
+    validate(result.stdout, dict(algorithm=algo, threads_requested=4, threads_actual=1))
+    extra_count += 1
+print(f'PASS: {len(cases) + extra_count} CLI cases; three-algorithm integration, no comparison benchmark')

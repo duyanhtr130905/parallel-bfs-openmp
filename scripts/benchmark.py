@@ -1,4 +1,4 @@
-"""Pre-integration runner. Never use against the bootstrap CLI."""
+"""API v1 benchmark runner. Requires real BFS and matching correctness evidence."""
 import argparse
 import datetime
 import json
@@ -114,11 +114,21 @@ def run(binary, dataset, environment, evidence, output, threads, repeats=10, see
                     dataset=meta, evidence=proof, repeats=repeats, seed=seed, warmups=1,
                     binary_sha256=sha256(binary), python=sys.version, platform=platform.platform(),
                     runner_sha256=sha256(__file__), invocation=sys.argv, samples=[], hashes={})
+    manifest['started_at_utc'] = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    manifest['complete'] = False
     manifest["tool_hashes"] = {p.name:sha256(p) for p in Path(__file__).parent.glob("*.py")}
     env = os.environ.copy()
     env["OMP_DYNAMIC"] = "FALSE"
     manifest["omp_environment"] = {k:env.get(k) for k in ("OMP_DYNAMIC", "OMP_PROC_BIND", "OMP_PLACES")}
     failures = 0
+    def checkpoint(final=False):
+        if final:
+            manifest['hashes'] = {f.name:sha256(f) for f in out.iterdir()
+                                  if f.name not in ('manifest.json', 'manifest.tmp')}
+        temporary = out / 'manifest.tmp'
+        temporary.write_text(json.dumps(manifest, indent=2, allow_nan=False)+'\n', encoding='utf-8')
+        temporary.replace(out / 'manifest.json')
+    checkpoint()
     with (out / "raw.jsonl").open("x", encoding="utf-8") as raw:
         for index, (repeat, algo, p, schedule) in enumerate(tasks):
             cmd = [binary, "--graph", str(graph), "--vertices", str(meta["vertices"]),
@@ -128,6 +138,7 @@ def run(binary, dataset, environment, evidence, output, threads, repeats=10, see
             env["OMP_NUM_THREADS"] = str(p)
             item = dict(index=index, repeat=repeat, warmup=repeat == -1, command=cmd,
                         omp_num_threads=p, valid=False)
+            item['started_at_utc'] = datetime.datetime.now(datetime.timezone.utc).isoformat()
             stdout, stderr = b"", b""
             try:
                 proc = execute_binary(cmd, capture_output=True, timeout=timeout, env=env)
@@ -152,9 +163,11 @@ def run(binary, dataset, environment, evidence, output, threads, repeats=10, see
             for suffix, data in (("stdout", stdout), ("stderr", stderr)):
                 (out / f"{index:05d}.{suffix}").write_bytes(data)
             manifest["samples"].append(item)
+            item['finished_at_utc'] = datetime.datetime.now(datetime.timezone.utc).isoformat()
+            checkpoint()
     manifest["complete"] = failures == 0
-    manifest["hashes"] = {f.name:sha256(f) for f in out.iterdir()}
-    (out / "manifest.json").write_text(json.dumps(manifest, indent=2, allow_nan=False)+"\n", encoding="utf-8")
+    manifest['finished_at_utc'] = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    checkpoint(final=True)
     return out, failures
 
 

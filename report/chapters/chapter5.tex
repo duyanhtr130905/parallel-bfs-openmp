@@ -3,7 +3,12 @@
 \section{Dữ liệu và điều kiện thực chạy}
 Cần dẫn mã phiên, SHA commit, máy đo, lệnh tái tạo và bảng dataset cuối cùng. Nêu mọi khác biệt với kế hoạch Chương 4 và lý do; phân biệt dữ liệu tự sinh và dữ liệu công khai.
 \section{Kết quả kiểm chứng}
-Bảng dự kiến có các cột: nhóm oracle, hướng cạnh, nguồn, phiên bản, số luồng, chính sách lập lịch, số lần kiểm, kết quả và liên kết log. Đánh giá riêng serial so oracle tay và parallel so toàn bộ distance. Chưa có log nên chưa đánh dấu PASS. Nêu lỗi phát hiện, cách sửa và commit kiểm lại nếu có; không suy correctness từ thời gian chạy.
+Bộ kiểm thử tích hợp gồm các target \texttt{test-bfs}, \texttt{test-parallel}, \texttt{test-integration}, \texttt{test-cli-validation} và \texttt{test-cli-failures}. Target tích hợp C dùng Floyd--Warshall từ danh sách cạnh đầu vào làm oracle độc lập với CSR, đối chiếu toàn bộ mảng khoảng cách của ba thuật toán trên grid và đồ thị ngẫu nhiên seed cố định, có hướng/vô hướng, ba nguồn, 1/2/4/8 luồng, ba schedule và ba lần lặp. Tổng cộng có 1296 lời gọi BFS trong target này. CSR được so từng byte trước và sau lời gọi.
+
+Các bộ kiểm thử A/B bổ sung path, star, diamond, cycle, disconnected/isolated, self-loop, duplicate và contention; kiểm tra đối số sai, overflow và metrics. CLI được kiểm schema JSONL, exit codes, nguồn khác 0, file lỗi và trường hợp runtime giới hạn team một luồng dù yêu cầu bốn. Backend lỗi chỉ dùng trong test kiểm tra rằng lỗi BFS, metrics bằng 0 hoặc distance sai không tạo bản ghi thành công. Fixture và thời gian smoke test không được sử dụng làm dữ liệu thực nghiệm.
+
+Kết quả chạy Linux/Windows UCRT64 và commit tương ứng được lưu trong hồ sơ \texttt{docs/ROLE\_C\_ACCEPTANCE.md} và CI của PR số 7. Người nghiệm thu cần kiểm tra đúng HEAD, không dùng kết quả ancestor thay thế. Kiểm thử lặp và review atomic/barrier hỗ trợ đánh giá tính đúng đắn nhưng không chứng minh tuyệt đối không có race; chưa chạy bộ phát hiện race chuyên dụng.
+
 \section{Thời gian và khả năng mở rộng}
 \begin{table}[htbp]
 \centering\small

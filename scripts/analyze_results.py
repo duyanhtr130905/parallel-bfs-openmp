@@ -47,6 +47,11 @@ def aggregate(records):
         row = dict(algorithm=a, threads_requested=p, threads_actual=team, schedule=s, **summarize(values))
         speed = serial/row['median'] if serial > 0 and row['median'] > 0 else None
         row.update(speedup=speed, efficiency=speed/team if speed is not None else None)
+        omp_one = groups.get((a, 1, s)) if a != 'serial' else None
+        one_stable = actual.get((a, 1, s)) == {1}
+        one_median = summarize(omp_one)['median'] if omp_one and one_stable else None
+        row['scaling_vs_omp1'] = (one_median / row['median']
+            if one_median and row['median'] > 0 else None)
         result.append(row)
     return result
 

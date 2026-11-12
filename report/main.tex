@@ -4,9 +4,9 @@
 \pagenumbering{roman}
 \chapter*{Tóm tắt}
 \addcontentsline{toc}{chapter}{Tóm tắt}
-Báo cáo nghiên cứu BFS trên CPU đa nhân với ba phiên bản dự kiến: tuần tự, OpenMP cơ bản và OpenMP tối ưu. Trọng tâm là bảo toàn khoảng cách ngắn nhất, khảo sát khả năng mở rộng theo cấu trúc đồ thị và đánh giá tác động của tổ chức frontier cùng chính sách lập lịch. Phương pháp so sánh dùng cùng CSR và nguồn, đo wall-clock quanh lời gọi BFS, báo median, khoảng tứ phân vị, speedup và efficiency theo số luồng thực tế.
+Báo cáo nghiên cứu BFS trên CPU đa nhân với ba phiên bản: tuần tự, OpenMP cơ bản và OpenMP tối ưu. Trọng tâm là bảo toàn khoảng cách ngắn nhất, khảo sát khả năng mở rộng theo cấu trúc đồ thị và đánh giá tác động của tổ chức frontier cùng chính sách lập lịch. Phương pháp so sánh dùng cùng CSR và nguồn, đo wall-clock quanh lời gọi BFS, báo median, khoảng tứ phân vị, speedup và efficiency theo số luồng thực tế.
 
-Bản trung gian hiện đã xây dựng phần mở đầu, phương pháp thực nghiệm và bộ công cụ Python phục vụ sinh dữ liệu, lưu phép đo và phân tích. Mã BFS của A/B chưa được tích hợp trên main; chưa có kết quả thực nghiệm. Do đó, các chương kết quả và kết luận hiện chỉ trình bày cấu trúc phân tích, chưa khẳng định lợi ích hiệu năng.
+Bản tích hợp đã nối ba thuật toán với cùng bộ nạp CSR, bộ kiểm chứng khoảng cách ngoài timer và JSONL theo hợp đồng v1. Các kiểm thử dùng oracle độc lập, nhiều nguồn, số luồng và chính sách lập lịch; bằng chứng theo commit được lưu trong hồ sơ nghiệm thu. Máy khảo sát chưa có GCC/OpenMP và Make đáp ứng yêu cầu, nên chưa thực hiện phiên đo hiệu năng hợp lệ. Vì vậy báo cáo phân biệt kết quả tích hợp với phần đánh giá hiệu năng còn bị chặn; chưa kết luận về speedup hoặc ưu thế của bản tối ưu.
 \begingroup
 \small
 \singlespacing

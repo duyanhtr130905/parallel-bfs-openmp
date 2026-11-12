@@ -1,3 +1,26 @@
+# Role C — tích hợp sau PR #9, 12/11/2026
+
+PR #9 đã merge `0b0c71fb1ead16285dd66b056830e7ff83385456`, Đức approve đúng
+HEAD1048833, CLEAN, threads resolved, đủ checks; main CI43176595134 PASS.
+Merge main vào chính nhánh `docs/c1-academic-report` bằng2656448; giữ Draft #7.
+CLI đã link cả ba BFS thật, giữ API/timing/metrics/schema; không sửa module A/B.
+Thêm oracle Floyd–Warshall từ input edges, 1296 calls, full distance/CSR byte
+comparison; fault CLI15 cases; requested4/actual1; giữ tests A/B/C.
+Tools bổ sung scaling vs omp1 và checkpoint incomplete; report abstract/1/4/5/6
+cập nhật blocker, không bịa số đo. Chi tiết/lệnh/checklist: ROLE_C_ACCEPTANCE.md.
+
+Local Clang14 graph+serial tests PASS; Python tools/static/cleanup PASS.
+Local GCC/OpenMP/Make và XeLaTeX BLOCKED; CI final phải kiểm đúng HEAD PR #7.
+Chưa có benchmark thật/raw/manifest/figures/speedup. PDF chỉ là bản review,
+chưa đủ nội dung thực nghiệm để nộp. Issue #5 OPEN, không approve/merge #7.
+
+Tiếp theo: xác minh CI/PDF đúng commit cuối → reviewer nghiệm thu tích hợp →
+chuẩn bị máy đủ công cụ được phép, pilot/benchmark thật và hoàn tất báo cáo.
+Không cài phần mềm hoặc thay thiết lập hệ thống trong phiên này.
+
+---
+## Lịch sử trước tích hợp C2 (giữ để truy vết)
+
 # Trạng thái hiện hành — 12/11/2026, Role C / tích hợp
 
 - PR #8 đã merge theo approval Terivn tại aa573bd; merge/main:

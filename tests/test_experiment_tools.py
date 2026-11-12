@@ -61,6 +61,13 @@ class ToolsTests(unittest.TestCase):
         records=[synthetic() for _ in range(10)]+[synthetic(algorithm='omp-basic',schedule='static',threads_requested=4,threads_actual=2,runtime_seconds=1.) for _ in range(10)]
         r=aggregate(records)[0]
         self.assertEqual((r['speedup'],r['efficiency']),(2.,1.))
+        self.assertIsNone(r['scaling_vs_omp1'])
+        with_one = records + [synthetic(algorithm='omp-basic', schedule='static',
+            runtime_seconds=3.) for _ in range(10)]
+        rows = aggregate(with_one)
+        four = next(r for r in rows if r['threads_requested'] == 4)
+        self.assertEqual(four['scaling_vs_omp1'], 3.)
+        self.assertEqual(four['speedup'], 2.)
         zero=[synthetic(runtime_seconds=0) for _ in range(10)]
         self.assertIsNone(aggregate(zero)[0]['speedup'])
         mixed=copy.deepcopy(records);mixed[-1]['source']=1
@@ -104,6 +111,13 @@ class ToolsTests(unittest.TestCase):
                 out,errors=run(*args)
             self.assertEqual(errors,143)
             self.assertEqual((out/'00000.stdout').read_bytes(),b'partial')
+            self.assertIn('started_at_utc', json.loads((out/'manifest.json').read_text()))
+            with patch('benchmark.git',side_effect=lambda *a: 'test-sha' if a[0]=='rev-parse' else ''),patch('benchmark.execute_binary',side_effect=KeyboardInterrupt):
+                with self.assertRaises(KeyboardInterrupt):run(*args)
+            unfinished = [json.loads(p.read_text()) for p in (root/'raw').glob('*/manifest.json')
+                          if not json.loads(p.read_text()).get('finished_at_utc')]
+            self.assertEqual(len(unfinished), 1)
+            self.assertFalse(unfinished[0]['complete'])
 
 
 if __name__=='__main__':unittest.main()

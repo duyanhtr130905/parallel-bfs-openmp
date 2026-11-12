@@ -1,4 +1,4 @@
-/* Serial integration; OpenMP dispatch awaits the independently merged B module. */
+/* API v1 integration: all algorithms share the production CSR loader. */
 #include <errno.h>
 #include <inttypes.h>
 #include <limits.h>
@@ -64,12 +64,15 @@ int main(int argc, char **argv)
     BFSConfig config = {1, BFS_SCHEDULE_STATIC};
     const char *graph = NULL;
     const char *algorithm = NULL;
+    BFSStatus (*bfs)(const CSRGraph *, uint32_t, int32_t *,
+                     const BFSConfig *, BFSMetrics *) = NULL;
+    const char *schedule_names[] = {"static", "dynamic", "guided"};
     int i;
     if (argc == 2 && strcmp(argv[1], "--help") == 0) {
         puts("Usage: bfs --graph PATH --vertices N --source S\n"
              "  --algo serial|omp-basic|omp-opt [--threads P]\n"
              "  [--schedule static|dynamic|guided] (--directed|--undirected)\n"
-             "Serial BFS available; OpenMP algorithms await integration.");
+             "Serial, OpenMP Basic and OpenMP Optimized BFS (API v1).");
         return 0;
     }
     for (i = 1; i < argc; ++i) {
@@ -105,10 +108,9 @@ int main(int argc, char **argv)
     }
     if ((seen & 15u) != 15u || source >= n ||
         ((seen >> 6) & 3u) == 0 || ((seen >> 6) & 3u) == 3u) return usage_error();
-    if (strcmp(algorithm, "serial") != 0) {
-        fputs("BFS_ERR_NOT_IMPLEMENTED: OpenMP module not integrated.\n", stderr);
-        return 3;
-    }
+    if (!strcmp(algorithm, "serial")) bfs = bfs_serial;
+    else if (!strcmp(algorithm, "omp-basic")) bfs = bfs_parallel_basic;
+    else bfs = bfs_parallel_optimized;
     {
         CSRGraph g = {0};
         BFSMetrics metrics = {0};
@@ -133,19 +135,25 @@ int main(int argc, char **argv)
             goto cleanup;
         }
         start = omp_get_wtime();
-        status = bfs_serial(&g, (uint32_t)source, distance, &config, &metrics);
+        status = bfs(&g, (uint32_t)source, distance, &config, &metrics);
         elapsed = omp_get_wtime() - start;
-        if (status != BFS_OK) goto cleanup;
-        if (metrics.threads_actual != 1 || !isfinite(elapsed) || elapsed < 0 ||
+        if (status != BFS_OK) {
+            if (status == BFS_ERR_NOT_IMPLEMENTED) result = 3;
+            goto cleanup;
+        }
+        if (metrics.threads_actual < 1 ||
+            (bfs == bfs_serial && metrics.threads_actual != 1) ||
+            !isfinite(elapsed) || elapsed < 0 ||
             !validate_distances(&g, (uint32_t)source, distance, witness, &reachable)) {
             status = BFS_ERR_RUNTIME;
             goto cleanup;
         }
-        if (printf("{\"schema_version\":1,\"status\":\"ok\",\"algorithm\":\"serial\","
+        if (printf("{\"schema_version\":1,\"status\":\"ok\",\"algorithm\":\"%s\","
                    "\"runtime_seconds\":%.17g,\"threads_requested\":%d,"
-                   "\"threads_actual\":%d,\"schedule\":\"none\",\"vertices\":%" PRIu32 ","
+                   "\"threads_actual\":%d,\"schedule\":\"%s\",\"vertices\":%" PRIu32 ","
                    "\"edges\":%zu,\"source\":%" PRIu32 ",\"reachable\":%zu,\"directed\":%s}\n",
-                   elapsed, config.threads, metrics.threads_actual, g.vertex_count,
+                   algorithm, elapsed, config.threads, metrics.threads_actual,
+                   bfs == bfs_serial ? "none" : schedule_names[config.schedule], g.vertex_count,
                    g.edge_count, (uint32_t)source, reachable,
                    mode == GRAPH_DIRECTED ? "true" : "false") < 0 || fflush(stdout) == EOF) {
             status = BFS_ERR_IO;

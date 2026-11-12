@@ -2,13 +2,13 @@
 \section{Thiết kế và điều kiện bắt đầu}
 Thực nghiệm dự kiến so sánh Serial BFS, OpenMP Basic và OpenMP Optimized trên cùng đồ thị CSR, cùng nguồn và cùng quy tắc biểu diễn cạnh. Biến độc lập là phiên bản thuật toán, số luồng yêu cầu, chính sách lập lịch và cấu trúc/kích thước đồ thị. Đại lượng quan sát là tính đúng đắn, thời gian wall-clock, speedup, efficiency và độ biến thiên. Mỗi tổ hợp đồ thị, nguồn, thuật toán, số luồng và schedule là một cấu hình đo riêng; không gộp các nguồn thành các lần lặp của cùng một cấu hình.
 
-Chỉ đo sau khi loader, serial và hai bản OpenMP đã merge, được review và vượt kiểm thử tính đúng đắn trên chính commit dùng để đo. CLI hiện tại chưa gọi BFS nên không được dùng để thu thời gian. Quy trình chi tiết và hợp đồng được quản lý tại \texttt{docs/EXPERIMENT\_PROTOCOL.md} và \texttt{docs/CONTRACT.md}. Chương này mô tả phương pháp dự kiến, chưa xác nhận thực nghiệm đã diễn ra.
+Chỉ đo sau khi loader, serial và hai bản OpenMP đã merge, được review và vượt kiểm thử tính đúng đắn trên chính commit dùng để đo. CLI hiện gọi cả ba thuật toán thật và kiểm chứng đầu ra ngoài timer. Tuy nhiên chưa có phiên benchmark trên máy đo hợp lệ. Quy trình chi tiết và hợp đồng được quản lý tại \texttt{docs/EXPERIMENT\_PROTOCOL.md} và \texttt{docs/CONTRACT.md}. Chương này mô tả phương pháp dự kiến, chưa xác nhận thực nghiệm đã diễn ra.
 
 \section{Môi trường và thông tin cần ghi nhận}
-CPU, RAM, hệ điều hành và compiler của máy đo \textbf{chưa xác minh}. Bảng~\ref{tab:environment-plan} chỉ ghi những trường phải thu thập; không suy cấu hình từ tên máy hoặc máy chạy CI.
+Khảo sát ngày 12/11/2026 xác nhận CPU Intel Core i5-12450HX (8 lõi vật lý, 12 luồng logic), Windows 11 Home Single Language phiên bản 10.0.26300, RAM hệ điều hành nhận 24\,866\,680 KiB và chế độ nguồn Balanced. Đây là máy dự kiến, chưa phải môi trường đã đo. GCC/UCRT64, Make, XeLaTeX và BibTeX không được tìm thấy trên PATH hoặc các vị trí chuẩn đã kiểm; Clang 14.0.6 có sẵn nhưng thiếu \texttt{omp.h}. Không cài phần mềm hoặc đổi chế độ nguồn. Bảng~\ref{tab:environment-plan} liệt kê metadata còn phải hoàn thiện khi máy đủ công cụ.
 \begin{table}[htbp]
 \centering\small
-\caption{Thông tin môi trường cần xác minh trước đo (chưa có giá trị).}
+\caption{Metadata bắt buộc của phiên đo, bổ sung cho khảo sát máy.}
 \label{tab:environment-plan}
 \begin{tabular}{p{0.30\textwidth}p{0.58\textwidth}}
 \toprule
@@ -43,7 +43,7 @@ Mỗi cấu hình có một warm-up không đưa vào thống kê và ít nhất
 Mỗi mẫu thành công lưu JSONL schema v1; serial ghi schedule là \texttt{none}, số luồng thực tế là 1. Mẫu lỗi, stderr, warm-up và thứ tự chạy vẫn được lưu. Mỗi phiên dùng thư mục mới, không ghi đè raw. Manifest liên kết SHA mã, lệnh, metadata môi trường/dataset, trạng thái kiểm chứng, chỉ số lần lặp và SHA-256 các tệp. Chỉ sinh bảng/biểu đồ từ raw đã đối chiếu manifest, bằng lệnh có thể chạy lại.
 
 \section{Thống kê và chỉ số hiệu năng}
-Với mỗi cấu hình hợp lệ, báo số mẫu, median, min, max và khoảng tứ phân vị $IQR=Q_3-Q_1$. Quy ước tính phân vị dự kiến là nội suy tuyến tính tại chỉ số $(N-1)q$ trên dãy tăng dần (đánh số từ 0); script phân tích sau này phải giữ quy ước này. Không âm thầm bỏ outlier; lỗi hoặc lần chạy bị gián đoạn được ghi riêng cùng lý do. IQR mô tả độ phân tán, không được trình bày như khoảng tin cậy.
+Với mỗi cấu hình hợp lệ, báo số mẫu, median, min, max và khoảng tứ phân vị $IQR=Q_3-Q_1$. Quy ước tính phân vị dự kiến là nội suy tuyến tính tại chỉ số $(N-1)q$ trên dãy tăng dần (đánh số từ 0); script phân tích hiện giữ quy ước này. Không âm thầm bỏ outlier; lỗi hoặc lần chạy bị gián đoạn được ghi riêng cùng lý do. IQR mô tả độ phân tán, không được trình bày như khoảng tin cậy.
 
 Gọi $\widetilde T_s$ là median serial và $\widetilde T_{a,p}$ là median bản OpenMP $a$ có team thực tế ổn định $p$ trên cùng đồ thị, nguồn và build:
 \[

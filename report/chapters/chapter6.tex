@@ -1,15 +1,17 @@
 \chapter{Kết luận và hướng phát triển}
-\section{Khung tổng hợp kết quả}
-Bản C1 đã chuẩn bị mục tiêu, câu hỏi nghiên cứu và phương pháp đo. Chưa có bằng chứng thực chạy để kết luận tính đúng đắn của ba phiên bản hoặc lợi ích hiệu năng. Khi hoàn tất thực nghiệm, phần này sẽ tổng hợp theo cấu trúc sau:
-\begin{enumerate}
-\item Tóm tắt các phiên bản thực sự triển khai, đối chiếu thiết kế Chương 3 và phạm vi Chương 1.
-\item Trả lời câu hỏi tính đúng đắn bằng oracle và log kiểm thử, nêu giới hạn của test.
-\item Trả lời câu hỏi tăng tốc bằng median, speedup và efficiency, dẫn trực tiếp bảng/hình Chương 5 cùng điều kiện đo.
-\item Nêu bản tối ưu hoặc schedule có lợi trong trường hợp nào, kể cả trường hợp không cải thiện. Không suy rộng vượt các cấu hình đã đo.
-\end{enumerate}
-\section{Hạn chế cần đánh giá sau thực nghiệm}
-Cần xác định phạm vi máy đo, tập đồ thị, nguồn, số lần lặp và các thành phần chưa đo riêng. Phân biệt giới hạn của thuật toán theo tầng với giới hạn của implementation hoặc công cụ đo. Chỉ ghi hạn chế quan sát được hoặc suy ra rõ từ thiết kế, không dùng chúng để bỏ qua kết quả bất lợi.
-\section{Hướng phát triển dự kiến}
-Có thể tái lập trên máy khác, mở rộng dữ liệu có provenance và bổ sung phép đo frontier hoặc đồng bộ nếu cần kiểm tra giả thuyết. Những hướng này là đề xuất sau bài tập lớn, chưa được triển khai hay chứng minh có lợi. Ưu tiên trước mắt là nhận bàn giao A/B, kiểm chứng, đo thật và hoàn thiện lập luận từ dữ liệu; không triển khai các mở rộng trong C1.
+\section{Kết quả tích hợp và phạm vi kết luận}
+Sản phẩm đã nối BFS tuần tự, OpenMP Basic và OpenMP Optimized qua cùng bộ nạp CSR bất biến và giữ API v1 năm tham số. CLI đo wall-clock trên cùng luồng gọi, kiểm chứng khoảng cách ngoài timer rồi xuất JSONL khi thuật toán và metrics hợp lệ. Bộ công cụ thực nghiệm hỗ trợ phiên đo riêng, warm-up, ít nhất mười mẫu mỗi cấu hình, manifest và SHA-256; công cụ phân tích tách speedup so serial khỏi scaling so OpenMP một luồng.
+
+Câu hỏi tính đúng đắn được tiếp cận bằng oracle tay, BFS kiểm thử độc lập và Floyd--Warshall từ cạnh đầu vào, so toàn bộ distance và kiểm CSR bất biến. Bằng chứng thực thi và trạng thái CI phải được đọc theo đúng commit trong hồ sơ nghiệm thu; số lần lặp kiểm thử không thay thế chứng minh đồng bộ hay review độc lập.
+
+Hai câu hỏi về khả năng mở rộng và lợi ích tối ưu vẫn chưa trả lời vì máy khảo sát thiếu toolchain GCC/OpenMP và Make. Không có median, speedup, efficiency hoặc biểu đồ thực nghiệm để kết luận. Không sử dụng thời gian CI hay dữ liệu synthetic của unit test thay số đo hiệu năng.
+
+\section{Hạn chế}
+Tập kiểm thử chủ yếu là đồ thị tổng hợp hữu hạn; chưa đại diện dữ liệu lớn hoặc mọi phân bố bậc. Chưa thực hiện phân tích race bằng công cụ chuyên dụng, đo trên phần cứng ổn định hoặc tái lập trên máy thứ hai. Timer tổng chưa tách riêng barrier, contention, cache miss hay chi phí cấp phát. Tên Optimized là định hướng thiết kế, không phải bằng chứng nhanh hơn Basic hoặc Serial.
+
+\section{Công việc tiếp theo và hướng phát triển}
+Ưu tiên hoàn thiện môi trường đo có sự cho phép của người dùng, chạy thử quy mô nhỏ, kiểm chứng trên đúng commit rồi thu ít nhất mười mẫu mỗi cấu hình theo Chương 4. Sau đó điền bảng và biểu đồ Chương 5 từ raw có manifest, báo cả slowdown và biến thiên, cập nhật tóm tắt và kết luận theo bằng chứng. Báo cáo cần được nghiệm thu độc lập trước khi coi là hoàn chỉnh để nộp.
+
+Có thể mở rộng dữ liệu có provenance, thay đổi nguồn có kiểm soát và tái lập trên máy khác. Chỉ bổ sung profiling frontier/đồng bộ nếu cần kiểm tra giả thuyết cụ thể. Đây là hướng phát triển, chưa phải tính năng đã triển khai.
 \paragraph{Ghi nhận cách tổ chức báo cáo.}
-Khung kế thừa cách tổ chức và trình bày đã ghi nhận từ mẫu SVD~\cite{svdtemplate}; không sử dụng nội dung chuyên môn hoặc kết quả nghiên cứu của mẫu.
+Báo cáo kế thừa cách tổ chức và trình bày đã ghi nhận từ mẫu SVD~\cite{svdtemplate}; không sử dụng nội dung chuyên môn hoặc kết quả nghiên cứu của mẫu.
