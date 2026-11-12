@@ -1,5 +1,14 @@
 # Role C — hồ sơ nghiệm thu 12/11/2026
 
+## Cập nhật thực nghiệm laptop
+
+Xem [hồ sơ chuẩn bị thực nghiệm](EXPERIMENT_20261112_PREPARATION.md): toolchain
+UCRT64 đã cài theo ủy quyền mới, local correctness và CI e2f37ff PASS;
+hai lỗi analyzer/plotter đã sửa và test. Pilot chỉ dùng chọn tải, chưa phải kết quả
+chính thức. Blocker hiện tại là timer OpenMP Windows bước 1 ms; chờ chủ dự án
+quyết định phương án đo trước khi chốt ma trận. Tên giảng viên đã xác nhận.
+Các ghi nhận thiếu toolchain bên dưới là lịch sử trước phiên cài đặt này.
+
 ## Phạm vi và trạng thái
 
 Giữ `docs/c1-academic-report` và Draft PR #7. PR #9 đã merge bằng merge commit

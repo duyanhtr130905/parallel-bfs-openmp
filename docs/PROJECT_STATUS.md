@@ -1,3 +1,28 @@
+# Role C — thực nghiệm laptop, cập nhật 12/11/2026
+
+Được người dùng cho phép cài toolchain, thực nghiệm, hoàn tất báo cáo và push
+trong Draft PR #7. Không merge/approve hoặc đóng Issue #5. Chi tiết môi trường,
+test/CI, pilot và nơi giữ bằng chứng: [hồ sơ chuẩn bị](EXPERIMENT_20261112_PREPARATION.md).
+
+- GCC/libgomp UCRT64 16.2.0, Make 4.4.1, Python 3.14.10 tại C:/tools/msys64.
+- Local rebuild bắt buộc toàn bộ `build test check-openmp` PASS tại e2f37ff;
+  gồm 1296 integration calls, oracle độc lập, CSR bất biến, 70 CLI, 15 faults.
+  CI cùng SHA PASS ba jobs, plotting tests PASS. Không dùng CI timing để benchmark.
+- Hai lỗi công cụ đã sửa và test: ma trận/warm-up đầy đủ, lý tưởng S=p và
+  so schedule tại cùng actual team. Không sửa module A/B.
+- Pilot 28 calls PASS, RAM quan sát tối đa khoảng 36,4 MiB. Đồng hồ OpenMP
+  Windows có bước 1 ms và serial path trả 0. Chưa thu raw benchmark chính thức.
+- Đang chờ quyết định người dùng về QPC Windows so với yêu cầu omp_get_wtime;
+  chưa thay timer/quy trình. Không suy speedup từ baseline 0.
+- Tên giảng viên Nguyễn Hải Vinh đã được xác nhận và điền bìa. PDF cuối chưa build.
+
+Tiếp theo: quyết định timer → chốt ma trận và kiểm chứng đúng commit đo →
+benchmark/backup/phân tích/biểu đồ → hoàn tất LaTeX và xem toàn bộ PDF → CI/review.
+PATH User/Machine và power plan giữ nguyên. Bằng chứng cài/pilot có backup ổ D.
+
+---
+## Lịch sử tích hợp sau PR #9
+
 # Role C — tích hợp sau PR #9, 12/11/2026
 
 PR #9 đã merge `0b0c71fb1ead16285dd66b056830e7ff83385456`, Đức approve đúng
