@@ -56,7 +56,7 @@ def publish(index_path, output, figures, tables):
     (out/'summary.json').write_text(json.dumps(rows,indent=2))
     (out/'sessions.json').write_text(json.dumps(sessions,indent=2))
     Path(tables).parent.mkdir(parents=True,exist_ok=True)
-    with Path(tables).open('x',encoding='utf-8') as f:f.write('\n'.join(tex)+'\n')
+    with Path(tables).open('x',encoding='utf-8') as f:f.write('\n'.join(tex).rstrip()+'\n')
     (out/'provenance.json').write_text(json.dumps(dict(index_sha256=sha256(index_path),
         publisher_sha256=sha256(__file__),analyzer_sha256=sha256('scripts/analyze_results.py'),
         plotter_sha256=sha256('scripts/plot_results.py'),matrix_sha256=sha256('docs/experiment-20261112-matrix.json'),

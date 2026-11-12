@@ -4,7 +4,7 @@ Nhóm đã tích hợp Serial, OpenMP Basic và Optimized qua cùng CSR bất bi
 
 Câu hỏi correctness được hỗ trợ bởi oracle độc lập,1296 integration BFS calls, tests A/B/C và 2475 lượt thực nghiệm không lỗi. Đây là bằng chứng hữu hạn và review đồng bộ, không phải chứng minh tuyệt đối không có race.
 
-Với khả năng mở rộng,2250 mẫu trên chín tổ hợp đồ thị/nguồn không ghi nhận $S>1$. Speedup tốt nhất là 0,2914 ở Optimized một luồng/static/grid512 nguồn 0. Basic8/static có speedup0,00005623 trên path8192,0,1185 trên star một triệu đỉnh và 0,01504 trên grid512. Mọi cấu hình nhiều luồng chậm hơn OpenMP một luồng cùng schedule. Tập cấu hình và mô hình lời gọi độc lập này chưa khai thác đa nhân hiệu quả.
+Với khả năng mở rộng,2250 mẫu trên chín tổ hợp đồ thị/nguồn không ghi nhận $S>1$. Speedup tốt nhất là 0,2914 ở Optimized một luồng/static/grid512 nguồn 0. Basic 8/static có speedup 0,00005623 trên path8192,0,1185 trên star một triệu đỉnh và 0,01504 trên grid512. Mọi cấu hình nhiều luồng chậm hơn OpenMP một luồng cùng schedule. Tập cấu hình và mô hình lời gọi độc lập này chưa khai thác đa nhân hiệu quả.
 
 Optimized không thắng nhất quán. Trên grid512 nguồn 0/static, một luồng Optimized thấp hơn Basic (5,814 so 7,0432 ms), nhưng 8 luồng cao hơn (179,7294 so 112,6744 ms). Dynamic làm star một triệu đỉnh/8 luồng chậm hơn static khoảng 3,7--3,8 lần. Cần đánh giá đồng thời tổ chức frontier, công việc hữu ích và chi phí lập lịch/đồng bộ, thay vì suy từ số lõi hoặc tên phiên bản.
 

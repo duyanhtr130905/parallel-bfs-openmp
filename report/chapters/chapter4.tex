@@ -2,7 +2,7 @@
 \section{Phần cứng, phần mềm và điều kiện chạy}
 Thực nghiệm chạy trực tiếp trên laptop Windows của nhóm, không lấy thời gian từ GitHub Actions. Máy dùng Intel Core i5-12450HX với 8 lõi vật lý và 12 luồng logic; Windows 11 Home Single Language 10.0.26300 nhận 24\,866\,680 KiB RAM (khoảng 23,7 GiB). Giữ active power scheme Balanced, cắm nguồn và không đóng ứng dụng của người dùng. Không điều chỉnh power plan, PATH hệ thống hoặc cơ chế bảo vệ Windows. Tải CPU nền trước từng phiên, RAM trống và trạng thái nguồn được lưu; không có số đo nhiệt độ CPU đáng tin cậy.
 
-Bộ công cụ chính thức MSYS2 UCRT64 được cập nhật đầy đủ theo hướng dẫn dự án~\cite{msys2update}. GCC và libgomp là 16.2.0-6, GNU Make 4.4.1, Python 3.14.10; \texttt{\_OPENMP=202111}. Windows Modules xác nhận BFS nạp \texttt{C:/tools/msys64/ucrt64/bin/libgomp-1.dll}; hash và ownership pacman được ghi trong hồ sơ. Cả ba thuật toán dùng chung \texttt{-O2 -Wall -Wextra -Wpedantic -Werror -std=c11 -fopenmp}, include \texttt{-Iinclude}, link \texttt{-fopenmp}. Không dùng cờ tối ưu riêng cho một phiên bản.
+Bộ công cụ chính thức MSYS2 UCRT64 được cập nhật đầy đủ theo hướng dẫn dự án~\cite{msys2update}. GCC và libgomp là 16.2.0-6, GNU Make 4.4.1, Python 3.14.10; \texttt{\_OPENMP=202111}. Windows Modules xác nhận BFS nạp \path{C:/tools/msys64/ucrt64/bin/libgomp-1.dll}; hash và ownership pacman được ghi trong hồ sơ. Cả ba thuật toán dùng chung \texttt{-O2}, \texttt{-Wall}, \texttt{-Wextra}, \texttt{-Wpedantic}, \texttt{-Werror}, \texttt{-std=c11}, \texttt{-fopenmp}, include \texttt{-Iinclude}, link \texttt{-fopenmp}. Không dùng cờ tối ưu riêng cho một phiên bản.
 
 Chỉ khảo sát $p=1,2,4,8$, không vượt số luồng logic và không mở rộng lên 12 sau khi xem kết quả. Đặt \texttt{OMP\_DYNAMIC=FALSE}; \texttt{OMP\_PROC\_BIND} và \texttt{OMP\_PLACES} không đặt. Windows quyết định vị trí luồng; không giả định các team nhỏ được đặt lên cùng loại lõi. Số luồng thực tế lấy từ \texttt{BFSMetrics} trong chính vùng BFS, không suy từ tham số yêu cầu.
 
@@ -17,18 +17,18 @@ Sáu đồ thị vô hướng tự sinh được chọn theo tương phản cấ
 Loại/kích thước & $n$ & Cạnh input & Cung CSR & Nguồn \\
 \midrule
 Path nhỏ & 2048 & 2047 & 4094 & 0 \\
-Path lớn & 8192 & 8191 & 16382 & 0,4096 \\
+Path lớn & 8192 & 8191 & 16382 & 0; 4096 \\
 Star nhỏ & 100000 & 99999 & 199998 & 0 \\
-Star lớn & 1000000 & 999999 & 1999998 & 0,1 \\
+Star lớn & 1000000 & 999999 & 1999998 & 0; 1 \\
 Grid $128\times128$ & 16384 & 32512 & 65024 & 0 \\
-Grid $512\times512$ & 262144 & 523264 & 1046528 & 0,131328 \\
+Grid $512\times512$ & 262144 & 523264 & 1046528 & 0; 131328 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 Path tạo nhiều mức có frontier hẹp; star có một đỉnh bậc rất cao; grid mở rộng frontier theo hình học hai chiều. Nguồn bổ sung ở giữa path, lá star và tâm grid tạo đối chứng có chủ đích. Các kích thước path được giới hạn vì chi phí đồng bộ tăng theo số mức; star đạt một triệu đỉnh, grid đạt hơn một triệu cung, giúp tránh việc mọi phép đo chỉ ở đồ thị cực nhỏ. Kết quả vẫn giới hạn ở ba họ đồ thị có cấu trúc, chưa đại diện đồ thị bất quy tắc.
 
-Pilot riêng xác nhận correctness, thời gian và RAM trước khi chốt ma trận. Các mẫu pilot không đưa vào thống kê. Tệp \texttt{docs/experiment-20261112-matrix.json} được commit trước mọi mẫu chính thức, gồm source, hash SHA-256, tham số generator và lý do chọn kích thước. Có 25 cấu hình trên mỗi tổ hợp: một Serial và $2\times4\times3=24$ OpenMP (Basic/Optimized, bốn mức luồng, ba schedule). Chín tổ hợp tạo 225 cấu hình; mỗi cấu hình có một warm-up và mười mẫu đo, tổng 2475 lời gọi độc lập.
+Pilot riêng xác nhận correctness, thời gian và RAM trước khi chốt ma trận. Các mẫu pilot không đưa vào thống kê. Tệp \path{docs/experiment-20261112-matrix.json} được commit trước mọi mẫu chính thức, gồm source, hash SHA-256, tham số generator và lý do chọn kích thước. Có 25 cấu hình trên mỗi tổ hợp: một Serial và $2\times4\times3=24$ OpenMP (Basic/Optimized, bốn mức luồng, ba schedule). Chín tổ hợp tạo 225 cấu hình; mỗi cấu hình có một warm-up và mười mẫu đo, tổng 2475 lời gọi độc lập.
 
 \section{Kiểm chứng trước và trong thực nghiệm}
 Commit đo là \texttt{ab588fb8ab535b796f0c8b6d5e98a7efe5ebc76c}. Cả local Windows và CI Linux/Windows chạy đầy đủ test graph/serial/parallel, CLI và lỗi trước đo. Target tích hợp dùng Floyd--Warshall từ input edges độc lập với CSR, so mọi phần tử distance và từng byte CSR qua 1296 lời gọi, nhiều nguồn, hướng cạnh, thread và schedule. Có 70 ca CLI và 15 ca backend lỗi. Stress và review atomic/barrier không thay chứng minh tuyệt đối không có race; chưa chạy race detector chuyên dụng.
