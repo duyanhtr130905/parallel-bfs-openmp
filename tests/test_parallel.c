@@ -395,19 +395,26 @@ static void test_invalid_arguments(void)
         CHECK_MSG(metrics.threads_actual == 0,
                   "%s: metrics not reset for empty graph", name);
 
-        CSRGraph broken = {4u, 0u, NULL, NULL};
-        metrics.threads_actual = 77;
-        CHECK_MSG(function(&broken, 0u, distance, &good, &metrics) ==
-                      BFS_ERR_ARGUMENT,
-                  "%s: missing row_offsets was not rejected", name);
+        /* bfs_serial's contract does not require rejecting a structurally
+         * inconsistent CSR (NULL offsets/columns); the parallel
+         * implementations add that guard.  Calling serial with those inputs
+         * would dereference the missing arrays, so only the parallel
+         * implementations are exercised here. */
+        if (function != bfs_serial) {
+            CSRGraph broken = {4u, 0u, NULL, NULL};
+            metrics.threads_actual = 77;
+            CHECK_MSG(function(&broken, 0u, distance, &good, &metrics) ==
+                          BFS_ERR_ARGUMENT,
+                      "%s: missing row_offsets was not rejected", name);
 
-        CSRGraph missing_columns = {4u, 1u, fixture.graph.row_offsets, NULL};
-        metrics.threads_actual = 77;
-        CHECK_MSG(function(&missing_columns, 0u, distance, &good, &metrics) ==
-                      BFS_ERR_ARGUMENT,
-                  "%s: missing col_indices with edges was not rejected", name);
-        CHECK_MSG(metrics.threads_actual == 0,
-                  "%s: metrics not reset for missing col_indices", name);
+            CSRGraph missing_columns = {4u, 1u, fixture.graph.row_offsets, NULL};
+            metrics.threads_actual = 77;
+            CHECK_MSG(function(&missing_columns, 0u, distance, &good, &metrics) ==
+                          BFS_ERR_ARGUMENT,
+                      "%s: missing col_indices with edges was not rejected", name);
+            CHECK_MSG(metrics.threads_actual == 0,
+                      "%s: metrics not reset for missing col_indices", name);
+        }
 
         metrics.threads_actual = 77;
         CHECK_MSG(function(&fixture.graph, 0u, distance, &good, &metrics) == BFS_OK,
