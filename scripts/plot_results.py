@@ -6,6 +6,19 @@ from analyze_results import analyze
 from generate_graph import sha256
 
 
+def scheduling_groups(rows):
+    """Compare policies only at the same measured team size, per algorithm."""
+    groups = {}
+    for row in rows:
+        if row['algorithm'] != 'serial':
+            key = (row['algorithm'], row['threads_actual'])
+            policies = groups.setdefault(key, {})
+            if row['schedule'] in policies:
+                raise ValueError('ambiguous scheduling comparison at actual team size')
+            policies[row['schedule']] = row
+    return sorted(groups.items())
+
+
 def plot(session, out):
     summary = analyze(session)
     import matplotlib
@@ -32,14 +45,20 @@ def plot(session, out):
         serial = next(r for r in rows if r['algorithm']=='serial')
         if metric=='median':
             ax.axhline(serial['median'],color='black',linestyle=':',label='Serial median')
+        if metric=='speedup':
+            teams = sorted({r['threads_actual'] for r in rows})
+            ax.plot(teams, teams, color='black', linestyle='--', label='Ideal S=p')
         ax.set(xlabel='Actual threads',ylabel=ylabel,title=title)
         ax.legend(fontsize=7);ax.grid(alpha=.3);fig.tight_layout()
         fig.savefig(out/f'{metric}.pdf');plt.close(fig)
     fig, ax = plt.subplots(figsize=(10,5))
-    selected = [r for r in rows if r['algorithm']!='serial']
-    x = list(range(len(selected)))
-    ax.bar(x,[r['median'] for r in selected])
-    ax.set_xticks(x,[f"{r['algorithm']}\n{r['schedule']}\np={r['threads_actual']}" for r in selected],rotation=90,fontsize=6)
+    groups = scheduling_groups(rows)
+    for offset, sched in enumerate(('static','dynamic','guided')):
+        positions = [i+(offset-1)*.25 for i,(_,policies) in enumerate(groups) if sched in policies]
+        values = [policies[sched]['median'] for _,policies in groups if sched in policies]
+        ax.bar(positions, values, width=.25, label=sched)
+    ax.set_xticks(range(len(groups)),[f'{a}\np={p}' for (a,p),_ in groups],fontsize=8)
+    ax.legend(); ax.grid(axis='y', alpha=.3)
     ax.set(ylabel='Runtime median (s)',title=title)
     fig.tight_layout();fig.savefig(out/'scheduling.pdf');plt.close(fig)
     summary['matplotlib_version'] = matplotlib.__version__

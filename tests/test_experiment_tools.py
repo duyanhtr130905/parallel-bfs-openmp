@@ -99,6 +99,31 @@ class ToolsTests(unittest.TestCase):
             self.assertEqual(errors,0)
             summary=analyze(out);self.assertEqual(len(summary['rows']),13)
             self.assertTrue(all(r['samples']==10 for r in summary['rows']))
+            manifest_path = out/'manifest.json'
+            original = json.loads(manifest_path.read_text())
+            # Removing an entire group from both raw and manifest must fail,
+            # even after rehashing the edited synthetic fixture.
+            for mode in ('group', 'warmup', 'repeat', 'duplicate', 'matrix'):
+                manifest = copy.deepcopy(original)
+                if mode == 'group':
+                    manifest['samples'] = [s for s in manifest['samples']
+                        if not (s['result']['algorithm']=='omp-opt' and s['result']['threads_requested']==2)]
+                elif mode == 'warmup':
+                    manifest['samples'] = [s for s in manifest['samples'] if s['index'] != 0]
+                elif mode == 'repeat':
+                    manifest['samples'][-1]['repeat'] = 99
+                elif mode == 'duplicate':
+                    manifest['samples'].append(copy.deepcopy(manifest['samples'][0]))
+                else:
+                    manifest['configurations'].pop()
+                retained = {s['index'] for s in manifest['samples']}
+                raw = ''.join(json.dumps(dict(index=s['index'],result=s['result']))+'\n'
+                              for s in original['samples'] if not s['warmup'] and s['index'] in retained)
+                (out/'raw.jsonl').write_text(raw)
+                manifest['hashes']['raw.jsonl'] = sha256(out/'raw.jsonl')
+                manifest_path.write_text(json.dumps(manifest))
+                with self.subTest(mode=mode), self.assertRaises(ValueError): analyze(out)
+            manifest_path.write_text(json.dumps(original))
             with (out/'raw.jsonl').open('a') as f:f.write('{}\n')
             with self.assertRaises(ValueError):analyze(out)
             with patch('benchmark.git',side_effect=lambda *a: 'test-sha' if a[0]=='rev-parse' else ''),patch('benchmark.execute_binary',return_value=subprocess.CompletedProcess([],3,b'',b'not implemented')):

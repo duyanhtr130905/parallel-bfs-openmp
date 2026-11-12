@@ -68,6 +68,32 @@ def analyze(session):
             raise ValueError("raw hash mismatch")
     if 'raw.jsonl' not in m['hashes']:
         raise ValueError("unhashed raw")
+    configs = m.get('configurations', [])
+    keys = [(c['algorithm'], c['threads_requested'], c['schedule']) for c in configs]
+    threads = {p for a,p,s in keys if a != 'serial'}
+    required = {('serial', 1, 'none')} | {
+        (a,p,s) for a in ('omp-basic','omp-opt') for p in threads
+        for s in ('static','dynamic','guided')}
+    if not threads or len(keys) != len(set(keys)) or set(keys) != required or m.get('warmups') != 1:
+        raise ValueError("missing/invalid planned configuration matrix or warm-up")
+    expected_slots = {(repeat, *key) for repeat in range(-1, m['repeats']) for key in keys}
+    slots = set()
+    indices = set()
+    expected_graph = {k:m['dataset'][k] for k in ('vertices','edges','directed')}
+    expected_graph.update(source=m['environment']['source'], reachable=m['environment']['reachable'])
+    for sample in m['samples']:
+        if not sample['valid'] or sample['exit'] != 0:
+            raise ValueError("failed sample, including warm-up")
+        r = validate(json.dumps(sample['result']), expected_graph)
+        slot = (sample['repeat'], r['algorithm'], r['threads_requested'], r['schedule'])
+        if (type(sample['repeat']) is not int or type(sample['warmup']) is not bool
+                or sample['warmup'] != (sample['repeat'] == -1)
+                or slot not in expected_slots or slot in slots or sample['index'] in indices):
+            raise ValueError("duplicate/unexpected sample or warm-up")
+        slots.add(slot)
+        indices.add(sample['index'])
+    if slots != expected_slots:
+        raise ValueError("missing planned configuration/repetition/warm-up")
     records = []
     samples = {s['index']:s for s in m['samples']}
     seen = set()

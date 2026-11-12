@@ -112,6 +112,8 @@ def run(binary, dataset, environment, evidence, output, threads, repeats=10, see
         tasks.extend((repeat, *c) for c in order)
     manifest = dict(schema_version=1, commit=head, dirty=False, environment=envmeta,
                     dataset=meta, evidence=proof, repeats=repeats, seed=seed, warmups=1,
+                    configurations=[dict(algorithm=a, threads_requested=p, schedule=s)
+                                    for a,p,s in configs],
                     binary_sha256=sha256(binary), python=sys.version, platform=platform.platform(),
                     runner_sha256=sha256(__file__), invocation=sys.argv, samples=[], hashes={})
     manifest['started_at_utc'] = datetime.datetime.now(datetime.timezone.utc).isoformat()
