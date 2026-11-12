@@ -11,6 +11,8 @@ ifeq ($(OS),Windows_NT)
 EXEEXT := .exe
 endif
 BIN := build/bfs$(EXEEXT)
+GRAPH_TEST := build/test_graph$(EXEEXT)
+SERIAL_TEST := build/test_serial$(EXEEXT)
 
 .PHONY: all build test test-bfs check-scaffold check-api check-openmp report clean help
 all: build
@@ -18,15 +20,22 @@ build: $(BIN)
 $(BIN): src/main.c include/bfs.h include/graph.h include/status.h
 	$(PYTHON) -c "from pathlib import Path; Path('build').mkdir(exist_ok=True)"
 	$(CC) $(CPPFLAGS) $(CFLAGS) src/main.c $(LDFLAGS) $(LDLIBS) -o $(BIN)
+$(GRAPH_TEST): src/graph.c tests/test_graph.c include/graph.h include/status.h
+	$(PYTHON) -c "from pathlib import Path; Path('build').mkdir(exist_ok=True)"
+	$(CC) $(CPPFLAGS) $(CFLAGS) src/graph.c tests/test_graph.c $(LDFLAGS) $(LDLIBS) -o $(GRAPH_TEST)
+$(SERIAL_TEST): src/graph.c src/bfs_serial.c tests/test_serial.c include/bfs.h include/graph.h include/status.h
+	$(PYTHON) -c "from pathlib import Path; Path('build').mkdir(exist_ok=True)"
+	$(CC) $(CPPFLAGS) $(CFLAGS) src/graph.c src/bfs_serial.c tests/test_serial.c $(LDFLAGS) $(LDLIBS) -o $(SERIAL_TEST)
 check-scaffold:
 	$(PYTHON) scripts/check_scaffold.py
 check-api:
 	$(CC) $(CPPFLAGS) $(CFLAGS) -Werror -fsyntax-only tests/api_contract.c
-test: build check-scaffold check-api
+test: build check-scaffold check-api test-bfs
 	$(PYTHON) tests/test_cli.py --binary $(BIN)
 	$(PYTHON) tests/test_clean.py
-test-bfs:
-	$(PYTHON) -c "import sys; sys.exit('NOT IMPLEMENTED: BFS correctness tests await real modules.')"
+test-bfs: $(GRAPH_TEST) $(SERIAL_TEST)
+	./$(GRAPH_TEST)
+	./$(SERIAL_TEST)
 check-openmp:
 	$(PYTHON) -c "from pathlib import Path; Path('build').mkdir(exist_ok=True)"
 	$(CC) $(CFLAGS) tests/openmp_probe.c $(LDFLAGS) $(LDLIBS) -o build/openmp_probe$(EXEEXT)
@@ -40,5 +49,5 @@ report:
 clean:
 	$(PYTHON) scripts/clean.py
 help:
-	@echo "build: bootstrap CLI; test: CLI checks only; test-bfs: unavailable"
+	@echo "build: bootstrap CLI; test: CLI and Role A correctness checks"
 	@echo "check-scaffold; check-openmp; report: XeLaTeX + BibTeX; clean: known outputs"

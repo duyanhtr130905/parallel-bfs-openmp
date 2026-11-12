@@ -1,12 +1,147 @@
 \chapter{Cơ sở lý thuyết}
-\section{Đồ thị và BFS}
-[BỔ SUNG: định nghĩa đồ thị có hướng/vô hướng, biểu diễn CSR, tính chất BFS,
-chứng minh khoảng cách và độ phức tạp; bổ sung nguồn được kiểm chứng.]
-\section{Hệ thống song song và OpenMP}
-Giáo trình của Trobec và cộng sự là nguồn nền tảng dự kiến, tập trung vào Chương
-2 về hệ thống song song và Chương 3 về OpenMP~\cite{trobec2018}.
-[BỔ SUNG SAU KHI ĐỌC: shared memory, work sharing, atomic, barrier và scheduling.]
-\section{Chỉ số hiệu năng}
-Với thời gian tuần tự $T_s$ và thời gian song song $T_p$ trên $p$ luồng thực tế,
-quy ước của thực nghiệm là $S_p=T_s/T_p$ và $E_p=S_p/p$.
-Các thời gian đại diện sử dụng median theo quy trình thực nghiệm.
+
+\section{Mô hình đồ thị}
+
+Đồ thị được biểu diễn bởi cặp $G=(V,E)$, trong đó $V$ là tập đỉnh và $E$ là
+tập cung. Với đồ thị có hướng, một cạnh $(u,v)$ chỉ biểu diễn cung đi từ
+$u$ đến $v$. Với đồ thị vô hướng, cạnh giữa $u$ và $v$ được biểu diễn bởi hai
+cung ngược chiều. Trong cài đặt, số đỉnh $n=|V|$ được cung cấp tường minh,
+do đó các đỉnh cô lập vẫn được giữ lại dù không xuất hiện trong danh sách cạnh.
+
+Các cạnh trùng được giữ nguyên. Self-loop $(u,u)$ là một cung trong đồ thị
+có hướng; khi chuyển sang đồ thị vô hướng, self-loop không được nhân đôi.
+Quy ước này làm cho \texttt{edge\_count} luôn có nghĩa là số cung thực sự lưu trong
+CSR, thay vì số dòng của file đầu vào.
+
+\begin{figure}[ht]
+\centering
+\setlength{\unitlength}{1mm}
+\begin{picture}(125,42)
+  \put(12,29){\circle*{3}} \put(9,23){\makebox(6,4){0}}
+  \put(43,29){\circle*{3}} \put(40,23){\makebox(6,4){1}}
+  \put(43,9){\circle*{3}}  \put(40,3){\makebox(6,4){2}}
+  \put(74,19){\circle*{3}} \put(71,13){\makebox(6,4){3}}
+  \put(103,29){\circle*{3}} \put(100,23){\makebox(6,4){4}}
+  \put(103,9){\circle*{3}}  \put(100,3){\makebox(6,4){5}}
+  \put(15,29){\vector(1,0){25}}
+  \put(15,27){\vector(3,-2){25}}
+  \put(46,27){\vector(3,-1){25}}
+  \put(46,10){\vector(3,1){25}}
+  \put(94,29){\makebox(16,4){cô lập}}
+  \put(94,9){\makebox(16,4){cô lập}}
+\end{picture}
+\caption{Ví dụ đồ thị sáu đỉnh dùng để minh họa BFS; cạnh được hiểu là có
+hướng theo các cung $0\to1$, $0\to2$, $1\to3$, $2\to3$ nếu chọn chế độ có
+hướng. Hình do nhóm tự xây dựng.}
+\label{fig:chapter2-example}
+\end{figure}
+
+\section{BFS và đường đi ngắn nhất}
+
+Breadth-First Search (BFS) duyệt đồ thị theo từng lớp khoảng cách tính từ
+đỉnh nguồn $s$. Ban đầu, $s$ có khoảng cách bằng không và mọi đỉnh khác có
+giá trị chưa thăm. Mỗi khi lấy một đỉnh $u$ khỏi hàng đợi, thuật toán xét
+tất cả đỉnh kề $v$. Nếu $v$ chưa được thăm, BFS gán
+
+\[
+    d[v] = d[u] + 1
+\]
+
+và đưa $v$ vào cuối hàng đợi. Một đỉnh chỉ được đưa vào hàng đợi lần đầu
+tiên, vì vậy lần gán đầu tiên của $d[v]$ là khoảng cách ngắn nhất từ $s$ đến
+$v$ trong đồ thị không trọng số.
+
+Giả mã tuần tự của BFS được dùng làm oracle trong phần kiểm thử:
+
+\begin{verbatim}
+BFS(G, s):
+    for mỗi v thuộc V: distance[v] <- -1
+    distance[s] <- 0; Q <- hàng đợi chứa s
+    while Q không rỗng:
+        u <- lấy phần tử đầu Q
+        for mỗi v trong danh sách kề của u:
+            if distance[v] = -1:
+                distance[v] <- distance[u] + 1
+                thêm v vào cuối Q
+\end{verbatim}
+
+Để chứng minh tính đúng đắn, gọi $L_k$ là lớp các đỉnh có khoảng cách $k$ từ
+$s$. BFS bắt đầu với $L_0=\{s\}$. Khi xử lý toàn bộ $L_k$, mọi đỉnh chưa thăm
+kề với một đỉnh trong $L_k$ được đưa vào $L_{k+1}$. Không có đỉnh nào có thể
+được gán khoảng cách nhỏ hơn $k+1$, vì khi đó nó phải thuộc một lớp trước đó
+đã được xử lý. Do đó BFS xử lý đúng thứ tự $L_0,L_1,L_2,\ldots$ và các đỉnh
+không xuất hiện trong lớp nào được ghi là không tới được, với khoảng cách
+$-1$ trong API của nhóm.
+
+Với ví dụ ở Hình~\ref{fig:chapter2-example}, chọn nguồn $0$ cho kết quả:
+
+\begin{table}[ht]
+\centering
+\caption{Các frontier của BFS theo từng mức}
+\label{tab:chapter2-frontier}
+\begin{tabular}{c|c|c}
+Mức & Frontier được xử lý & Đỉnh mới phát hiện\\
+\midrule
+$L_0$ & \{0\} & \{1,2\}\\
+$L_1$ & \{1,2\} & \{3\}\\
+$L_2$ & \{3\} & \{\}\
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\caption{Khoảng cách BFS từ nguồn $0$ trên ví dụ sáu đỉnh}
+\label{tab:chapter2-distance}
+\begin{tabular}{c|cccccc}
+Đỉnh & 0 & 1 & 2 & 3 & 4 & 5\\
+\midrule
+Khoảng cách & 0 & 1 & 1 & 2 & -1 & -1
+\end{tabular}
+\end{table}
+
+\section{Biểu diễn CSR}
+
+Compressed Sparse Row (CSR) lưu toàn bộ danh sách kề trong một mảng liên tục
+\texttt{col\_indices}. Mảng \texttt{row\_offsets} có $n+1$ phần tử; danh sách kề của đỉnh
+$u$ nằm trong khoảng chỉ số
+
+\[
+    [\texttt{row\_offsets}[u],\texttt{row\_offsets}[u+1]).
+\]
+
+Với các cung $0\to1$, $0\to2$, $1\to2$, CSR là:
+
+\begin{verbatim}
+row_offsets = [0, 2, 3, 3]
+col_indices = [1, 2, 2]
+\end{verbatim}
+
+So với adjacency list, CSR giảm số lượng con trỏ và lưu dữ liệu kề liên tục,
+phù hợp với truy cập tuần tự và bộ nhớ đệm. Đổi lại, CSR khó cập nhật thêm
+cạnh sau khi xây dựng. Vì BFS chỉ đọc đồ thị, CSR bất biến là lựa chọn phù hợp
+cho cả phiên bản tuần tự và các phiên bản OpenMP sau này.
+
+\section{Độ phức tạp}
+
+Mỗi đỉnh được đưa vào hàng đợi nhiều nhất một lần và mỗi cung được xét nhiều
+nhất một lần. Vì vậy BFS tuần tự có độ phức tạp thời gian $O(V+E)$ và cần
+$O(V)$ bộ nhớ bổ sung cho mảng khoảng cách và hàng đợi. Việc xây dựng CSR
+cũng cần $O(V+E)$ thời gian và $O(V+E)$ bộ nhớ. Với đồ thị vô hướng, $E$ ở
+đây là số cung sau khi đã thêm các cung ngược chiều.
+
+Các phiên bản song song vẫn phải so sánh toàn bộ mảng khoảng cách với BFS
+tuần tự. Vì vậy kết quả tuần tự trong chương này là oracle tham chiếu cho
+kiểm thử correctness, không phải là số liệu speedup. Số liệu hiệu năng chỉ
+được thu thập sau khi correctness và các điều kiện tái lập của giao thức thí
+nghiệm đã đạt.
+
+\section{Liên hệ với hệ thống song song}
+
+Trong hệ thống OpenMP, các đỉnh của frontier hiện tại có thể được phân phối
+cho nhiều luồng. Tuy nhiên việc đánh dấu đỉnh đã thăm, ghi khoảng cách và
+chuyển sang frontier kế tiếp cần đồng bộ phù hợp. Các vấn đề atomic, barrier
+và schedule thuộc phần triển khai song song; BFS tuần tự ở đây cung cấp hành
+vi đúng và oracle độc lập để kiểm tra chúng. Kiến thức về work sharing và
+đồng bộ bộ nhớ được trình bày trong tài liệu nền tảng về tính toán song song
+của Trobec và cộng sự~\cite{trobec2018}; các biến thể BFS song song hiện đại
+được thảo luận bởi Beamer và cộng sự~\cite{beamer2012}.
