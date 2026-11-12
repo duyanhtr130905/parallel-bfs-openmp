@@ -6,6 +6,7 @@ names = [
     'build/bfs', 'build/bfs.exe',
     'build/test_graph', 'build/test_graph.exe',
     'build/test_serial', 'build/test_serial.exe',
+    'build/test_parallel', 'build/test_parallel.exe',
     'build/openmp_probe', 'build/openmp_probe.exe',
 ]
 suffixes = ('aux', 'log', 'toc', 'lof', 'lot', 'out', 'bbl', 'blg',

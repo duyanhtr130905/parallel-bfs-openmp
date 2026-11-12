@@ -1,15 +1,287 @@
 \chapter{Thiết kế và triển khai thuật toán BFS song song}
-\section{Hợp đồng dữ liệu và API}
-Đồ thị CSR là dữ liệu bất biến dùng chung. Số đỉnh được truyền tường minh để
-giữ đỉnh cô lập. Distance có kiểu int32, nguồn bằng 0 và unreachable bằng $-1$.
-Số cạnh báo cáo là số cung thực lưu trong CSR; cạnh vô hướng không phải self-loop
-được lưu ở cả hai chiều. Hợp đồng chi tiết nằm trong docs/CONTRACT.md của mã nguồn.
-\section{BFS tuần tự}
-[CHƯA TRIỂN KHAI: thành viên phụ trách bổ sung thuật toán, giả mã và kiểm thử.]
-\section{OpenMP cơ bản và tối ưu}
-[CHƯA TRIỂN KHAI: mô tả claim visited, frontier, barrier giữa các mức;
-giải thích an toàn bộ nhớ và lựa chọn static/dynamic/guided sau khi có code.]
-\section{Nguồn tham khảo và giới hạn sử dụng}
-Repository ParallelBFS được dùng làm nguồn khảo sát~\cite{parallelbfs}.
-Bootstrap chưa audit thuật toán tại một commit cụ thể và không sao chép code
-hoặc sử dụng số liệu README làm kết quả nhóm.
+\label{chap:parallel-bfs}
+
+Chương này trình bày hai phiên bản BFS song song bằng OpenMP trên CPU: phiên bản
+cơ bản dùng frontier chia sẻ và phiên bản tối ưu dùng bộ đệm cục bộ theo luồng.
+Cả hai giữ nguyên đồ thị CSR bất biến, cùng một giao diện năm tham số và cùng
+định nghĩa khoảng cách như BFS tuần tự. Trọng tâm là lý do đúng của thao tác
+tranh chấp \emph{visited}, cách công bố frontier giữa các mức, chi phí đồng bộ
+và ảnh hưởng của cấu trúc đồ thị. Chương chưa đưa ra kết luận về tốc độ vì chưa
+có số liệu thực nghiệm trên cùng một commit.
+
+\section{Mô hình thực thi và dữ liệu}
+\label{sec:parallel-model}
+
+Đồ thị được biểu diễn bằng CSR với \texttt{row\_offsets} dài $n+1$ và
+\texttt{col\_indices} dài $m$; mảng này không bị sửa trong suốt lời gọi BFS.
+Mỗi mức $k$ duyệt một tập biên (\emph{frontier}) gồm các đỉnh có khoảng cách
+đúng $k$ từ nguồn. Mảng \texttt{distance} do bên gọi cấp phát, được khởi tạo
+$-1$, sau đó đặt \texttt{distance[source]}=0. Khi thuật toán kết thúc thành công,
+mọi đỉnh không đến được vẫn bằng $-1$ và mọi đỉnh đến được có khoảng cách ngắn
+nhất tính bằng số cung.
+
+Hai mảng frontier \texttt{current} và \texttt{next} có sức chứa $n$ phần tử.
+Một mảng \texttt{visited} kiểu \texttt{\_Atomic unsigned char} dài $n$ được dùng
+riêng cho việc giành quyền xử lý đỉnh. Tách \texttt{visited} khỏi
+\texttt{distance} bảo đảm không có chỗ nào vừa đọc/ghi thường vừa dùng thao tác
+nguyên tử trên cùng một ô nhớ. Mảng \texttt{distance} chỉ được ghi bởi luồng
+thắng cuộc và chỉ được đọc sau barrier của mức, nên không cần biến nó thành kiểu
+nguyên tử.
+
+Cả hai phiên bản tạo \emph{một} nhóm luồng (\emph{persistent team}) cho toàn bộ
+lời gọi BFS thay vì mở lại nhóm ở từng mức. Cách này giữ kích thước nhóm ổn định,
+giảm chi phí tạo nhóm và làm cho \texttt{threads\_actual} đo được một lần trong
+vùng \texttt{single} là đại diện đúng cho mọi vùng xử lý. Số luồng thực tế vẫn
+có thể nhỏ hơn số luồng yêu cầu do giới hạn tài nguyên của runtime; giá trị được
+công bố là số đo thực, không phải giá trị cấu hình.
+
+\section{BFS song song cơ bản}
+\label{sec:basic-bfs}
+
+Phiên bản cơ bản dùng chung một biến đếm nguyên tử cho frontier kế tiếp. Với mỗi
+đỉnh $u$ trong frontier hiện tại, một luồng quét các cung đi ra của $u$. Khi gặp
+láng giềng $v$, luồng thực hiện trao đổi nguyên tử trên \texttt{visited[v]}. Chỉ
+một luồng nhận giá trị cũ bằng $0$; luồng đó ghi khoảng cách và thêm $v$ vào
+frontier kế tiếp. Các luồng còn lại nhận giá trị $1$ và bỏ qua. Nhờ vậy mỗi đỉnh
+được đưa vào frontier đúng một lần và không có hai luồng cùng ghi khoảng cách cho
+một đỉnh.
+
+\begin{quote}
+\small
+\begin{tabbing}
+\hspace{0.6cm}\=\hspace{0.7cm}\=\hspace{0.7cm}\=\hspace{0.7cm}\=\hspace{0.7cm}\=\kill
+\textbf{Thuật toán 3.1} BFS song song cơ bản\\
+\> $d[v] \gets -1$ với mọi $v$; $d[s] \gets 0$\\
+\> $F \gets \{s\}$\\
+\> \textbf{while} $F \neq \emptyset$ \textbf{do}\\
+\> \> $F' \gets \emptyset$; $c \gets 0$\\
+\> \> \textbf{parallel for} $u \in F$ với schedule đã chọn\\
+\> \> \> \textbf{for} mỗi cung $(u,v)$ trong CSR \textbf{do}\\
+\> \> \> \> \textbf{if} atomic\_exchange(visited[$v$], 1) $= 0$ \textbf{then}\\
+\> \> \> \> \> $d[v] \gets d[u]+1$\\
+\> \> \> \> \> $i \gets$ atomic\_fetch\_add($c$, 1)\\
+\> \> \> \> \> $F'[i] \gets v$\\
+\> \> barrier\\
+\> \> $F \gets F'$\\
+\end{tabbing}
+\end{quote}
+
+Chi phí chính của phiên bản này gồm hai loại tranh chấp. Thứ nhất, mỗi cung sinh
+ra một thao tác nguyên tử trên \texttt{visited}; các cạnh cùng trỏ tới một đỉnh
+có thể làm nhiều luồng tranh chấp trên cùng một ô nhớ. Thứ hai, biến đếm $c$ là
+điểm nóng khi nhiều đỉnh mới được phát hiện trong cùng một mức. Barrier cuối mỗi
+mức bảo đảm frontier và khoảng cách đã công bố trước khi mức sau đọc. Với đồ thị
+có ít mức nhưng frontier rộng, chi phí barrier ít nhưng tranh chấp bộ đếm tăng.
+Với đồ thị dạng đường đi, frontier chỉ có một đỉnh nên gần như không có song song
+theo mức.
+
+\section{Phiên bản tối ưu với bộ đệm cục bộ}
+\label{sec:optimized-bfs}
+
+Phiên bản tối ưu giữ nguyên thao tác giành quyền trên \texttt{visited} nhưng thay
+biến đếm chia sẻ bằng bộ đệm riêng cho từng luồng. Luồng thắng cuộc ghi đỉnh mới
+vào \texttt{L[t]} của mình. Cuối mức, mỗi luồng báo số phần tử đã ghi; một vùng
+\texttt{single} tính tổng tiền tố để xác định vị trí bắt đầu của từng bộ đệm
+trong frontier kế tiếp. Sau barrier, mỗi luồng tự sao chép đoạn của mình vào
+\texttt{next} tại vị trí tương ứng. Nhờ đó, số thao tác nguyên tử trên một biến
+đếm chung giảm từ ``mỗi đỉnh mới'' xuống còn ``mỗi mức''.
+
+\begin{quote}
+\small
+\begin{tabbing}
+\hspace{0.6cm}\=\hspace{0.7cm}\=\hspace{0.7cm}\=\hspace{0.7cm}\=\hspace{0.7cm}\=\kill
+\textbf{Thuật toán 3.2} BFS song song với bộ đệm cục bộ\\
+\> $d[v] \gets -1$ với mọi $v$; $d[s] \gets 0$; $F \gets \{s\}$\\
+\> \textbf{while} $F \neq \emptyset$ \textbf{do}\\
+\> \> mỗi luồng $t$: $L_t \gets \emptyset$\\
+\> \> \textbf{parallel for} $u \in F$ với schedule đã chọn\\
+\> \> \> \textbf{for} mỗi cung $(u,v)$ trong CSR \textbf{do}\\
+\> \> \> \> \textbf{if} atomic\_exchange(visited[$v$], 1) $= 0$ \textbf{then}\\
+\> \> \> \> \> $d[v] \gets d[u]+1$; thêm $v$ vào $L_t$\\
+\> \> barrier\\
+\> \> \textbf{single}: offset[$t$] $\gets \sum_{j<t}|L_j|$;\quad
+      $c \gets \sum_j |L_j|$\\
+\> \> barrier\\
+\> \> mỗi luồng $t$: sao chép $L_t$ vào $F'$ tại offset[$t$]\\
+\> \> barrier; $F \gets F'$\\
+\end{tabbing}
+\end{quote}
+
+\begin{figure}[htbp]
+\centering
+\setlength{\unitlength}{1cm}
+\begin{picture}(13.4,5.6)
+  \put(0.0,4.5){\framebox(2.8,0.8){\small Luồng 0}}
+  \put(3.4,4.5){\framebox(2.8,0.8){\small Luồng 1}}
+  \put(6.8,4.5){\framebox(2.8,0.8){\small Luồng 2}}
+  \put(10.2,4.5){\framebox(2.8,0.8){\small Luồng 3}}
+  \put(1.4,4.4){\vector(0,-1){0.5}}
+  \put(4.8,4.4){\vector(0,-1){0.5}}
+  \put(8.2,4.4){\vector(0,-1){0.5}}
+  \put(11.6,4.4){\vector(0,-1){0.5}}
+  \put(0.0,3.0){\framebox(2.8,0.8){\small Bộ đệm $L_0$}}
+  \put(3.4,3.0){\framebox(2.8,0.8){\small Bộ đệm $L_1$}}
+  \put(6.8,3.0){\framebox(2.8,0.8){\small Bộ đệm $L_2$}}
+  \put(10.2,3.0){\framebox(2.8,0.8){\small Bộ đệm $L_3$}}
+  \put(1.4,2.9){\vector(0,-1){0.6}}
+  \put(4.8,2.9){\vector(0,-1){0.6}}
+  \put(8.2,2.9){\vector(0,-1){0.6}}
+  \put(11.6,2.9){\vector(0,-1){0.6}}
+  \put(0.0,1.3){\framebox(13.0,0.9){\small
+    Frontier mức kế tiếp: ghép $L_0,L_1,L_2,L_3$ theo offset tiền tố}}
+  \put(0.0,0.4){\small Barrier cuối mức; hoán đổi \texttt{current} và
+    \texttt{next}}
+\end{picture}
+\caption{Sơ đồ thu thập frontier của phiên bản tối ưu. Mỗi luồng ghi vào bộ đệm
+riêng, sau đó các bộ đệm được ghép lại theo thứ tự offset đã tính ở vùng
+\texttt{single}.}
+\label{fig:frontier-merge}
+\end{figure}
+
+Hình~\ref{fig:frontier-merge} minh họa thứ tự ghép. Cách này loại bỏ tranh chấp
+trên biến đếm chung nhưng đổi lại cần bộ nhớ cục bộ và một bước cộng tiền tố
+$O(p)$ cho mỗi mức, với $p$ là số luồng thực tế. Bộ đệm được cấp phát tăng dần
+theo cấp số nhân và được tái sử dụng giữa các mức; nếu cấp phát thất bại, thuật
+toán trả lỗi bộ nhớ thay vì bỏ qua đỉnh và tiếp tục với frontier thiếu. Trong
+trường hợp xấu nhất một luồng có thể giữ gần $n$ đỉnh, nên tổng bộ nhớ cục bộ có
+thể lớn hơn phiên bản cơ bản; đây là đánh đổi cần được đo, không phải một kết
+luận hiệu năng.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}p{0.22\textwidth}p{0.34\textwidth}p{0.34\textwidth}@{}}
+\toprule
+Tiêu chí & Cơ bản & Tối ưu \\
+\midrule
+Thu thập frontier & Một biến đếm nguyên tử dùng chung &
+Bộ đệm riêng từng luồng, ghép bằng offset \\
+Tranh chấp & Mỗi đỉnh mới tranh chấp bộ đếm chung &
+Chỉ tranh chấp \texttt{visited}; bộ đếm không còn \\
+Bộ nhớ phụ & Hai mảng frontier và mảng \texttt{visited} &
+Thêm bộ đệm cục bộ có thể tăng theo số luồng \\
+Chi phí mỗi mức & Barrier và tranh chấp bộ đếm &
+Cộng tiền tố $O(p)$ và sao chép cục bộ \\
+Điểm mạnh & Đơn giản, ít bộ nhớ, dễ giải thích &
+Giảm điểm nóng khi frontier rộng \\
+Điểm yếu & Bộ đếm chung thành nút cổ chai &
+Tốn bộ nhớ, thêm bước ghép, có thể chậm ở frontier nhỏ \\
+\bottomrule
+\end{tabular}
+\caption{So sánh hai phiên bản BFS song song. Các nhận định về hiệu năng là giả
+thuyết thiết kế; chưa có số đo thực nghiệm.}
+\label{tab:basic-vs-optimized}
+\end{table}
+
+\section{Đồng bộ, mô hình bộ nhớ và metrics}
+\label{sec:memory-model}
+
+Thao tác trao đổi trên \texttt{visited} tạo ra một thứ tự sửa đổi duy nhất cho
+mỗi ô nhớ. Với mọi đỉnh $v$, đúng một luồng nhận giá trị cũ $0$; các luồng khác
+nhận $1$. Vì vậy, không có hai luồng cùng ghi \texttt{distance[v]} và mỗi đỉnh
+được thêm vào frontier kế tiếp đúng một lần. Thao tác nguyên tử với thứ tự
+\texttt{relaxed} là đủ cho mục đích loại trừ lẫn nhau; việc công bố dữ liệu dựa
+vào barrier cuối mỗi mức. Barrier này tạo quan hệ \emph{happens-before} giữa các
+ghi khoảng cách, ghi frontier và các lần đọc ở mức kế tiếp. Nhờ đó không cần đặt
+\texttt{distance} thành kiểu nguyên tử, nhưng cũng không được phép đọc/ghi thường
+đồng thời với thao tác nguyên tử trên cùng một ô.
+
+Mảng \texttt{visited} chỉ được truy cập bằng thao tác nguyên tử sau khi khởi tạo,
+và mọi lần khởi tạo cũng dùng thao tác nguyên tử. Frontier và khoảng cách chỉ
+được ghi bởi luồng sở hữu rồi được đọc sau barrier, nên các truy cập thường không
+tạo data race. Nếu một luồng không thể cấp phát bộ đệm cục bộ hoặc phát hiện
+frontier vượt sức chứa $n$, thuật toán dừng và trả mã lỗi; không có nhánh nào
+âm thầm quay về tuần tự hoặc xuất kết quả không đầy đủ.
+
+\paragraph{Metrics.} Nếu con trỏ \texttt{metrics} khác NULL, trường
+\texttt{threads\_actual} được đặt về $0$ trước khi kiểm tra đối số. Chỉ khi
+\texttt{BFS\_OK} mới công bố giá trị đo được từ
+\texttt{omp\_get\_num\_threads()} bên trong vùng \texttt{single} của nhóm luồng
+thực thi BFS. Nhóm luồng được giữ cố định trong suốt lời gọi, nên không có trường
+hợp các vùng xử lý dùng các nhóm khác kích thước. Giá trị này khác với số luồng
+yêu cầu nếu runtime tạo ít luồng hơn; báo cáo hiệu năng phải dùng số thực tế.
+
+\section{Lựa chọn schedule}
+\label{sec:scheduling}
+
+Schedule được áp dụng cho vòng lặp phân phối các đỉnh của frontier hiện tại, không
+áp dụng cho vòng lặp bên trong danh sách láng giềng và không áp dụng cho vòng sao
+chép bộ đệm cục bộ. Chunk mặc định do OpenMP quyết định; phiên bản này không thêm
+tham số chunk vào CLI. Ba lựa chọn có trade-off khác nhau:
+
+\begin{itemize}
+  \item \textbf{static}: chia frontier thành các khối gần bằng nhau, ít chi phí
+        lập lịch và thân thiện với bộ nhớ đệm. Tuy nhiên, nếu một vài đỉnh có bậc
+        rất cao, các luồng nhận đỉnh đó có thể làm việc lâu hơn hẳn.
+  \item \textbf{dynamic}: cấp từng khối việc khi luồng rảnh, giảm mất cân bằng
+        khi bậc đỉnh chênh lệch mạnh. Đổi lại, chi phí đồng bộ và mất cục bộ bộ
+        nhớ đệm tăng.
+  \item \textbf{guided}: khối việc giảm dần, cố gắng cân bằng giữa chi phí lập
+        lịch của dynamic và tính ổn định của static.
+\end{itemize}
+
+Giáo trình của Trobec và cộng sự trình bày các mô hình shared-memory, vòng lặp
+song song và schedule như những lựa chọn ảnh hưởng trực tiếp đến chi phí đồng
+bộ~\cite{trobec2018}. Đặc tả OpenMP mô tả chi tiết ngữ nghĩa của
+\texttt{atomic}, barrier và các loại schedule~\cite{openmp52}. Việc chọn schedule
+nào nhanh hơn phụ thuộc vào phân bố bậc và kích thước frontier, nên cần đo trên
+từng đồ thị thay vì suy đoán từ cấu hình.
+
+\section{Chi phí, độ phức tạp và giả thuyết hiệu năng}
+\label{sec:parallel-cost}
+
+Về khối lượng công việc duyệt đồ thị, mỗi cung được quét đúng một lần khi đỉnh
+nguồn của nó nằm trong frontier, và mỗi đỉnh được giành quyền đúng một lần. Nếu
+chỉ đếm phần duyệt CSR thì công việc là $O(n+m)$ và không phụ thuộc số luồng. Tuy
+nhiên tổng chi phí thực thi còn phần quản lý song song. Gọi $L$ là số tầng BFS
+thực sự được duyệt từ nguồn; $L$ phụ thuộc nguồn và eccentricity, không nhất thiết
+bằng đường kính đồ thị, nhất là với đồ thị có hướng hoặc không liên thông. Mỗi
+tầng có nhiều điểm đồng bộ: bản cơ bản dùng các vùng \texttt{single}/\texttt{for}
+và barrier cuối tầng, còn bản tối ưu thêm bước cộng tiền tố $O(p)$ và barrier
+trước khi sao chép frontier. Vì vậy chi phí có thể mô hình hóa là
+$O(n+m+pL)$ cộng hằng số barrier cho mỗi tầng, thay vì chỉ $O(n+m)$; khi phân
+tích cần tách chi phí duyệt khỏi chi phí đồng bộ và lập lịch.
+
+Từ mô hình này có thể nêu các giả thuyết cần kiểm chứng, chưa phải kết quả đo:
+
+\begin{itemize}
+  \item \textbf{Đồ thị dạng đường đi hoặc chuỗi dài}: frontier nhỏ, mỗi mức gần
+        như tuần tự; chi phí barrier và tạo nhóm luồng có thể làm phiên bản song
+        song chậm hơn tuần tự.
+  \item \textbf{Đồ thị hình sao}: frontier mức một rất rộng nhưng mỗi đỉnh chỉ có
+        một cạnh; công việc quét phân bố đều, trong khi số mức rất nhỏ nên tổng
+        lợi ích bị giới hạn bởi chi phí khởi động và kết thúc.
+  \item \textbf{Đồ thị bậc cao, phân bố lệch}: static dễ mất cân bằng; dynamic
+        hoặc guided có thể tốt hơn nhưng phải trả chi phí lập lịch.
+  \item \textbf{Đồ thị nhỏ}: thời gian làm việc ít hơn chi phí cố định của
+        OpenMP; phiên bản tối ưu có thêm cấp phát bộ đệm và cộng tiền tố nên có
+        thể chậm hơn phiên bản cơ bản.
+\end{itemize}
+
+Các giả thuyết trên chỉ được xác nhận hoặc bác bỏ bằng thực nghiệm tái lập trên
+cùng commit, cùng dữ liệu, cùng cờ biên dịch và cùng số luồng thực tế. Báo cáo
+không dùng số liệu của repository tham khảo thay cho số đo của nhóm.
+
+\section{Kiểm chứng và giới hạn}
+\label{sec:parallel-verification}
+
+Bộ kiểm thử dựng CSR bằng \texttt{graph\_from\_edges} của module A; một ca còn
+đọc edge-list qua \texttt{graph\_read\_edge\_list} để kiểm tra đường nạp dữ liệu.
+Một BFS tuần tự viết độc lập trong tệp kiểm thử đóng vai trò oracle; với fixture
+sáu đỉnh của nhóm, khoảng cách còn được đối chiếu với bảng tính tay. Mỗi fixture
+được chạy với \texttt{bfs\_serial} và cả hai phiên bản song song, nhiều nguồn, các
+schedule static/dynamic/guided và các mức luồng 1, 2, 4, 8 (các đồ thị lớn dùng
+1, 4, 8); mọi phần tử của \texttt{distance} được so sánh với oracle và với kết
+quả tuần tự, không chỉ số đỉnh đến được. Kiểm thử
+cũng xác nhận
+\texttt{threads\_actual} được đặt lại $0$ khi lỗi, được công bố ít nhất $1$ khi
+thành công, CSR không bị sửa và các đối số NULL/ngoài miền bị từ chối.
+
+Giới hạn hiện tại: các fixture là đồ thị tổng hợp nhỏ và đồ thị sinh ngẫu nhiên
+có seed cố định, chưa phải bộ dữ liệu lớn; oracle trong tệp kiểm thử là mã kiểm
+chứng, không phải implementation thay thế. Việc lặp kiểm thử không chứng minh
+tuyệt đối không có race; kết luận về đồng bộ dựa trên review mô hình bộ nhớ và
+barrier. Chưa có
+đo thời gian, speedup hay efficiency trong chương này; các số liệu đó chỉ được
+điền sau khi tích hợp đủ A và B, kiểm tra đúng đắn trên cùng commit và chạy theo
+quy trình thực nghiệm đã thống nhất.
