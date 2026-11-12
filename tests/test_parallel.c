@@ -1,12 +1,11 @@
 /*
  * Correctness tests for the two OpenMP BFS implementations.
  *
- * Until issue #3 (CSR loader + sequential BFS) is merged this file builds
- * small CSR fixtures directly and compares every distance element against an
- * independent queue-based oracle written here.  The fixture builder is test
- * code only: it is not a production graph loader and it is not used as
- * benchmark data.  When the sequential implementation lands, the same matrix
- * should additionally compare against bfs_serial.
+ * CSR input comes from the production loader (graph_from_edges from module A);
+ * one case also goes through graph_read_edge_list.  Every distance element is
+ * compared against an independent queue-based oracle written here and against
+ * bfs_serial, so the parallel results are checked against both a hand-written
+ * oracle and the sequential production implementation.
  */
 #include "bfs.h"
 
@@ -17,8 +16,6 @@
 
 typedef struct {
     CSRGraph graph;
-    size_t *row_offsets;
-    uint32_t *col_indices;
 } Fixture;
 
 typedef BFSStatus (*BfsFunction)(const CSRGraph *, uint32_t, int32_t *,
@@ -49,92 +46,35 @@ static const struct {
     const char *name;
     BfsFunction function;
 } implementations[] = {
+    {"serial", bfs_serial},
     {"basic", bfs_parallel_basic},
     {"optimized", bfs_parallel_optimized},
 };
 
 static void fixture_free(Fixture *fixture)
 {
-    free(fixture->row_offsets);
-    free(fixture->col_indices);
-    memset(fixture, 0, sizeof(*fixture));
+    graph_free(&fixture->graph);
 }
 
-/* Test-only CSR builder.  It mirrors undirected edges and keeps self-loops
- * and duplicates, matching the public graph contract closely enough for BFS
- * input fixtures. */
+/* Build a fixture with the production CSR loader so the tests exercise the
+ * same ownership, overflow and undirected-mirroring rules as the library. */
 static int fixture_build(Fixture *fixture, uint32_t vertex_count,
                          const Edge *edges, size_t edge_count, GraphMode mode)
 {
     memset(fixture, 0, sizeof(*fixture));
-    if (vertex_count == 0u) {
-        return 0;
-    }
-
-    fixture->row_offsets =
-        (size_t *)calloc((size_t)vertex_count + 1u, sizeof(*fixture->row_offsets));
-    if (fixture->row_offsets == NULL) {
-        return 0;
-    }
-
-    for (size_t i = 0u; i < edge_count; ++i) {
-        if (edges[i].src >= vertex_count || edges[i].dst >= vertex_count) {
-            fixture_free(fixture);
-            return 0;
-        }
-        fixture->row_offsets[edges[i].src + 1u] += 1u;
-        if (mode == GRAPH_UNDIRECTED && edges[i].src != edges[i].dst) {
-            fixture->row_offsets[edges[i].dst + 1u] += 1u;
-        }
-    }
-    for (uint32_t i = 0u; i < vertex_count; ++i) {
-        fixture->row_offsets[i + 1u] += fixture->row_offsets[i];
-    }
-
-    const size_t stored = fixture->row_offsets[vertex_count];
-    if (stored > 0u) {
-        fixture->col_indices =
-            (uint32_t *)malloc(stored * sizeof(*fixture->col_indices));
-        if (fixture->col_indices == NULL) {
-            fixture_free(fixture);
-            return 0;
-        }
-    }
-
-    size_t *cursor = (size_t *)malloc((size_t)vertex_count * sizeof(*cursor));
-    if (cursor == NULL) {
-        fixture_free(fixture);
-        return 0;
-    }
-    for (uint32_t i = 0u; i < vertex_count; ++i) {
-        cursor[i] = fixture->row_offsets[i];
-    }
-    for (size_t i = 0u; i < edge_count; ++i) {
-        const uint32_t src = edges[i].src;
-        const uint32_t dst = edges[i].dst;
-        fixture->col_indices[cursor[src]++] = dst;
-        if (mode == GRAPH_UNDIRECTED && src != dst) {
-            fixture->col_indices[cursor[dst]++] = src;
-        }
-    }
-    free(cursor);
-
-    fixture->graph.vertex_count = vertex_count;
-    fixture->graph.edge_count = stored;
-    fixture->graph.row_offsets = fixture->row_offsets;
-    fixture->graph.col_indices = fixture->col_indices;
-    return 1;
+    return graph_from_edges(vertex_count, edges, edge_count, mode,
+                            &fixture->graph) == BFS_OK;
 }
 
 static uint64_t fixture_checksum(const Fixture *fixture)
 {
     uint64_t hash = UINT64_C(1469598103934665603);
     for (uint32_t i = 0u; i <= fixture->graph.vertex_count; ++i) {
-        hash ^= (uint64_t)fixture->row_offsets[i];
+        hash ^= (uint64_t)fixture->graph.row_offsets[i];
         hash *= UINT64_C(1099511628211);
     }
     for (size_t i = 0u; i < fixture->graph.edge_count; ++i) {
-        hash ^= (uint64_t)fixture->col_indices[i];
+        hash ^= (uint64_t)fixture->graph.col_indices[i];
         hash *= UINT64_C(1099511628211);
     }
     return hash;
@@ -331,6 +271,41 @@ static void test_hand_fixture(void)
     fixture_free(&fixture);
 }
 
+static void test_edge_list_loader(void)
+{
+    /* End-to-end loader path: edge-list text (comment, CRLF, self-loop) goes
+     * through graph_read_edge_list and then the same BFS matrix. */
+    const char *path = "build/test_parallel_input.edgelist";
+    const char *content =
+        "# synthetic edge-list for the parallel BFS integration test\n"
+        "0 1\n"
+        "0 2\r\n"
+        "1 3\n"
+        "2 3\n"
+        "4 4\n";
+    FILE *file = fopen(path, "wb");
+    CHECK_MSG(file != NULL, "could not create %s", path);
+    if (file == NULL) {
+        return;
+    }
+    const size_t length = strlen(content);
+    CHECK_MSG(fwrite(content, 1u, length, file) == length,
+              "short write to %s", path);
+    CHECK_MSG(fclose(file) == 0, "could not close %s", path);
+
+    Fixture fixture;
+    memset(&fixture, 0, sizeof(fixture));
+    const BFSStatus status =
+        graph_read_edge_list(path, 6u, GRAPH_DIRECTED, &fixture.graph);
+    CHECK_MSG(status == BFS_OK, "graph_read_edge_list returned %d", (int)status);
+    if (status == BFS_OK) {
+        const uint32_t sources[] = {0u};
+        run_fixture("edge_list", &fixture, sources, 1u, 0);
+    }
+    fixture_free(&fixture);
+    CHECK_MSG(remove(path) == 0, "could not remove %s", path);
+}
+
 static void test_invalid_arguments(void)
 {
     const Edge edges[] = {{0u, 1u}, {1u, 2u}, {2u, 3u}};
@@ -426,7 +401,7 @@ static void test_invalid_arguments(void)
                       BFS_ERR_ARGUMENT,
                   "%s: missing row_offsets was not rejected", name);
 
-        CSRGraph missing_columns = {4u, 1u, fixture.row_offsets, NULL};
+        CSRGraph missing_columns = {4u, 1u, fixture.graph.row_offsets, NULL};
         metrics.threads_actual = 77;
         CHECK_MSG(function(&missing_columns, 0u, distance, &good, &metrics) ==
                       BFS_ERR_ARGUMENT,
@@ -668,6 +643,7 @@ static void test_random_graphs(void)
 int main(void)
 {
     test_hand_fixture();
+    test_edge_list_loader();
     test_single_vertex();
     test_no_edges();
     test_path();

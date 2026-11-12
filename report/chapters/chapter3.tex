@@ -230,12 +230,17 @@ từng đồ thị thay vì suy đoán từ cấu hình.
 \section{Chi phí, độ phức tạp và giả thuyết hiệu năng}
 \label{sec:parallel-cost}
 
-Về khối lượng công việc, mỗi cung được quét đúng một lần khi đỉnh nguồn của nó
-nằm trong frontier, và mỗi đỉnh được giành quyền đúng một lần. Do đó tổng công
-việc vẫn là $O(n+m)$, không phụ thuộc số luồng. Phần song song được chia theo
-frontier: nếu mức $k$ có $f_k$ đỉnh và tổng bậc của chúng là $e_k$, thời gian lý
-tưởng của mức là $O(e_k/p)$ cộng chi phí barrier và, với phiên bản tối ưu, chi
-phí cộng tiền tố $O(p)$. Số barrier bằng số mức, tức đường kính của đồ thị.
+Về khối lượng công việc duyệt đồ thị, mỗi cung được quét đúng một lần khi đỉnh
+nguồn của nó nằm trong frontier, và mỗi đỉnh được giành quyền đúng một lần. Nếu
+chỉ đếm phần duyệt CSR thì công việc là $O(n+m)$ và không phụ thuộc số luồng. Tuy
+nhiên tổng chi phí thực thi còn phần quản lý song song. Gọi $L$ là số tầng BFS
+thực sự được duyệt từ nguồn; $L$ phụ thuộc nguồn và eccentricity, không nhất thiết
+bằng đường kính đồ thị, nhất là với đồ thị có hướng hoặc không liên thông. Mỗi
+tầng có nhiều điểm đồng bộ: bản cơ bản dùng các vùng \texttt{single}/\texttt{for}
+và barrier cuối tầng, còn bản tối ưu thêm bước cộng tiền tố $O(p)$ và barrier
+trước khi sao chép frontier. Vì vậy chi phí có thể mô hình hóa là
+$O(n+m+pL)$ cộng hằng số barrier cho mỗi tầng, thay vì chỉ $O(n+m)$; khi phân
+tích cần tách chi phí duyệt khỏi chi phí đồng bộ và lập lịch.
 
 Từ mô hình này có thể nêu các giả thuyết cần kiểm chứng, chưa phải kết quả đo:
 
@@ -260,20 +265,23 @@ không dùng số liệu của repository tham khảo thay cho số đo của nh
 \section{Kiểm chứng và giới hạn}
 \label{sec:parallel-verification}
 
-Bộ kiểm thử hiện tại dựng CSR trực tiếp từ các fixture nhỏ và một bộ sinh đồ thị
-ngẫu nhiên có seed cố định. Một BFS tuần tự viết độc lập trong tệp kiểm thử đóng
-vai trò oracle; với fixture sáu đỉnh của nhóm, khoảng cách còn được đối chiếu với
-bảng tính tay. Mỗi fixture được chạy với cả hai phiên bản, nhiều nguồn, các schedule
-static/dynamic/guided và các mức luồng 1, 2, 4, 8 (các đồ thị lớn dùng 1, 4, 8);
-mọi phần tử của \texttt{distance} được so sánh, không chỉ số đỉnh đến được. Kiểm thử
+Bộ kiểm thử dựng CSR bằng \texttt{graph\_from\_edges} của module A; một ca còn
+đọc edge-list qua \texttt{graph\_read\_edge\_list} để kiểm tra đường nạp dữ liệu.
+Một BFS tuần tự viết độc lập trong tệp kiểm thử đóng vai trò oracle; với fixture
+sáu đỉnh của nhóm, khoảng cách còn được đối chiếu với bảng tính tay. Mỗi fixture
+được chạy với \texttt{bfs\_serial} và cả hai phiên bản song song, nhiều nguồn, các
+schedule static/dynamic/guided và các mức luồng 1, 2, 4, 8 (các đồ thị lớn dùng
+1, 4, 8); mọi phần tử của \texttt{distance} được so sánh với oracle và với kết
+quả tuần tự, không chỉ số đỉnh đến được. Kiểm thử
 cũng xác nhận
 \texttt{threads\_actual} được đặt lại $0$ khi lỗi, được công bố ít nhất $1$ khi
 thành công, CSR không bị sửa và các đối số NULL/ngoài miền bị từ chối.
 
-Giới hạn hiện tại: chưa so sánh với \texttt{bfs\_serial} thật vì module tuần tự
-thuộc issue~\#3 chưa được merge; oracle trong tệp kiểm thử là mã kiểm chứng, không
-phải implementation thay thế. Việc lặp kiểm thử không chứng minh tuyệt đối không
-có race; kết luận về đồng bộ dựa trên review mô hình bộ nhớ và barrier. Chưa có
+Giới hạn hiện tại: các fixture là đồ thị tổng hợp nhỏ và đồ thị sinh ngẫu nhiên
+có seed cố định, chưa phải bộ dữ liệu lớn; oracle trong tệp kiểm thử là mã kiểm
+chứng, không phải implementation thay thế. Việc lặp kiểm thử không chứng minh
+tuyệt đối không có race; kết luận về đồng bộ dựa trên review mô hình bộ nhớ và
+barrier. Chưa có
 đo thời gian, speedup hay efficiency trong chương này; các số liệu đó chỉ được
 điền sau khi tích hợp đủ A và B, kiểm tra đúng đắn trên cùng commit và chạy theo
 quy trình thực nghiệm đã thống nhất.
