@@ -2,13 +2,13 @@
 
 C11/OpenMP CPU, cùng CSR loader cho Serial, Basic và Optimized. A/B đã merge;
 CLI tích hợp đang ở **Draft PR #7**, nhánh `docs/c1-academic-report`.
-**Chưa có benchmark hiệu năng hoặc báo cáo kết quả cuối**. GCC/libgomp UCRT64
-16.2.0, Make 4.4.1 và Python 3.14.10 đã cài; local correctness và pilot PASS.
-Đã duyệt QPC trên Windows để tránh đồng hồ OpenMP bước 1 ms; Linux giữ
-omp_get_wtime. Ma trận chốt trước đo: [9 dataset/source](docs/experiment-20261112-matrix.json),
-1/2/4/8 luồng, ba schedule, warm-up1 +10 mẫu/config.
-Xem [hồ sơ máy đo](docs/EXPERIMENT_20261112_PREPARATION.md).
-Không dùng timing CI làm số đo.
+**Đã thực nghiệm thật** trên laptop Windows: 6 đồ thị/9 tổ hợp nguồn,225 cấu hình,
+225 warm-up và2250 mẫu chính thức, không lỗi/timeout. Commit đo ab588fb sau
+correctness local và CI3/3 PASS. Không cấu hình OpenMP nào nhanh hơn Serial;
+max speedup0,2914 ở Optimized1/static/grid512. Không dùng timing CI làm số đo.
+[Dữ liệu và tái lập](results/experiment-20261112/README.md),
+[hồ sơ nghiệm thu mới](docs/EXPERIMENT_20261112_RESULTS.md),
+[ma trận trước đo](docs/experiment-20261112-matrix.json).
 
 Đọc [hồ sơ nghiệm thu](docs/ROLE_C_ACCEPTANCE.md), [trạng thái](docs/PROJECT_STATUS.md),
 [API v1](docs/CONTRACT.md) và [protocol](docs/EXPERIMENT_PROTOCOL.md).
@@ -34,12 +34,15 @@ Test tools không phải benchmark; fixtures synthetic không dùng làm số li
 ## Báo cáo và thực nghiệm
 
 `make report`: XeLaTeX → BibTeX → XeLaTeX hai lần, output `report/main.pdf`.
-CI lưu PDF artifact theo SHA để tải và xem. Báo cáo tích hợp sáu chương, Chương5/6
-chưa có kết quả đo thật; không phải bản cuối để nộp.
+CI lưu PDF artifact theo SHA để tải và xem. Sáu chương và abstract đã điền số
+thật,9 bảng cấu hình chi tiết và12 biểu đồ từ raw (36 figures được lưu để tái tạo).
+GCC/libgomp16.2.0, Make4.4.1, Python3.14.10 tại C:/tools/msys64. Windows dùng QPC
+theo ADR-0003; Linux giữ omp_get_wtime. PDF cần được kiểm theo final PR HEAD.
 
-Lệnh pilot, metadata/evidence, raw retention, hash, analysis và plotting nằm trong
-[ROLE_C_ACCEPTANCE.md](docs/ROLE_C_ACCEPTANCE.md). Runner cần working tree sạch,
-correctness log đúng SHA và môi trường đã xác minh. Không overwrite session cũ.
+Raw/hash/backup/lệnh tái lập ở [results README](results/experiment-20261112/README.md).
+Runner cần working tree sạch, correctness log/binary hash đúng SHA và môi trường
+đã xác minh. Không overwrite session cũ. Fresh process/team startup được tính,
+warm-up không tạo warmed team; không suy rộng kết quả sang mọi đồ thị/runtime.
 
 ## Quy trình Git
 

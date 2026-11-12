@@ -2,12 +2,12 @@
 
 ## Cập nhật thực nghiệm laptop
 
-Xem [hồ sơ chuẩn bị thực nghiệm](EXPERIMENT_20261112_PREPARATION.md): toolchain
-UCRT64 đã cài theo ủy quyền mới, local correctness và CI e2f37ff PASS;
-hai lỗi analyzer/plotter đã sửa và test. Pilot chỉ dùng chọn tải, chưa phải kết quả
-chính thức. Chủ dự án đã duyệt QPC Windows để giải quyết bước1ms của OpenMP;
-xem ADR-0003 và ma trận9 jobs đã chốt trước đo. Tên giảng viên đã xác nhận.
-Các ghi nhận thiếu toolchain bên dưới là lịch sử trước phiên cài đặt này.
+Xem [hồ sơ kết quả mới](EXPERIMENT_20261112_RESULTS.md) và
+[dữ liệu/tái lập](../results/experiment-20261112/README.md): UCRT64 đã cài,
+local correctness và CI ab588fb PASS,2250 mẫu thật +225 warm-up không lỗi,
+backup ổ D đã so hash. Chủ dự án duyệt QPC Windows (ADR-0003), tên giảng viên
+Nguyễn Hải Vinh. Báo cáo đã điền kết quả/giới hạn; final CI/PDF phải đọc đúng HEAD.
+Các ghi nhận thiếu toolchain/benchmark bên dưới là lịch sử trước phiên mới.
 
 ## Phạm vi và trạng thái
 

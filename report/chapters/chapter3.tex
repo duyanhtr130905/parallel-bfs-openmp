@@ -6,8 +6,8 @@ cơ bản dùng frontier chia sẻ và phiên bản tối ưu dùng bộ đệm 
 Cả hai giữ nguyên đồ thị CSR bất biến, cùng một giao diện năm tham số và cùng
 định nghĩa khoảng cách như BFS tuần tự. Trọng tâm là lý do đúng của thao tác
 tranh chấp \emph{visited}, cách công bố frontier giữa các mức, chi phí đồng bộ
-và ảnh hưởng của cấu trúc đồ thị. Chương chưa đưa ra kết luận về tốc độ vì chưa
-có số liệu thực nghiệm trên cùng một commit.
+và ảnh hưởng của cấu trúc đồ thị. Các giả thuyết thiết kế trong chương được
+đối chiếu với số liệu thực nghiệm tại Chương 5.
 
 \section{Mô hình thực thi và dữ liệu}
 \label{sec:parallel-model}
@@ -171,7 +171,7 @@ Tốn bộ nhớ, thêm bước ghép, có thể chậm ở frontier nhỏ \\
 \bottomrule
 \end{tabular}
 \caption{So sánh hai phiên bản BFS song song. Các nhận định về hiệu năng là giả
-thuyết thiết kế; chưa có số đo thực nghiệm.}
+thuyết thiết kế; kết quả đo và đối chiếu nằm ở Chương 5.}
 \label{tab:basic-vs-optimized}
 \end{table}
 
@@ -283,7 +283,6 @@ Giới hạn hiện tại: các fixture là đồ thị tổng hợp nhỏ và �
 có seed cố định, chưa phải bộ dữ liệu lớn; oracle trong tệp kiểm thử là mã kiểm
 chứng, không phải implementation thay thế. Việc lặp kiểm thử không chứng minh
 tuyệt đối không có race; kết luận về đồng bộ dựa trên review mô hình bộ nhớ và
-barrier. Chưa có
-đo thời gian, speedup hay efficiency trong chương này; các số liệu đó chỉ được
-điền sau khi tích hợp đủ A và B, kiểm tra đúng đắn trên cùng commit và chạy theo
-quy trình thực nghiệm đã thống nhất.
+barrier. Số đo thời gian, speedup và efficiency sau tích hợp/kiểm chứng được
+trình bày ở Chương 5 theo quy trình Chương 4; không dùng timing fixture test làm
+số liệu hiệu năng.

@@ -1,27 +1,33 @@
-# Role C — thực nghiệm laptop, cập nhật 12/11/2026
+# Role C — thực nghiệm thật, báo cáo và nghiệm thu 12/11/2026
 
-Được người dùng cho phép cài toolchain, thực nghiệm, hoàn tất báo cáo và push
-trong Draft PR #7. Không merge/approve hoặc đóng Issue #5. Chi tiết môi trường,
-test/CI, pilot và nơi giữ bằng chứng: [hồ sơ chuẩn bị](EXPERIMENT_20261112_PREPARATION.md).
+Đã thực hiện trên laptop Windows theo ủy quyền cài toolchain, đo thật và hoàn tất
+báo cáo trong Draft PR #7. Không approve/merge hoặc đóng Issue #5.
+Chi tiết hiện hành: [kết quả và checklist](EXPERIMENT_20261112_RESULTS.md),
+[dữ liệu/tái lập](../results/experiment-20261112/README.md).
 
-- GCC/libgomp UCRT64 16.2.0, Make 4.4.1, Python 3.14.10 tại C:/tools/msys64.
-- Local rebuild bắt buộc toàn bộ `build test check-openmp` PASS tại e2f37ff;
-  gồm 1296 integration calls, oracle độc lập, CSR bất biến, 70 CLI, 15 faults.
-  CI cùng SHA PASS ba jobs, plotting tests PASS. Không dùng CI timing để benchmark.
-- Hai lỗi công cụ đã sửa và test: ma trận/warm-up đầy đủ, lý tưởng S=p và
-  so schedule tại cùng actual team. Không sửa module A/B.
-- Pilot 28 calls PASS, RAM quan sát tối đa khoảng 36,4 MiB. Đồng hồ OpenMP
-  Windows có bước 1 ms và serial path trả 0. Chưa thu raw benchmark chính thức.
-- Người dùng đã duyệt QPC Windows; timer/protocol/CONTRACT và test timer đã cập
-  nhật, BFS A/B/API giữ nguyên. QPC pilot28 calls PASS; serial path8192 đo được
-  52,7 microsecond thay vì0 ở pilot cũ. Không trộn hai pilot vào benchmark.
-- Chốt trước đo [ma trận9 jobs](experiment-20261112-matrix.json): 225 cấu hình,
-  225 warm-up và2250 mẫu chính thức, seed2026, threads1/2/4/8, ba schedule.
-- Tên giảng viên Nguyễn Hải Vinh đã được xác nhận và điền bìa. PDF cuối chưa build.
+- Commit đo ab588fb8ab535b796f0c8b6d5e98a7efe5ebc76c: local correctness và
+  CI Linux/Windows/XeLaTeX PASS3/3 trước đo. 1296 integration calls,70 CLI,15 faults,
+  independent oracle/CSR checks và stress; module A/B/API không đổi.
+- MSYS2 UCRT64 GCC/libgomp16.2.0, Make4.4.1, Python3.14.10. QPC10MHz được
+  người dùng duyệt sau phát hiện OpenMP Windows1ms; ADR-0003 và timer test.
+- Ma trận chốt trước đo: 9 jobs ×25 configs ×11 calls =2475;2250 đo +225 warm-up,
+  không lỗi/timeout/loại mẫu, requested=actual1/2/4/8, ba schedule.
+- 16:32:58–16:42:26 UTC+7; AC ổn định, min free RAM10,37GiB. Không có nhiệt độ.
+- 225 dòng thống kê,36 figures có provenance;9 bảng static và12 hình lớn trong
+  report. Mọi216 cấu hình OpenMP S<1; maxS0,2914 ở Optimized1/static/grid512.
+- Raw/manifest/logs tại results/raw/SESSION, backup từng byte ổ D:
+  D:/Code/parallel-bfs-evidence/20261112-1616/official-ab588fb. Source archive,
+  dataset, binary đo và correctness evidence cũng được lưu. Không commit raw/binary.
+- Chương1/4/5/6,abstract và chuyển tiếp Chương3 cập nhật; giữ lý thuyết/thuật toán
+  Đức/Dũng, bìa ghi Nguyễn Hải Vinh. CI/PDF final theo đúng PR HEAD sau thay đổi.
+- PATH User/Machine và power plan không đổi; không sửa Defender/firewall/registry.
+- Review công cụ/timer hỗ trợ AI độc lập không có blocker; không thay human approval.
 
-Tiếp theo: kiểm chứng/CI đúng commit đo đã chốt ma trận →
-benchmark/backup/phân tích/biểu đồ → hoàn tất LaTeX và xem toàn bộ PDF → CI/review.
-PATH User/Machine và power plan giữ nguyên. Bằng chứng cài/pilot có backup ổ D.
+Tiếp theo cho nghiệm thu: đối chiếu final CI/PDF và hồ sơ cục bộ trong
+build/experiment-20261112; reviewer tái tạo thống kê/figures và kiểm giới hạn;
+người có quyền quyết định approval/merge sau nghiệm thu. PR #7 giữ Draft và #5 OPEN.
+BFS trong fresh process gồm khởi tạo team; không suy rộng sang warmed-team,
+đồ thị bất quy tắc hoặc máy khác. Chưa profiling/race detector/nhiệt/máy thứ hai.
 
 ---
 ## Lịch sử tích hợp sau PR #9
