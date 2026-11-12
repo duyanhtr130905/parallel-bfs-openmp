@@ -2,7 +2,12 @@
 from pathlib import Path
 
 root = Path(__file__).resolve().parents[1]
-names = ['build/bfs', 'build/bfs.exe', 'build/openmp_probe', 'build/openmp_probe.exe']
+names = [
+    'build/bfs', 'build/bfs.exe',
+    'build/test_graph', 'build/test_graph.exe',
+    'build/test_serial', 'build/test_serial.exe',
+    'build/openmp_probe', 'build/openmp_probe.exe',
+]
 suffixes = ('aux', 'log', 'toc', 'lof', 'lot', 'out', 'bbl', 'blg',
             'fls', 'fdb_latexmk', 'synctex.gz')
 names += ['report/main.' + suffix for suffix in suffixes]
