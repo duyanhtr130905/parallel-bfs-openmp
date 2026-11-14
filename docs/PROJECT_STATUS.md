@@ -1,3 +1,114 @@
+# Bàn giao cuối 14/11/2026 — Role C / PR #7
+
+Nghiệm thu raw độc lập PASS 9 session/2250 mẫu +225 warm-up, 225 dòng thống kê,
+81 dòng bảng static, 36 hình tái vẽ khớp từng pixel; backup 4968 file khớp.
+Không thay raw/kết quả/thuật toán, không đo lại. Bìa sửa **TS Nguyễn Hải Vinh**,
+bỏ câu lịch sử C1 ở Chương 1. Local full correctness/tools/OpenMP và plot tests PASS.
+
+[Hồ sơ nghiệm thu cuối](FINAL_HANDOFF_20261114.md) và
+[hướng dẫn bộ nộp](SUBMISSION_README.md). Bộ bàn giao riêng ở workspace cha:
+`output/Parallel_BFS_BanGiao_20261114/`; HANDOFF.md/final-acceptance.json ghi
+HEAD, CI cuối, PDF mới/hash/số trang và ZIP sau khi tải artifact đúng HEAD.
+Máy không có XeLaTeX local: build đủ lượt bằng CI; kiểm mọi trang PDF mới.
+Sau final CI/PDF PASS, chuyển PR Ready và mời ducnt05/Terivn.
+Chưa có human approval; không tự merge PR #7 hoặc đóng Issue #5.
+Chưa biết quy định nộp chính thức; người dùng đối chiếu trước nộp.
+
+---
+## Lịch sử trước bàn giao cuối
+
+# Role C — thực nghiệm thật, báo cáo và nghiệm thu 12/11/2026
+
+Đã thực hiện trên laptop Windows theo ủy quyền cài toolchain, đo thật và hoàn tất
+báo cáo trong Draft PR #7. Không approve/merge hoặc đóng Issue #5.
+Chi tiết hiện hành: [kết quả và checklist](EXPERIMENT_20261112_RESULTS.md),
+[dữ liệu/tái lập](../results/experiment-20261112/README.md).
+
+- Commit đo ab588fb8ab535b796f0c8b6d5e98a7efe5ebc76c: local correctness và
+  CI Linux/Windows/XeLaTeX PASS3/3 trước đo. 1296 integration calls,70 CLI,15 faults,
+  independent oracle/CSR checks và stress; module A/B/API không đổi.
+- MSYS2 UCRT64 GCC/libgomp16.2.0, Make4.4.1, Python3.14.10. QPC10MHz được
+  người dùng duyệt sau phát hiện OpenMP Windows1ms; ADR-0003 và timer test.
+- Ma trận chốt trước đo: 9 jobs ×25 configs ×11 calls =2475;2250 đo +225 warm-up,
+  không lỗi/timeout/loại mẫu, requested=actual1/2/4/8, ba schedule.
+- 16:32:58–16:42:26 UTC+7; AC ổn định, min free RAM10,37GiB. Không có nhiệt độ.
+- 225 dòng thống kê,36 figures có provenance;9 bảng static và12 hình lớn trong
+  report. Mọi216 cấu hình OpenMP S<1; maxS0,2914 ở Optimized1/static/grid512.
+- Raw/manifest/logs tại results/raw/SESSION, backup từng byte ổ D:
+  D:/Code/parallel-bfs-evidence/20261112-1616/official-ab588fb. Source archive,
+  dataset, binary đo và correctness evidence cũng được lưu. Không commit raw/binary.
+- Chương1/4/5/6,abstract và chuyển tiếp Chương3 cập nhật; giữ lý thuyết/thuật toán
+  Đức/Dũng, bìa ghi Nguyễn Hải Vinh. CI/PDF final theo đúng PR HEAD sau thay đổi.
+- PATH User/Machine và power plan không đổi; không sửa Defender/firewall/registry.
+- Review công cụ/timer hỗ trợ AI độc lập không có blocker; không thay human approval.
+
+Tiếp theo cho nghiệm thu: đối chiếu final CI/PDF và hồ sơ cục bộ trong
+build/experiment-20261112; reviewer tái tạo thống kê/figures và kiểm giới hạn;
+người có quyền quyết định approval/merge sau nghiệm thu. PR #7 giữ Draft và #5 OPEN.
+BFS trong fresh process gồm khởi tạo team; không suy rộng sang warmed-team,
+đồ thị bất quy tắc hoặc máy khác. Chưa profiling/race detector/nhiệt/máy thứ hai.
+
+---
+## Lịch sử tích hợp sau PR #9
+
+# Role C — tích hợp sau PR #9, 12/11/2026
+
+PR #9 đã merge `0b0c71fb1ead16285dd66b056830e7ff83385456`, Đức approve đúng
+HEAD1048833, CLEAN, threads resolved, đủ checks; main CI43176595134 PASS.
+Merge main vào chính nhánh `docs/c1-academic-report` bằng2656448; giữ Draft #7.
+CLI đã link cả ba BFS thật, giữ API/timing/metrics/schema; không sửa mã module A/B. Polish học thuật tối thiểu: nhãn hình Chương2,
+khởi tạo visited/diễn giải prefix Chương3; xem ROLE_C_ACCEPTANCE.md.
+Thêm oracle Floyd–Warshall từ input edges, 1296 calls, full distance/CSR byte
+comparison; fault CLI15 cases; requested4/actual1; giữ tests A/B/C.
+Tools bổ sung scaling vs omp1 và checkpoint incomplete; report abstract/1/4/5/6
+cập nhật blocker, không bịa số đo. Chi tiết/lệnh/checklist: ROLE_C_ACCEPTANCE.md.
+
+Local Clang14 graph+serial tests PASS; Python tools/static/cleanup PASS.
+Local GCC/OpenMP/Make và XeLaTeX BLOCKED; CI final phải kiểm đúng HEAD PR #7.
+Chưa có benchmark thật/raw/manifest/figures/speedup. PDF chỉ là bản review,
+chưa đủ nội dung thực nghiệm để nộp. Issue #5 OPEN, không approve/merge #7.
+
+Tiếp theo: xác minh CI/PDF đúng commit cuối → reviewer nghiệm thu tích hợp →
+chuẩn bị máy đủ công cụ được phép, pilot/benchmark thật và hoàn tất báo cáo.
+Không cài phần mềm hoặc thay thiết lập hệ thống trong phiên này.
+
+---
+## Lịch sử trước tích hợp C2 (giữ để truy vết)
+
+# Trạng thái hiện hành — 12/11/2026, Role C / tích hợp
+
+- PR #8 đã merge theo approval Terivn tại aa573bd; merge/main:
+  `f73514d2cc5439923972bab8abb0fdbf1780c6e7`.
+  CI sau merge [43170202116](https://github.com/duyanhtr130905/parallel-bfs-openmp/actions/runs/43170202116)
+  PASS đủ Linux, Windows UCRT64 và report. Không bypass ruleset.
+- Giữ cùng branch `docs/c1-academic-report` và Draft PR #7; merge main bằng
+  commit thường, giải conflict Makefile bằng cách giữ test-bfs và test-tools.
+- C nối loader + serial production vào CLI, kiểm chứng toàn distance ngoài timer,
+  JSONL schema v1/metrics/exit codes, bổ sung CLI và loader-to-serial oracle tests.
+  Chỉ serial sẵn sàng trên nhánh C. omp-basic/omp-opt vẫn exit3, stdout rỗng.
+- Local: Clang14 C11 -O2 -Wall -Wextra -Wpedantic -Werror build/run graph và
+  serial tests PASS (không OpenMP). Python scaffold, cleanup, 4 nhóm tool tests PASS.
+  GCC/Make/XeLaTeX không có tại các vị trí đã kiểm; không cài phần mềm.
+  CLI dùng omp_get_wtime thật; kiểm GCC/OpenMP/CLI mới bằng CI sau push,
+  kết quả final theo PR #7, không suy từ CI ancestor.
+- PR #9 tại `640c0201f51cb7313d524447dca9bb5c116084ab` đã CONFLICTING sau #8,
+  chưa approval. Không sửa module B, không approve/merge #9.
+- Chưa chạy benchmark ba thuật toán, chưa có speedup/kết quả Chương 5/6.
+  PR #7 tiếp tục Draft; còn phụ thuộc #9 và independent review.
+
+## Ba bước tiếp theo
+
+1. B làm theo [hướng dẫn tích hợp](C2_INTEGRATION_HANDOFF.md), cập nhật main,
+   so toàn distance với serial thật, CI và Đức review sau commit cuối.
+2. Sau #9 merge: C merge main vào cùng Draft #7, nối hai hàm OpenMP thật,
+   kiểm correctness + CLI cả ba trên Linux/Windows cùng commit.
+3. Xác minh máy/dataset, chạy protocol warm-up + >=10 mẫu/config với raw/hash,
+   sinh biểu đồ; hoàn thiện báo cáo và xem PDF rồi review độc lập.
+
+---
+
+## Lịch sử bootstrap (giữ để truy vết; không phải trạng thái hiện hành)
+
 # Bootstrap PR #1 — sửa review ngày 05/11/2026
 
 Gate: AWAITING INDEPENDENT CHATGPT RE-REVIEW; final CI evidence ở PR #1.

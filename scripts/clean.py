@@ -3,7 +3,10 @@ from pathlib import Path
 
 root = Path(__file__).resolve().parents[1]
 names = [
+    'build/test_integration', 'build/test_integration.exe',
+    'build/cli_fault_backend', 'build/cli_fault_backend.exe',
     'build/bfs', 'build/bfs.exe',
+    'build/test_cli_validation', 'build/test_cli_validation.exe',
     'build/test_graph', 'build/test_graph.exe',
     'build/test_serial', 'build/test_serial.exe',
     'build/test_parallel', 'build/test_parallel.exe',

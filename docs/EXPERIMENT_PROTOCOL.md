@@ -1,4 +1,4 @@
-# Quy trình thực nghiệm v1 (chưa thực thi)
+# Quy trình thực nghiệm v1 — sửa timer Windows 12/11/2026
 
 Chỉ bắt đầu khi loader + serial + OpenMP đã triển khai và qua correctness review.
 Không dùng số liệu README của repository tham khảo làm số liệu nhóm.
@@ -26,9 +26,14 @@ Test input lỗi và size overflow độc lập. Sai kết quả thì không nh�
 
 ## Đo
 
-Wall-clock omp_get_wtime cùng thread, đơn vị giây, chỉ quanh lời gọi BFS;
+Wall-clock cùng caller thread, đơn vị giây, chỉ quanh một lời gọi BFS.
+Windows dùng QPC theo ủy quyền chủ dự án ngày 12/11/2026; Linux giữ
+omp_get_wtime. Ghi timer/frequency trong metadata (ADR-0003), không gộp timer.
 output cấp phát trước, distance init/scratch trong BFS được tính. Loại I/O,
 CSR construction, correctness check, serialization khỏi khoảng đo.
+Runner mở một tiến trình mới cho mỗi warm-up/mẫu: khởi tạo runtime/team trong
+BFS được tính. Warm-up không làm nóng team trong tiến trình đo tiếp theo;
+đây là phép đo lời gọi độc lập, không phải steady-state với team đã nóng.
 Một warm-up không ghi thống kê, ít nhất 10 mẫu đo cho mỗi cấu hình/dataset/source;
 đồ thị quá nhỏ phải báo hạn chế độ phân giải/overhead. Không trừ overhead tùy ý.
 Đảo thứ tự cấu hình với seed cố định để giảm sai lệch nhiệt; lưu thứ tự thực tế.

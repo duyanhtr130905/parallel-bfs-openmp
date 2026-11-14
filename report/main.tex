@@ -4,13 +4,11 @@
 \pagenumbering{roman}
 \chapter*{Tóm tắt}
 \addcontentsline{toc}{chapter}{Tóm tắt}
-Đề tài hướng tới xây dựng và đánh giá thuật toán tìm kiếm theo chiều rộng trên
-CPU đa nhân bằng C11 và OpenMP. Bản hiện tại chỉ xác lập hợp đồng dữ liệu CSR,
-giao diện thuật toán, quy trình kiểm thử và phương pháp đo thời gian.
-Chưa triển khai BFS và chưa thu thập số liệu. Phần kết quả và kết luận về hiệu
-năng sẽ được viết sau khi có thực nghiệm tái lập và kiểm chứng tính đúng đắn.
+Báo cáo nghiên cứu BFS trên CPU đa nhân với ba phiên bản: tuần tự, OpenMP cơ bản và OpenMP tối ưu. Trọng tâm là bảo toàn khoảng cách ngắn nhất, khảo sát khả năng mở rộng theo cấu trúc đồ thị và đánh giá tác động của tổ chức frontier cùng chính sách lập lịch. Phương pháp so sánh dùng cùng CSR và nguồn, đo wall-clock quanh lời gọi BFS, báo median, khoảng tứ phân vị, speedup và efficiency theo số luồng thực tế.
+
+Thực nghiệm thật trên laptop Intel Core i5-12450HX, Windows 11 và GCC và libgomp UCRT64 16.2.0 gồm sáu đồ thị path/star/grid, chín tổ hợp đồ thị/nguồn, 225 cấu hình và 2250 mẫu chính thức sau 225 warm-up. Kiểm thử oracle độc lập và toàn bộ lượt thực nghiệm không quan sát lỗi. Do đồng hồ OpenMP Windows có bước 1 ms, nhóm dùng QPC theo quyết định đã được chủ dự án duyệt, giữ cùng ranh giới BFS. Không cấu hình OpenMP nào nhanh hơn Serial: speedup cao nhất 0,2914 ở Optimized một luồng trên grid512. Basic 8/static đạt speedup khoảng 0,1185 trên star một triệu đỉnh, nhưng chỉ 0,00005623 trên path8192. Kết quả cho thấy frontier hẹp, số mức, lập lịch và tổ chức frontier ảnh hưởng mạnh đến hiệu năng lời gọi độc lập; Optimized không thắng nhất quán. Raw, manifest, hash, thống kê và biểu đồ được lưu để tái lập. Kết luận giới hạn ở một máy và mô hình mỗi mẫu mở tiến trình mới, chưa đại diện BFS với team đã nóng hoặc đồ thị thực bất quy tắc.
 \begingroup
-\small
+\fontsize{11}{13}\selectfont
 \singlespacing
 \tableofcontents
 \endgroup

@@ -1,3 +1,14 @@
+# Kiến trúc hiện hành — Role C, 12/11/2026
+
+Loader CSR và serial từ PR #8, basic/optimized từ PR #9 đã merge main.
+Nhánh Draft PR #7 nối CLI → loader → output/metrics → timer đúng BFS call →
+validation toàn distance → JSONL v1. API/header giữ nguyên. Cả ba thuật toán
+build/link production qua BFS_SOURCES trong Makefile; test backend lỗi chỉ
+link vào binary riêng. Xem ROLE_C_ACCEPTANCE.md và PROJECT_STATUS.md cho evidence.
+Benchmark còn BLOCKED do toolchain máy đo; chưa có kết quả hiệu năng.
+
+## Thiết kế và lịch sử bootstrap bên dưới
+
 # Kiến trúc và ranh giới bootstrap
 
 C11/OpenMP CPU, Windows/MSYS2 UCRT64/GCC, Python kiểm tra/phân tích, XeLaTeX

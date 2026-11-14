@@ -1,11 +1,21 @@
 \chapter{Kết luận và hướng phát triển}
-\section{Trạng thái hiện tại}
-Đã xác lập API và khung triển khai. Chưa đủ bằng chứng kết luận tính đúng đắn
-của thuật toán hoặc lợi ích hiệu năng OpenMP vì các module chưa được xây dựng.
-\section{Công việc tiếp theo}
-Triển khai các module theo hợp đồng; kiểm chứng trước đo; thu thập dữ liệu tái
-lập; hoàn thiện báo cáo và chuẩn bị bảo vệ. Không khẳng định tối ưu nhanh hơn
-cho đến khi có số liệu phù hợp.
-\section{Ghi nhận cách tổ chức báo cáo}
-Khung tham khảo bố cục, lề, cỡ chữ, heading, bìa và sáu chương của mẫu
-SVD~\cite{svdtemplate}; không sử dụng nội dung chuyên môn của báo cáo SVD.
+\section{Đóng góp và câu trả lời nghiên cứu}
+Nhóm đã tích hợp Serial, OpenMP Basic và Optimized qua cùng CSR bất biến, API v1 và validation ngoài timer; cài và kiểm tra thật GCC/libgomp UCRT64 trên laptop Windows. Bộ công cụ giữ raw, lỗi, thứ tự, warm-up, actual team, manifest và SHA-256; analyzer từ chối thiếu cấu hình, plotter tách speedup so Serial khỏi scaling so OpenMP một luồng. Quyết định QPC được ghi rõ sau khi phát hiện giới hạn timer OpenMP Windows.
+
+Câu hỏi correctness được hỗ trợ bởi oracle độc lập,1296 integration BFS calls, tests A/B/C và 2475 lượt thực nghiệm không lỗi. Đây là bằng chứng hữu hạn và review đồng bộ, không phải chứng minh tuyệt đối không có race.
+
+Với khả năng mở rộng,2250 mẫu trên chín tổ hợp đồ thị/nguồn không ghi nhận $S>1$. Speedup tốt nhất là 0,2914 ở Optimized một luồng/static/grid512 nguồn 0. Basic 8/static có speedup 0,00005623 trên path8192,0,1185 trên star một triệu đỉnh và 0,01504 trên grid512. Mọi cấu hình nhiều luồng chậm hơn OpenMP một luồng cùng schedule. Tập cấu hình và mô hình lời gọi độc lập này chưa khai thác đa nhân hiệu quả.
+
+Optimized không thắng nhất quán. Trên grid512 nguồn 0/static, một luồng Optimized thấp hơn Basic (5,814 so 7,0432 ms), nhưng 8 luồng cao hơn (179,7294 so 112,6744 ms). Dynamic làm star một triệu đỉnh/8 luồng chậm hơn static khoảng 3,7--3,8 lần. Cần đánh giá đồng thời tổ chức frontier, công việc hữu ích và chi phí lập lịch/đồng bộ, thay vì suy từ số lõi hoặc tên phiên bản.
+
+\section{Giới hạn và bài học}
+Kết luận chỉ áp dụng cho laptop/build/dataset đã mô tả, một BFS trong mỗi tiến trình mới. Warm-up không tạo team đã nóng cho mẫu sau; khởi tạo team trong BFS được tính. Mười mẫu và IQR không thay khoảng tin cậy hoặc tái lập độc lập. Không đo nhiệt độ, affinity theo loại lõi, cache miss, băng thông hay từng barrier; nguồn/kích thước chạy theo khối nên còn ảnh hưởng thời điểm. Không lấy timing CI hoặc bỏ outlier để làm kết quả đẹp hơn.
+
+Path có frontier hẹp; star có một đỉnh bậc cao nhưng vòng láng giềng chưa song song; grid có nhiều mức tương đối hẹp. Chúng là phép thử có ý nghĩa nhưng chưa bao phủ frontier rất rộng bất quy tắc. OpenMP chậm ở đây không bác bỏ khả năng tăng tốc trên cấu trúc, runtime hoặc triển khai khác.
+
+\section{Hướng phát triển}
+Ưu tiên profiling để định lượng đồng bộ, visited và ghép frontier trước khi sửa thuật toán. Có thể thiết kế protocol riêng cho nhiều BFS cùng tiến trình/team đã nóng, đồng thời giữ phép đo lời gọi độc lập; không gộp hai mô hình thành một baseline. Chia công việc theo cạnh hoặc khảo sát direction-optimizing~\cite{beamer2012} là hướng khác, chưa phải phần đã triển khai.
+
+Thực nghiệm tiếp theo nên đăng ký trước đồ thị layered/ngẫu nhiên seed cố định, nguồn và kích thước frontier rộng, kiểm soát thứ tự giữa các khối rồi tái lập trên máy khác. Mọi thay đổi vẫn cần oracle và provenance. Báo cáo/bảng/biểu đồ/raw được chuẩn bị để nghiệm thu độc lập; CI và review hỗ trợ AI không thay approval của thành viên có quyền.
+
+\paragraph{Ghi nhận cách tổ chức báo cáo.} Tham khảo cấu trúc trình bày của mẫu SVD~\cite{svdtemplate}, không sử dụng nội dung chuyên môn hoặc số liệu của mẫu.

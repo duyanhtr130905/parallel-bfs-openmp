@@ -114,7 +114,7 @@ trả RANGE. Không mở/đọc/đóng file được trả IO. Builder đóng fi
 | BFS_ERR_RUNTIME | 7 | Lỗi runtime được phát hiện |
 
 Không quy định ưu tiên khi nhiều lỗi đồng thời. Mã API khác mã thoát CLI.
-Hiện chỉ có khai báo; chưa có định nghĩa graph/BFS, không thể link ứng dụng BFS thật.
+Cập nhật triển khai 12/11/2026: graph/serial và hai bản OpenMP đã merge qua PR #8/#9; nhánh C tích hợp CLI trong Draft PR #7. Quy định API ở trên không đổi.
 
 ## CLI v1
 
@@ -130,9 +130,9 @@ threads_requested đúng đối số và threads_actual=1.
 
 Exit: 0 help hoặc BFS thật thành công; 2 sai CLI; 3 module chưa triển khai;
 4 lỗi thực thi (graph/BFS/validation). stderr nhận chẩn đoán; lỗi không có result
-trên stdout. Bootstrap parse/validate CLI rồi exit 3, chưa mở graph hay đo runtime.
+trên stdout. Bootstrap trước đây chỉ parse/validate rồi exit3; bản tích hợp gọi BFS thật, exit3 chỉ dành cho status NOT_IMPLEMENTED.
 
-## Kết quả benchmark v1 (chỉ quy định, chưa phát ra)
+## Kết quả JSONL v1 (CLI tích hợp; chưa có benchmark chính thức)
 
 Một JSON object một dòng stdout cho mỗi BFS thành công, locale số C, không NaN/Inf:
 `schema_version`=1, `status`="ok", `algorithm` thuộc enum CLI,
@@ -143,7 +143,11 @@ Một JSON object một dòng stdout cho mỗi BFS thành công, locale số C, 
 Thiếu team measurement thì chưa được
 phát result thành công. Log chẩn đoán chỉ stderr.
 
-Đo wall-clock `omp_get_wtime()` trên cùng master thread trước/sau một lời gọi BFS.
+Đo wall-clock trên cùng caller thread trước/sau một lời gọi BFS. Windows dùng
+`QueryPerformanceCounter` (QPC), đổi hiệu tick sang giây bằng tần số đã kiểm;
+Linux dùng `omp_get_wtime()`. Chủ dự án đã duyệt ngoại lệ Windows ngày 12/11/2026
+vì libgomp UCRT64 có bước 1 ms làm serial path nhận 0. Metadata phải ghi timer,
+tần số/độ phân giải; không trộn các timer/build trong một session. Xem ADR-0003.
 Không gồm đọc file, dựng CSR, cấp phát output, kiểm chứng và ghi kết quả;
 có gồm khởi tạo distance và cấp phát scratch bên trong hàm BFS.
 Chi tiết lặp đo/so sánh trong EXPERIMENT_PROTOCOL.md.

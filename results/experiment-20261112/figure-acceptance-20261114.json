@@ -1,0 +1,182 @@
+[
+  {
+    "figure": "report/figures/experiment-20261112/grid128-s0/efficiency.pdf",
+    "raster_sha256": "c29ee5fc877fc91a10319576547482a372a45b8eae3093b9a1062629b815c705",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/grid128-s0/median.pdf",
+    "raster_sha256": "1aeb19946d3340af1f6ad79b7748f13751fb41ba9330aac9e954fe65286b3637",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/grid128-s0/scheduling.pdf",
+    "raster_sha256": "589e8a9e4036d076e5613f9931c9428922d52664bfe736d08730e84f07db7106",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/grid128-s0/speedup.pdf",
+    "raster_sha256": "f3ad749292338cc439498c25aac2919b729c969db50601950976f0e3c15a6ea0",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/grid512-s0/efficiency.pdf",
+    "raster_sha256": "2c65d11f6415d918f9e84d1a56defb949bedb500bcb17ccfd2742864973e09c3",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/grid512-s0/median.pdf",
+    "raster_sha256": "ad4e4637cca3382ab22713cac9e73de30bd1c45aca9932e04c0c32e79bc4aee0",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/grid512-s0/scheduling.pdf",
+    "raster_sha256": "129b62c383dc69092581ad52dbae7bc03c5917d4a16c4c70a76c146f2797bd0a",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/grid512-s0/speedup.pdf",
+    "raster_sha256": "11d619eb97fc5f52bb143c278dfabfcd26dbbe4d1ad7d9adbd45644da332566f",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/grid512-s131328/efficiency.pdf",
+    "raster_sha256": "0c616aa2eed4f45ae1ec85baf2f53187407c3b27dd3fa388637cf8d3d120d383",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/grid512-s131328/median.pdf",
+    "raster_sha256": "0a2ea5ce36cf034a1c287360f5a1c5787c635b4060657c782fa00dad8149fe96",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/grid512-s131328/scheduling.pdf",
+    "raster_sha256": "5540472b49db7a1945cd63f50a3fc2a732a3543a81405c901da48524805092e8",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/grid512-s131328/speedup.pdf",
+    "raster_sha256": "df4a94d90e2a20b5e1184221b6a687d5cbeeb3c40998a35b1b9f575697ef966d",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/path2048-s0/efficiency.pdf",
+    "raster_sha256": "00a5125532478e65a0eaaec72e1b4bb8b96907e3f0d7673b671b306ea3422d61",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/path2048-s0/median.pdf",
+    "raster_sha256": "9a1b0f20921ad0bea7641e9a2f0dce1abc0ce0068efd61edd9e024dfb35e759e",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/path2048-s0/scheduling.pdf",
+    "raster_sha256": "29a7bc6681cc04219e1f8ac2db5999be247c6cdc5dab77924600f03ee325c3ce",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/path2048-s0/speedup.pdf",
+    "raster_sha256": "ab3617d44ae22be64c76364b2924a964bfe3d101ed170d7a193e833c56198083",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/path8192-s0/efficiency.pdf",
+    "raster_sha256": "94737ae69bef370df9dc752a59754b993514055b917e2d05741ff15f7c110a9d",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/path8192-s0/median.pdf",
+    "raster_sha256": "e62fdbbfd5029b4b21db96bcfbbf3484d8a18610e7a48e2317a2fe1a81e09a4b",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/path8192-s0/scheduling.pdf",
+    "raster_sha256": "3fcb143a52caff3859ecee11e1750f74f4bc94fbb6eb68b4ffdae3f69fe783cf",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/path8192-s0/speedup.pdf",
+    "raster_sha256": "e47ac2dcfde546e233744bfd00beb5a46681f4dbfe80828b4c94f1b8def25b33",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/path8192-s4096/efficiency.pdf",
+    "raster_sha256": "adb28707c692a1949d9101e10eefe1ff972d6e37827f7edb94891063671dabb6",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/path8192-s4096/median.pdf",
+    "raster_sha256": "2951cf613064bd9124af437b8e9a6cb2dad137de1ee69be539ac84657915d428",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/path8192-s4096/scheduling.pdf",
+    "raster_sha256": "57da36773bfd31ea5715cf6ea1127ff2d1b2ff48944d21a9f68b6ccfc356380a",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/path8192-s4096/speedup.pdf",
+    "raster_sha256": "8c30b05e314364d9cca6f0da50639dbe595aac4cb043e9b1f23f96e098a57201",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/star100000-s0/efficiency.pdf",
+    "raster_sha256": "791d5b42b5998b03befb40c95d76606cdbb0461755048e321e030bfbf4d945f8",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/star100000-s0/median.pdf",
+    "raster_sha256": "011dad0c9f396dd9c965c908c3b44c8f47d87153e0d225942f5709c8685059f0",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/star100000-s0/scheduling.pdf",
+    "raster_sha256": "51cd22ce473128679071a6327bc7da60552f485a1dd0aa31f45f20d2055350cc",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/star100000-s0/speedup.pdf",
+    "raster_sha256": "689cbe8b5a338ec16321396761e770b172033b14f8c500b6dcb921cd750a6cd9",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/star1000000-s0/efficiency.pdf",
+    "raster_sha256": "71545bb31271729441d3fb9eba8af48c564789dd35478e101e5654ad418d5795",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/star1000000-s0/median.pdf",
+    "raster_sha256": "2c60df957c723a406a6458959742aad18fb1e07c26a400faefd64b59643ef868",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/star1000000-s0/scheduling.pdf",
+    "raster_sha256": "04fe20aff48b35b7a08eaf366bba1a058dd62b7994c3ee24bf9b3a92dec209bd",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/star1000000-s0/speedup.pdf",
+    "raster_sha256": "b9bfb89d122a68e0419b884201ffa8f48ffc71fa6b0c02a7d3a3bf2f6ed869bb",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/star1000000-s1/efficiency.pdf",
+    "raster_sha256": "e1e28eacb39774b0add3a1844ec6473219f3fc0425e5fa5a1ddfd3d8cc839617",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/star1000000-s1/median.pdf",
+    "raster_sha256": "e189dcd8b7c0678036aacd085e4a35fd8142b3c14ca9bae609e9bcdfaf0aac6f",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/star1000000-s1/scheduling.pdf",
+    "raster_sha256": "4591d408ad883125fd4e9f63b53b8bef1616ce6e565897b0adb034ff851b95fd",
+    "matches_independent_recalculation": true
+  },
+  {
+    "figure": "report/figures/experiment-20261112/star1000000-s1/speedup.pdf",
+    "raster_sha256": "1935183e71cd047b35ee38f850495c2a59c7242f5959da62ab5cdf7dae1333be",
+    "matches_independent_recalculation": true
+  }
+]

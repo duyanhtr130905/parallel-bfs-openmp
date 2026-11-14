@@ -1,9 +1,83 @@
 \chapter{Kết quả thực nghiệm và đánh giá}
-\textbf{Chưa có kết quả thực nghiệm.} Không có bảng hoặc biểu đồ số liệu trong bản khung.
-\section{Kết quả tính đúng đắn}
-[CHỜ: oracle tay, so distance với serial, nhiều source/threads/schedule, lỗi input.]
-\section{Thời gian, speedup và efficiency}
-[CHỜ: dữ liệu raw, manifest, script tái tạo, median và IQR của từng cấu hình.]
-\section{Thảo luận và giới hạn}
-[CHỜ: chi phí đồng bộ, mất cân bằng tải, kích thước frontier, băng thông bộ nhớ,
-sự biến thiên thời gian và giới hạn suy rộng từ một máy thử nghiệm.]
+\section{Tính toàn vẹn dữ liệu và kết quả tổng quát}
+Thực nghiệm chính thức ngày 12/11/2026 bắt đầu lúc 16:32:58 và kết thúc lúc 16:42:26 (UTC+7), khoảng 9 phút 28 giây, trên commit \texttt{ab588fb}. Chín phiên đều có đúng 275 lượt: 25 warm-up và 250 mẫu chính thức; tổng 2250 mẫu được nhận, không lỗi, timeout hoặc mẫu bị loại. Requested và actual threads khớp tại 1/2/4/8. Analyzer kiểm hash, đầy đủ cấu hình, warm-up và chỉ số lần lặp trước khi tổng hợp. Bản sao ổ D được đối chiếu từng file.
+
+Giám sát ghi nguồn AC trong toàn bộ phiên; RAM trống thấp nhất khoảng 10,37 GiB. Tải CPU nền đo một giây trước mỗi phiên nằm trong khoảng 1,30--19,01\%; đây không phải tải nền đo liên tục trong BFS. Không có số đo nhiệt độ để khẳng định máy không throttling. Toàn bộ bảng/biểu đồ dùng raw thật, không dùng timing CI hoặc fixture unit test.
+
+\textbf{Không có cấu hình OpenMP nào nhanh hơn Serial trên ma trận này.} Trong 216 cấu hình OpenMP, speedup lớn nhất là 0,2914 ở Optimized một luồng/static/grid512 nguồn 0 (5,814 ms so Serial 1,6942 ms). Khi xét team từ hai luồng, scaling so OpenMP một luồng lớn nhất cũng chỉ 0,7536 ở Basic hai luồng/static/star một triệu đỉnh. Đây là kết quả của phép đo lời gọi độc lập trên tập dữ liệu đã chốt, không phải kết luận mọi BFS song song đều chậm.
+
+\begin{table}[htbp]\centering\small
+\caption{Ba đồ thị lớn, nguồn 0, static, actual 8; median theo ms, speedup so Serial, 10 mẫu/cấu hình.}\label{tab:headline}
+\begin{tabular}{lrrrrr}\toprule
+Đồ thị & Serial & Basic 8 & Opt 8 & $S_{B,8}$ & $S_{O,8}$ \\\midrule
+Path8192 & 0,05185 & 922,0907 & 1562,0243 & 0,00005623 & 0,00003319 \\
+Star1000000 & 3,1294 & 26,4158 & 26,4872 & 0,1185 & 0,1181 \\
+Grid512 & 1,6942 & 112,6744 & 179,7294 & 0,01504 & 0,009426 \\\bottomrule
+\end{tabular}\end{table}
+
+\section{Bảng thống kê theo cấu hình}
+Các bảng sau trình bày mọi mức luồng với static: Serial baseline, median, IQR, speedup, efficiency theo team thực và scaling so OpenMP một luồng. Không chọn schedule thắng để thay ma trận. Tệp đi kèm \path{results/experiment-20261112/summary.csv} chứa đầy đủ 225 dòng với cả static/dynamic/guided, min, max, $Q_1$ và $Q_3$. Serial là một baseline cho mỗi đồ thị/nguồn. Số hiển thị được làm tròn; phép tính và tệp máy đọc giữ độ chính xác gốc.
+\input{chapters/experiment_tables}
+\clearpage
+
+\section{Path: giới hạn của frontier hẹp}
+Với nguồn 0, tăng path từ 2048 lên 8192 đỉnh (gấp 4) làm median Serial tăng từ 0,0097 lên 0,05185 ms; Basic 8/static từ 229,45 lên 922,09 ms, gần gấp 4. Optimized 8/static từ 389,96 lên 1562,02 ms. Frontier chỉ có một đỉnh mỗi mức, nên tăng team không cung cấp thêm đỉnh cùng tầng để chia. Chi phí đồng bộ theo hàng nghìn mức phù hợp với xu hướng này; timer tổng chưa định lượng riêng barrier.
+
+Basic một luồng/static mất 0,6653 ms ở path8192, khoảng 12,8 lần Serial; actual 8 mất 922,09 ms. Optimized 8 chậm hơn Basic 8 khoảng 1,694 lần. Không thể giải thích toàn bộ chênh lệch chỉ bằng khởi tạo team một lần: tổ chức frontier/visited, lịch trình và đồng bộ lặp theo mức cũng có thể góp phần, cần profiling để tách riêng.
+
+Đổi nguồn từ 0 sang 4096 giảm khoảng cách lớn nhất từ 8191 xuống 4096. Basic 8/static còn 468,45 ms (giảm 49,2\%), Optimized còn 767,02 ms (giảm 50,9\%). Quan sát phù hợp số mức giảm, nhưng hai nguồn chạy ở phiên riêng nên còn sai lệch thời điểm/tải nền. Cả hai vẫn chậm hơn Serial. Hình~\ref{fig:path-runtime}--\ref{fig:path-schedule} trình bày toàn bộ schedule và team.
+
+\begin{figure}[p]\centering\includegraphics[width=.94\textwidth]{figures/experiment-20261112/path8192-s0/median.pdf}
+\caption[Path8192: thời gian]{Path8192, nguồn 0, ab588fb: median và dải $Q_1$--$Q_3$, 10 mẫu/cấu hình; trục thời gian log để thấy cả Serial.}\label{fig:path-runtime}\end{figure}
+\begin{figure}[p]\centering\includegraphics[width=.94\textwidth]{figures/experiment-20261112/path8192-s0/speedup.pdf}
+\caption[Path8192: speedup]{Path8192, nguồn 0: speedup so Serial trên trục log; $S=p$ là mốc lý tưởng, không phải số đo.}\label{fig:path-speedup}\end{figure}
+\begin{figure}[p]\centering\includegraphics[width=.94\textwidth]{figures/experiment-20261112/path8192-s0/efficiency.pdf}
+\caption[Path8192: efficiency]{Path8192, nguồn 0: efficiency $S/p$ theo team thực, 10 mẫu/cấu hình, commit ab588fb.}\label{fig:path-efficiency}\end{figure}
+\begin{figure}[p]\centering\includegraphics[width=.94\textwidth]{figures/experiment-20261112/path8192-s0/scheduling.pdf}
+\caption[Path8192: scheduling]{Path8192, nguồn 0: scheduling trong cùng thuật toán/team; cột là median, thanh sai số là $Q_1$--$Q_3$.}\label{fig:path-schedule}\end{figure}
+\clearpage
+
+\section{Star: bậc lệch và chi phí lập lịch}
+Star một triệu đỉnh có Serial median 3,1294 ms. Static/actual 8 cho Basic 26,4158 ms và Optimized 26,4872 ms; speedup khoảng 0,118, efficiency khoảng 1,48\%. Hai median chênh 0,0714 ms, nhỏ hơn IQR của mỗi bản (1,1649 và 2,3114 ms); chưa đủ cơ sở gọi Optimized tốt hơn. Ở bốn luồng/static, Optimized 23,0336 ms thấp hơn Basic 25,2312 ms khoảng 8,7\%, nhưng lợi ích không nhất quán qua số luồng và vẫn chậm hơn Serial.
+
+Đỉnh tâm có bậc 999999 nhưng chỉ do một lần lặp frontier xử lý; vòng láng giềng trong một đỉnh không được chia cho nhiều luồng. Frontier sau đó rộng nhưng mỗi lá chỉ có một cung về tâm đã thăm. Nhiều đỉnh không đồng nghĩa nhiều công việc hữu ích cân bằng ở mọi mức; bỏ bộ đếm frontier chung chưa đủ bảo đảm tăng tốc.
+
+Ở actual 8, dynamic làm Basic tăng từ 26,4158 lên 98,8135 ms (3,74 lần), Optimized từ 26,4872 lên 101,2997 ms (3,82 lần). Guided là 27,2610 và 26,1920 ms, gần static hơn. Điều này phù hợp giả thuyết chi phí cấp phát nhiều đơn vị việc nhỏ khi quét các lá; chưa phải đo riêng bộ lập lịch.
+
+Nguồn lá1 cho Basic 8/static 26,2714 ms và Optimized 25,6343 ms, chỉ khác khoảng 0,5--3,2\% so nguồn tâm trong khi IQR cỡ1,6--1,9 ms. Không kết luận lợi ích nguồn lá ổn định. Tăng kích thước từ 100000 lên 1000000 làm Serial median tăng11,1 lần, Basic 8/static tăng6,1 lần, nhưng chưa tạo $S>1$. Xem Hình~\ref{fig:star-runtime}--\ref{fig:star-schedule}.
+
+\begin{figure}[p]\centering\includegraphics[width=.94\textwidth]{figures/experiment-20261112/star1000000-s0/median.pdf}
+\caption[Star1000000: thời gian]{Star1000000, nguồn 0: median và dải IQR thời gian, 10 mẫu/cấu hình, commit ab588fb.}\label{fig:star-runtime}\end{figure}
+\begin{figure}[p]\centering\includegraphics[width=.94\textwidth]{figures/experiment-20261112/star1000000-s0/speedup.pdf}
+\caption[Star1000000: speedup]{Star1000000, nguồn 0: speedup so Serial và mốc $S=p$ trên trục log; mọi cấu hình dưới 1.}\label{fig:star-speedup}\end{figure}
+\begin{figure}[p]\centering\includegraphics[width=.94\textwidth]{figures/experiment-20261112/star1000000-s0/efficiency.pdf}
+\caption[Star1000000: efficiency]{Star1000000, nguồn 0: efficiency theo team thực, đơn vị phần số, không phải phần trăm.}\label{fig:star-efficiency}\end{figure}
+\begin{figure}[p]\centering\includegraphics[width=.94\textwidth]{figures/experiment-20261112/star1000000-s0/scheduling.pdf}
+\caption[Star1000000: scheduling]{Star1000000, nguồn 0: median và $Q_1$--$Q_3$ của ba schedule tại cùng team; dynamic chậm rõ ở nhiều luồng.}\label{fig:star-schedule}\end{figure}
+\clearpage
+
+\section{Grid: kích thước, số mức và nguồn}
+Grid512 nguồn góc có Serial median 1,6942 ms, Basic 8/static 112,6744 ms và Optimized 179,7294 ms. Speedup là 0,01504 và 0,009426; efficiency 0,188\% và 0,118\%. Từ grid128 lên grid512, số đỉnh gấp 16 và số mức từ góc gần gấp 4; Basic 8/static tăng30,5277 lên 112,6744 ms (3,69 lần), Serial tăng18,6 lần. Xu hướng phù hợp ảnh hưởng mạnh của số mức, nhưng chưa tách mọi nguyên nhân từ timer tổng.
+
+Nguồn tâm131328 giảm khoảng cách lớn nhất từ 1022 xuống 512. Basic 8/static còn 62,3913 ms (giảm 44,6\%), Optimized 92,5461 ms (giảm 48,5\%). Serial lại tăng1,6942 lên 1,87115 ms, nên không có một xu hướng cho mọi thuật toán. Frontier rộng hơn và ít mức hơn có thể giải thích thay đổi OpenMP; thứ tự truy cập và điều kiện phiên chưa kiểm soát hoàn toàn.
+
+Ở nguồn góc/actual 8, dynamic cho Basic 143,5954 ms và Optimized 224,1793 ms, lớn hơn static 27,4\% và 24,7\%. Guided nằm giữa:127,8383 và 190,7862 ms. Optimized một luồng/static thấp hơn Basic (5,814 so 7,0432 ms), nhưng 8 luồng lại cao hơn 59,5\%. Giảm contention có thể đổi lấy prefix/copy/barrier; dữ liệu không ủng hộ lợi ích ổn định qua team. Xem Hình~\ref{fig:grid-runtime}--\ref{fig:grid-schedule}.
+
+\begin{figure}[p]\centering\includegraphics[width=.94\textwidth]{figures/experiment-20261112/grid512-s0/median.pdf}
+\caption[Grid512: thời gian]{Grid512, nguồn 0: median và dải IQR thời gian; 10 mẫu/cấu hình, commit ab588fb.}\label{fig:grid-runtime}\end{figure}
+\begin{figure}[p]\centering\includegraphics[width=.94\textwidth]{figures/experiment-20261112/grid512-s0/speedup.pdf}
+\caption[Grid512: speedup]{Grid512, nguồn 0: speedup và mốc lý tưởng trên trục log. Optimized một luồng tốt nhất ma trận nhưng vẫn dưới 1.}\label{fig:grid-speedup}\end{figure}
+\begin{figure}[p]\centering\includegraphics[width=.94\textwidth]{figures/experiment-20261112/grid512-s0/efficiency.pdf}
+\caption[Grid512: efficiency]{Grid512, nguồn 0: efficiency theo actual team; không lấy requested threads thay team thực.}\label{fig:grid-efficiency}\end{figure}
+\begin{figure}[p]\centering\includegraphics[width=.94\textwidth]{figures/experiment-20261112/grid512-s0/scheduling.pdf}
+\caption[Grid512: scheduling]{Grid512, nguồn 0: median và $Q_1$--$Q_3$ của schedule tại cùng thuật toán/team.}\label{fig:grid-schedule}\end{figure}
+\clearpage
+
+\section{Đối chiếu câu hỏi nghiên cứu và độ tin cậy}
+Correctness có oracle độc lập, full distance/CSR equality trong test và validation của 2475 lượt chạy; không quan sát lỗi trong phạm vi đã thử. Khả năng mở rộng không cho thấy tăng tốc: cả 216 cấu hình OpenMP có $S<1$, mọi cấu hình từ hai luồng có $C<1$. Hiệu năng thấp không làm kết quả khoảng cách trở thành sai, nhưng bác bỏ kỳ vọng tăng tốc cho phép đo này.
+
+Optimized/scheduling phụ thuộc cấu hình: Optimized có median tốt hơn Basic ở một số cấu hình một/bốn luồng, song chậm hơn rõ trên path/grid ở 8 luồng; dynamic thường thêm chi phí trên star/grid. Không có bằng chứng một phiên bản/schedule luôn thắng. Các tỉ số mô tả median, chưa phải kiểm định thống kê khác biệt trung bình.
+
+IQR/median lớn nhất khoảng 67,0\% ở Serial/star100000: median 0,2825 ms, min 0,1870, max 0,6137, $Q_1=0,1926$, $Q_3=0,381825$ ms. Mọi mẫu vẫn được giữ. Chênh lệch nhỏ hơn mức phân tán cần diễn giải thận trọng; QPC chỉ giải quyết lượng tử hóa1 ms, không loại tải nền hoặc scheduling Windows.
+
+Dataset/nguồn chạy theo từng khối; shuffle chỉ trong khối nên còn sai lệch giữa thời điểm. Một máy, đồ thị có cấu trúc, team mới mỗi process, không affinity/profiling/nhiệt độ hoặc máy thứ hai là các giới hạn chính. Chưa có cơ sở suy luận về frontier rộng bất quy tắc hoặc BFS lặp với team đã nóng. sessions.json liên kết bảng/đồ thị với session, commit và manifest/raw hashes; summary.csv giữ đầy đủ thống kê để kiểm tra lại.

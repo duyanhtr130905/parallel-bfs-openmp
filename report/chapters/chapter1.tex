@@ -1,10 +1,27 @@
 \chapter{Mở đầu}
-\section{Bối cảnh và mục tiêu}
-Tìm kiếm theo chiều rộng (BFS) là bài toán duyệt đồ thị theo khoảng cách tính
-bằng số cạnh từ một đỉnh nguồn. Nhóm dự kiến triển khai một phiên bản tuần tự
-và hai phiên bản OpenMP để nghiên cứu tính đúng đắn và chi phí song song hóa.
-\section{Phạm vi}
-Chương trình sử dụng C11, đồ thị CSR, OpenMP trên CPU và môi trường Windows.
-Phiên bootstrap chỉ tạo hợp đồng và khung làm việc; chưa có thuật toán hoàn chỉnh.
-\section{Nội dung cần bổ sung}
-[BỔ SUNG: động cơ chọn đề tài, phân công ba thành viên và đóng góp thực tế sau triển khai.]
+\section{Bối cảnh và ý nghĩa của xử lý đồ thị}
+Đồ thị biểu diễn các đối tượng bằng đỉnh và quan hệ bằng cạnh. Cách biểu diễn này cho phép đặt những câu hỏi về khả năng đi tới, khoảng cách và cấu trúc liên kết trong mạng giao thông, mạng máy tính hoặc mạng quan hệ. Khi quy mô dữ liệu tăng, chi phí duyệt các liên kết trở thành một thành phần đáng quan tâm trong thời gian xử lý. Bài tập lớn lựa chọn bài toán khoảng cách trên đồ thị không trọng số để khảo sát việc khai thác CPU đa nhân qua một thuật toán có đầu ra rõ ràng, dễ kiểm chứng.
+
+Tìm kiếm theo chiều rộng (Breadth-First Search, BFS) xác định khoảng cách ngắn nhất từ nguồn đến các đỉnh theo số cạnh. Với biểu diễn cho phép liệt kê láng giềng, BFS tuần tự có độ phức tạp $O(|V|+|E|)$ trong trường hợp xấu nhất~\cite{cornellbfs}. Tuy nhiên, độ phức tạp tuyến tính không có nghĩa thời gian tuyệt đối luôn nhỏ: lượng dữ liệu phải truy cập vẫn tăng theo kích thước đồ thị. Vì vậy, khai thác nhiều lõi xử lý là hướng nghiên cứu phù hợp, đồng thời cần đánh giá chi phí phát sinh khi chuyển từ xử lý tuần tự sang xử lý đồng thời.
+
+\section{Động cơ chọn OpenMP và vấn đề nghiên cứu}
+BFS theo tầng tạo ra tập đỉnh đang được mở rộng, gọi là frontier. Các đỉnh cùng tầng có thể cung cấp công việc cho nhiều luồng, nhưng các luồng cũng có thể cùng phát hiện một đỉnh mới. Việc phân chia công việc do đó phải đi kèm cơ chế nhận quyền thăm và đồng bộ giữa các tầng. Frontier hẹp hạn chế lượng công việc đồng thời; frontier có bậc đỉnh không đều có thể gây mất cân bằng tải. Đây là các giả thuyết thiết kế cần kiểm tra, chưa phải kết quả hiệu năng của nhóm.
+
+OpenMP phù hợp với phạm vi bài tập vì cho phép diễn đạt xử lý song song bộ nhớ chia sẻ trong chương trình C trên một máy đa nhân. Nhóm có thể tập trung vào phân chia frontier, đồng bộ và lập lịch mà vẫn dùng chung dữ liệu CSR. Giáo trình của Trobec và cộng sự đặt lập trình đa nhân với OpenMP cùng việc đo và phân tích chương trình song song trong một lộ trình học tập thống nhất~\cite{trobec2018}.
+
+\section{Mục tiêu và câu hỏi nghiên cứu}
+Mục tiêu là xây dựng một BFS tuần tự và hai biến thể OpenMP dễ giải thích, kiểm chứng đầy đủ mảng khoảng cách, rồi so sánh thời gian trên cùng dữ liệu và môi trường. So sánh Basic với Optimized giúp tách tác động của việc bổ sung luồng khỏi tác động của cách tổ chức thu frontier: giảm tranh chấp có thể đổi lấy bộ nhớ tạm và công việc ghép kết quả. Vì vậy, chỉ so tuần tự với một bản song song chưa đủ đánh giá lựa chọn triển khai. Tên OpenMP Optimized chỉ thể hiện định hướng giảm chi phí của bản cơ bản, không hàm ý luôn nhanh hơn.
+\begin{enumerate}
+\item Ba phiên bản có trả cùng khoảng cách ngắn nhất trên các cấu trúc đồ thị và nguồn được chọn hay không?
+\item Khi tăng số luồng thực tế, thời gian, speedup và efficiency thay đổi thế nào với kích thước và cấu trúc đồ thị?
+\item Bản tối ưu và các chính sách static, dynamic, guided có đem lại lợi ích ổn định so với bản cơ bản hay chi phí bổ sung làm giảm lợi ích?
+\end{enumerate}
+Câu hỏi thứ nhất được trả lời bằng oracle và kiểm thử. Hai câu hỏi sau chỉ được trả lời bằng dữ liệu nhóm đo sau khi kiểm chứng tính đúng đắn.
+
+\section{Phạm vi và phương pháp thực hiện}
+Đề tài giới hạn ở đồ thị tĩnh không trọng số, có hướng hoặc vô hướng, biểu diễn CSR và BFS một nguồn trên CPU bộ nhớ chia sẻ. Chương trình dùng C11 và OpenMP; môi trường đích là Windows với GCC/UCRT64, còn Linux CI hỗ trợ kiểm tra khả năng xây dựng và hồi quy. Không nghiên cứu GPU, MPI, đồ thị động hay xây dựng hệ thống phân tán. Đầu ra là khoảng cách đến mọi đỉnh, với giá trị $-1$ cho đỉnh không tới được; không yêu cầu thứ tự thăm hoặc cây cha giống nhau.
+
+Phương pháp gồm khảo sát tài liệu, phân tích bất biến theo tầng, oracle độc lập và phép đo có kiểm soát. Đóng góp thực tế là ba phiên bản dùng chung hợp đồng CSR/API, bộ kiểm thử tích hợp 1296 lời gọi, môi trường UCRT64 chạy thật và 2250 mẫu đo trên chín tổ hợp đồ thị/nguồn. Dữ liệu gốc, manifest, hash, script phân tích và biểu đồ tạo phép so sánh có thể kiểm tra lại. Nhóm báo cáo cả slowdown, giới hạn timer Windows và ảnh hưởng của mô hình mỗi mẫu mở tiến trình mới; không coi tăng tốc là điều kiện để nhận kết quả.
+
+\section{Bố cục báo cáo}
+Chương 2 trình bày lý thuyết BFS và CSR; Chương 3 trình bày thiết kế hai phiên bản OpenMP. Chương 4 mô tả môi trường, dữ liệu, kiểm chứng và quy trình thực chạy. Chương 5 đưa bảng, biểu đồ, phân tích và đối chiếu câu hỏi nghiên cứu từ raw. Chương 6 tổng hợp đóng góp, kết luận có giới hạn và hướng phát triển. Phần lý thuyết/thuật toán của Đức và Dũng được giữ khi tích hợp kết quả thực nghiệm.
