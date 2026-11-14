@@ -1,3 +1,22 @@
+# Bàn giao cuối 14/11/2026 — Role C / PR #7
+
+Nghiệm thu raw độc lập PASS 9 session/2250 mẫu +225 warm-up, 225 dòng thống kê,
+81 dòng bảng static, 36 hình tái vẽ khớp từng pixel; backup 4968 file khớp.
+Không thay raw/kết quả/thuật toán, không đo lại. Bìa sửa **TS Nguyễn Hải Vinh**,
+bỏ câu lịch sử C1 ở Chương 1. Local full correctness/tools/OpenMP và plot tests PASS.
+
+[Hồ sơ nghiệm thu cuối](FINAL_HANDOFF_20261114.md) và
+[hướng dẫn bộ nộp](SUBMISSION_README.md). Bộ bàn giao riêng ở workspace cha:
+`output/Parallel_BFS_BanGiao_20261114/`; HANDOFF.md/final-acceptance.json ghi
+HEAD, CI cuối, PDF mới/hash/số trang và ZIP sau khi tải artifact đúng HEAD.
+Máy không có XeLaTeX local: build đủ lượt bằng CI; kiểm mọi trang PDF mới.
+Sau final CI/PDF PASS, chuyển PR Ready và mời ducnt05/Terivn.
+Chưa có human approval; không tự merge PR #7 hoặc đóng Issue #5.
+Chưa biết quy định nộp chính thức; người dùng đối chiếu trước nộp.
+
+---
+## Lịch sử trước bàn giao cuối
+
 # Role C — thực nghiệm thật, báo cáo và nghiệm thu 12/11/2026
 
 Đã thực hiện trên laptop Windows theo ủy quyền cài toolchain, đo thật và hoàn tất

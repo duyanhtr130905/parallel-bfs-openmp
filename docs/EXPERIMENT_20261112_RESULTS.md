@@ -1,3 +1,8 @@
+> Cập nhật nghiệm thu 14/11/2026: xem [FINAL_HANDOFF](FINAL_HANDOFF_20261114.md).
+> Raw/hash/statistics/36 hình đã đối chiếu độc lập PASS; bìa mới ghi
+> **TS Nguyễn Hải Vinh**. Trạng thái bên dưới là lịch sử 12/11; trạng thái PR/CI/PDF
+> mới nhất ghi tại PR #7 và bộ bàn giao `output/Parallel_BFS_BanGiao_20261114/`.
+
 # Role C — thực nghiệm thật và hồ sơ nghiệm thu
 
 Commit đo `ab588fb8ab535b796f0c8b6d5e98a7efe5ebc76c`, sau local correctness và

@@ -1,0 +1,276 @@
+{
+  "status": "PASS",
+  "method": "Independent stdlib/Decimal audit; no imports from production experiment tools; linear quantiles at (n-1)q; tolerance rel=1e-12 abs=1e-15.",
+  "sessions": [
+    {
+      "id": "path2048-s0",
+      "manifest_sha256": "f6e06de5d0a8547aceaa2dbc5796cde6449bf8da2b85d38e663c02c991304e40",
+      "raw_sha256": "edefad927b623d7d0ee3d884255434b82e49c7ad72b6398c0e8aa4d52aa3cac2",
+      "dataset_sha256": "292a70515ca91af4a41d4a0727180203d2a2a481b1d24f6328cd89df33885dd8",
+      "binary_sha256": "17bbe6386544c2ddfc5c68e87ea1a9758bbc0aa326945a83e151fc7eb972e2d1",
+      "warmups": 25,
+      "measured": 250,
+      "files_compared_to_backup": 552
+    },
+    {
+      "id": "path8192-s0",
+      "manifest_sha256": "42cadec2994c2115c76baacd013c988f43eeb7f88bcce35c87bdd715bee80d24",
+      "raw_sha256": "752f054b5072366c2c2f9777e7f20ef3204b136351221205996993f63a2eb915",
+      "dataset_sha256": "38688bb19ae46df3a49e716bcfd061d6be0260423957e9e968de7246e11ec37f",
+      "binary_sha256": "17bbe6386544c2ddfc5c68e87ea1a9758bbc0aa326945a83e151fc7eb972e2d1",
+      "warmups": 25,
+      "measured": 250,
+      "files_compared_to_backup": 552
+    },
+    {
+      "id": "path8192-s4096",
+      "manifest_sha256": "04e8870242bcde4ca76a3a3e176062a818c23d8a3e24b90a1bc8f78362e13425",
+      "raw_sha256": "7be164fe5a0a2beddeb9b7292be749f983f792d08a1006a844cf3c2ee88aa91c",
+      "dataset_sha256": "38688bb19ae46df3a49e716bcfd061d6be0260423957e9e968de7246e11ec37f",
+      "binary_sha256": "17bbe6386544c2ddfc5c68e87ea1a9758bbc0aa326945a83e151fc7eb972e2d1",
+      "warmups": 25,
+      "measured": 250,
+      "files_compared_to_backup": 552
+    },
+    {
+      "id": "star100000-s0",
+      "manifest_sha256": "3c9152d4db27427709b2fd378db677c7cae9dddb7e65858981b92d68757943b1",
+      "raw_sha256": "658fdc527a0bca51a2c475381d65405b987e31da158209089c1269bbcb3b56a4",
+      "dataset_sha256": "42b4d068703692fc2da923bc8a82cc9ff6cb34c0262d7c38687313ac20289e21",
+      "binary_sha256": "17bbe6386544c2ddfc5c68e87ea1a9758bbc0aa326945a83e151fc7eb972e2d1",
+      "warmups": 25,
+      "measured": 250,
+      "files_compared_to_backup": 552
+    },
+    {
+      "id": "star1000000-s0",
+      "manifest_sha256": "9be47c4e652bf716130f2be8afaf6a891027bb10e1b7aeded3c49a709ccb0233",
+      "raw_sha256": "a6a1946b30f322a1bae46be74cb2488ece792b9b3c8b69e3ab8c5f8672063020",
+      "dataset_sha256": "dbca129bdb451deb3921049f4112113f50662996f8be66cddf077f0eb5f6d609",
+      "binary_sha256": "17bbe6386544c2ddfc5c68e87ea1a9758bbc0aa326945a83e151fc7eb972e2d1",
+      "warmups": 25,
+      "measured": 250,
+      "files_compared_to_backup": 552
+    },
+    {
+      "id": "star1000000-s1",
+      "manifest_sha256": "fa898911faa39b7837e2f6c1cb9307e42c2f490893593fedb87a1fb5c13da718",
+      "raw_sha256": "a22001037a7046e9645f0c486ad4168e4a86d6b2d89fa259cf9d778b7b60e03d",
+      "dataset_sha256": "dbca129bdb451deb3921049f4112113f50662996f8be66cddf077f0eb5f6d609",
+      "binary_sha256": "17bbe6386544c2ddfc5c68e87ea1a9758bbc0aa326945a83e151fc7eb972e2d1",
+      "warmups": 25,
+      "measured": 250,
+      "files_compared_to_backup": 552
+    },
+    {
+      "id": "grid128-s0",
+      "manifest_sha256": "c9e38c58d3494caac29e6bd5b635052ce0a7bc82d658c68f9e7e72fb0199c011",
+      "raw_sha256": "e00f495751d102dd9b41c9049bfbfa278ab5e50d422e4a0bc64465c6a53443ed",
+      "dataset_sha256": "5e5dcf485f59266541168e14816d96c4710d0a2aae6f692dc97e1c0d238b88c3",
+      "binary_sha256": "17bbe6386544c2ddfc5c68e87ea1a9758bbc0aa326945a83e151fc7eb972e2d1",
+      "warmups": 25,
+      "measured": 250,
+      "files_compared_to_backup": 552
+    },
+    {
+      "id": "grid512-s0",
+      "manifest_sha256": "cdb37b2513b5c048a61ffc3d780d2cdf83a49b35efb5d966d7ee42df4c0db3b6",
+      "raw_sha256": "b83ab2218599f412e2278d079005901f0402966316582fa1b59bf5911e38d61a",
+      "dataset_sha256": "6e97c849af7934035e1de75e406a9380d66260c3519e668ca93c0d4cb8420456",
+      "binary_sha256": "17bbe6386544c2ddfc5c68e87ea1a9758bbc0aa326945a83e151fc7eb972e2d1",
+      "warmups": 25,
+      "measured": 250,
+      "files_compared_to_backup": 552
+    },
+    {
+      "id": "grid512-s131328",
+      "manifest_sha256": "2791ac973db9d20cae2ce342cdbc84f617ceab8e44206dae0a46902d3fa1575f",
+      "raw_sha256": "a7be7f076d219457dad9093b1ed96d780dd6e28fd4f34ddd0ba88b26c4e77a8a",
+      "dataset_sha256": "6e97c849af7934035e1de75e406a9380d66260c3519e668ca93c0d4cb8420456",
+      "binary_sha256": "17bbe6386544c2ddfc5c68e87ea1a9758bbc0aa326945a83e151fc7eb972e2d1",
+      "warmups": 25,
+      "measured": 250,
+      "files_compared_to_backup": 552
+    }
+  ],
+  "figures": [
+    {
+      "path": "report/figures/experiment-20261112/path2048-s0/efficiency.pdf",
+      "sha256": "9808ae7529a1db54f4773bb32363688ed58836bde0666fa6871d652817ecde7a"
+    },
+    {
+      "path": "report/figures/experiment-20261112/path2048-s0/median.pdf",
+      "sha256": "21ad338e083435d5169ba29464782f3bb0accee4a055971ca823f4a6e0d3ecd3"
+    },
+    {
+      "path": "report/figures/experiment-20261112/path2048-s0/scheduling.pdf",
+      "sha256": "6596fecb3ba5083524020b05f9aa10c14f67042361afe1db49f77a85315a254e"
+    },
+    {
+      "path": "report/figures/experiment-20261112/path2048-s0/speedup.pdf",
+      "sha256": "4c5a63ee6b03e87f812b6fb3c31be12533b12049090c7542b381c613199fdcfb"
+    },
+    {
+      "path": "report/figures/experiment-20261112/path8192-s0/efficiency.pdf",
+      "sha256": "2ba6b32f7698e4daf9a43c8c48a4b4455ca629d064024ac3e4a5b232dc8bbc7b"
+    },
+    {
+      "path": "report/figures/experiment-20261112/path8192-s0/median.pdf",
+      "sha256": "044ca65b993d72b7141fc025a7ae70d79309080a7df43f66632b75d70f241050"
+    },
+    {
+      "path": "report/figures/experiment-20261112/path8192-s0/scheduling.pdf",
+      "sha256": "0cc1d9117e8e7be835d2b947bdbc141c061343f374dd164c17f55574979d6c91"
+    },
+    {
+      "path": "report/figures/experiment-20261112/path8192-s0/speedup.pdf",
+      "sha256": "466fc332c12e8b70b5391c58e6b091c02f581ca00b9f9ee6b2715eba01dc036f"
+    },
+    {
+      "path": "report/figures/experiment-20261112/path8192-s4096/efficiency.pdf",
+      "sha256": "878d6858d47c07958850a30e0c417a9f3f9f12daa201108295dd331e3a497415"
+    },
+    {
+      "path": "report/figures/experiment-20261112/path8192-s4096/median.pdf",
+      "sha256": "27a437fca605db843006420beeea2ef454e60abca77ba00985016449dd3e2b86"
+    },
+    {
+      "path": "report/figures/experiment-20261112/path8192-s4096/scheduling.pdf",
+      "sha256": "80abac1d61c14b037062ed75df58bb3b96839716f5f5c109fd6924dc84899a9d"
+    },
+    {
+      "path": "report/figures/experiment-20261112/path8192-s4096/speedup.pdf",
+      "sha256": "6f603d752c846d3cfc896740d3ca1c7d5a64042fd7d0633006469d73f702e3d0"
+    },
+    {
+      "path": "report/figures/experiment-20261112/star100000-s0/efficiency.pdf",
+      "sha256": "f2549a0bf63aa39c69e101f3a4394bfb0fbc85f67ee6772b43ef78f6f7e3caa6"
+    },
+    {
+      "path": "report/figures/experiment-20261112/star100000-s0/median.pdf",
+      "sha256": "d1a63fc993d5d9c4175712b13b244453254e1a41f822e3f36f29f55bb80e84bc"
+    },
+    {
+      "path": "report/figures/experiment-20261112/star100000-s0/scheduling.pdf",
+      "sha256": "6bbae41755d629d3df7354112c32f4b7dd7e348a031fa391d449c6d09896361d"
+    },
+    {
+      "path": "report/figures/experiment-20261112/star100000-s0/speedup.pdf",
+      "sha256": "be33e3aac8a96b8f228a0f1496fff015fdbc7014419eac0fe6a6d8c10193503d"
+    },
+    {
+      "path": "report/figures/experiment-20261112/star1000000-s0/efficiency.pdf",
+      "sha256": "4f9cb2131b0085ef47ef20e3f7c54a0a58756de58b8ab90ab99008d49b0750c5"
+    },
+    {
+      "path": "report/figures/experiment-20261112/star1000000-s0/median.pdf",
+      "sha256": "a5cfa16052b440da80991eed3c80c1a03eb63211b6f89cb66d69df5ead6d846c"
+    },
+    {
+      "path": "report/figures/experiment-20261112/star1000000-s0/scheduling.pdf",
+      "sha256": "ea3f83eae62f2187748b16a1f6b96fac5fc839d816cf1df74a9d0d5ee1cb2339"
+    },
+    {
+      "path": "report/figures/experiment-20261112/star1000000-s0/speedup.pdf",
+      "sha256": "871a93b19f244ba9b6aa02e8b784cbe3465beac08c32b271b30f25eb67368e6b"
+    },
+    {
+      "path": "report/figures/experiment-20261112/star1000000-s1/efficiency.pdf",
+      "sha256": "2f3ef7133f0c36145635f64272b0a9114c7bf11fff70625a02b47c2b6c334afb"
+    },
+    {
+      "path": "report/figures/experiment-20261112/star1000000-s1/median.pdf",
+      "sha256": "b206a121e3bae506e80e4be0d0e7d7f986e22453424e26c73ed939077f6dc1a9"
+    },
+    {
+      "path": "report/figures/experiment-20261112/star1000000-s1/scheduling.pdf",
+      "sha256": "8eaa2caf7ab241bfb2b6287a7f7ee45e9f8ea20527a4eb60cb486c89e03e3918"
+    },
+    {
+      "path": "report/figures/experiment-20261112/star1000000-s1/speedup.pdf",
+      "sha256": "11f1b49be99bedd230b29f6d2d2e32dfeeafb25ba1e32fd489c3e93e22ba4ce3"
+    },
+    {
+      "path": "report/figures/experiment-20261112/grid128-s0/efficiency.pdf",
+      "sha256": "f5b5096c4a331183cb55057db0de715ebc7e3a524d4d40d502376f0ea72b24f8"
+    },
+    {
+      "path": "report/figures/experiment-20261112/grid128-s0/median.pdf",
+      "sha256": "7f0bb68ef31cd3df8b279f5d5df86ed3c6d956587b3778edc7b59d1d668f85e1"
+    },
+    {
+      "path": "report/figures/experiment-20261112/grid128-s0/scheduling.pdf",
+      "sha256": "d650c59fb1dbdef2e0eb445dea820e7e514a98537c8dc895b51f6e32c03fe6c8"
+    },
+    {
+      "path": "report/figures/experiment-20261112/grid128-s0/speedup.pdf",
+      "sha256": "c9de2b325c20b3e5c106501774cd497e2feb9664aba2c18d0d0ad4ed9323f3a8"
+    },
+    {
+      "path": "report/figures/experiment-20261112/grid512-s0/efficiency.pdf",
+      "sha256": "fc27a7d1fbe63850656a7da85fd099ab38587e1c9f0f89a2d97e990bc98e7fa9"
+    },
+    {
+      "path": "report/figures/experiment-20261112/grid512-s0/median.pdf",
+      "sha256": "7d5261e4ffa82e996c90be8adbecf9465fd1cc7af81a162ba296c6786f2ee3f8"
+    },
+    {
+      "path": "report/figures/experiment-20261112/grid512-s0/scheduling.pdf",
+      "sha256": "4591ac29eb4d95e074102ba6b63afa3062808a8800605ac068df2984dc4c5683"
+    },
+    {
+      "path": "report/figures/experiment-20261112/grid512-s0/speedup.pdf",
+      "sha256": "5a0494d3b82e38a36e179260dbaa39f240cec641d7d68d0eecad8ac9bc7c1c28"
+    },
+    {
+      "path": "report/figures/experiment-20261112/grid512-s131328/efficiency.pdf",
+      "sha256": "a24e619627c96dbfb36746c969deba1ca87bae5333e76c0e0da7f00494efa125"
+    },
+    {
+      "path": "report/figures/experiment-20261112/grid512-s131328/median.pdf",
+      "sha256": "7938b81eb8b08fcb61a74d7ece22ef0fa667a37cfd372168c4895086f340259a"
+    },
+    {
+      "path": "report/figures/experiment-20261112/grid512-s131328/scheduling.pdf",
+      "sha256": "4e9f3075d2675d9dd5d7d0d8c6c63cd696cdfab0c5f0c8b489616b359a80126e"
+    },
+    {
+      "path": "report/figures/experiment-20261112/grid512-s131328/speedup.pdf",
+      "sha256": "efc08eaf4ae0b74c4befff3f0d3926fc36df9fa8cb30aaec08cf140ba61557aa"
+    }
+  ],
+  "backup": "D:\\Code\\parallel-bfs-evidence\\20261112-1616\\official-ab588fb",
+  "rows_checked": 225,
+  "static_table_rows_checked": 81,
+  "report_figures": [
+    "figures/experiment-20261112/path8192-s0/median.pdf",
+    "figures/experiment-20261112/path8192-s0/speedup.pdf",
+    "figures/experiment-20261112/path8192-s0/efficiency.pdf",
+    "figures/experiment-20261112/path8192-s0/scheduling.pdf",
+    "figures/experiment-20261112/star1000000-s0/median.pdf",
+    "figures/experiment-20261112/star1000000-s0/speedup.pdf",
+    "figures/experiment-20261112/star1000000-s0/efficiency.pdf",
+    "figures/experiment-20261112/star1000000-s0/scheduling.pdf",
+    "figures/experiment-20261112/grid512-s0/median.pdf",
+    "figures/experiment-20261112/grid512-s0/speedup.pdf",
+    "figures/experiment-20261112/grid512-s0/efficiency.pdf",
+    "figures/experiment-20261112/grid512-s0/scheduling.pdf"
+  ],
+  "max_speedup": {
+    "id": "grid512-s0",
+    "algorithm": "omp-opt",
+    "threads_actual": 1,
+    "schedule": "static",
+    "median": 0.005814,
+    "min": 0.0056936,
+    "max": 0.0082349,
+    "q1": 0.005760575,
+    "q3": 0.006274475,
+    "iqr": 0.0005139,
+    "speedup": 0.29140006879944963,
+    "efficiency": 0.29140006879944963,
+    "scaling_vs_omp1": 1.0
+  },
+  "openmp_speedups_below_one": 216,
+  "multithread_scaling_below_one": 162
+}

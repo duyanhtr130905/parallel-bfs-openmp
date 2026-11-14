@@ -1,7 +1,10 @@
 # Parallel BFS Using OpenMP
 
+Bộ bàn giao cuối: [nghiệm thu 14/11/2026](docs/FINAL_HANDOFF_20261114.md),
+[hướng dẫn biên dịch/chạy ba thuật toán/tái lập/nộp](docs/SUBMISSION_README.md).
+
 C11/OpenMP CPU, cùng CSR loader cho Serial, Basic và Optimized. A/B đã merge;
-CLI tích hợp đang ở **Draft PR #7**, nhánh `docs/c1-academic-report`.
+CLI tích hợp đang ở **PR #7**, nhánh `docs/c1-academic-report`.
 **Đã thực nghiệm thật** trên laptop Windows: 6 đồ thị/9 tổ hợp nguồn,225 cấu hình,
 225 warm-up và2250 mẫu chính thức, không lỗi/timeout. Commit đo ab588fb sau
 correctness local và CI3/3 PASS. Không cấu hình OpenMP nào nhanh hơn Serial;
@@ -47,7 +50,7 @@ warm-up không tạo warmed team; không suy rộng kết quả sang mọi đồ
 ## Quy trình Git
 
 Canonical https://github.com/duyanhtr130905/parallel-bfs-openmp .
-Giữ feature branch và Draft #7; không force push, direct push main, tự approve,
+Giữ feature branch và PR #7; không force push, direct push main, tự approve,
 merge #7 hoặc đóng Issue #5 khi benchmark/report chưa đạt. AGENTS.md là quy trình
 chung; hồ sơ bootstrap cũ trong docs là lịch sử, không phải trạng thái hiện tại.
 
