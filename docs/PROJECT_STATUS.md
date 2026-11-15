@@ -11,7 +11,8 @@ bỏ câu lịch sử C1 ở Chương 1. Local full correctness/tools/OpenMP và
 HEAD, CI cuối, PDF mới/hash/số trang và ZIP sau khi tải artifact đúng HEAD.
 Máy không có XeLaTeX local: build đủ lượt bằng CI; kiểm mọi trang PDF mới.
 PR #7 đã Ready for Review; Dũng yêu cầu sửa hai P2 ngày 14/11/2026.
-Đang sửa trạng thái tài liệu và provenance portable; re-review theo HEAD mới sau CI.
+Đã sửa trạng thái tài liệu và provenance portable; bằng chứng local tại
+[PORTABLE_PROVENANCE_V1](PORTABLE_PROVENANCE_V1.md). Re-review theo HEAD mới sau CI.
 Chưa có human approval; không tự merge PR #7 hoặc đóng Issue #5.
 Chưa biết quy định nộp chính thức; người dùng đối chiếu trước nộp.
 
