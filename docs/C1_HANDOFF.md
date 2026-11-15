@@ -1,3 +1,7 @@
+> Trạng thái cuối 14/11/2026: PR #8/#9 đã merge, ba BFS tích hợp/kiểm thử,
+> benchmark 12/11 hoàn tất (9 session, 2250 mẫu +225 warm-up). PR #7 Ready for Review.
+> Xem [FINAL_HANDOFF](FINAL_HANDOFF_20261114.md). Các mốc bên dưới là lịch sử.
+
 # Cập nhật 12/11/2026
 
 PR #8 đã merge; C đang tích hợp serial thật trong cùng Draft PR #7.

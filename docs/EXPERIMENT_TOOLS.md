@@ -1,4 +1,8 @@
-# Công cụ C độc lập — chưa đo chính thức
+# Công cụ C — đã đo chính thức 12/11/2026
+
+Trạng thái 14/11/2026: PR #8/#9 đã merge, ba BFS tích hợp và kiểm thử;
+9 session, 225 warm-up + 2250 mẫu, 225 dòng thống kê, 36 biểu đồ, báo cáo
+42 trang. PR #7 Ready for Review. Xem [bàn giao cuối](FINAL_HANDOFF_20261114.md).
 
 Chạy từ root repository với Python 3.9+ (stdlib). Không cần cài thêm cho generator/runner/analysis. `make test` nay gọi `test-tools` trên cả Linux và Windows CI; không sửa workflow hay code A/B. Unit tests chứa SYNTHETIC TEST DATA ONLY, mock subprocess trong thư mục tạm, không tạo raw trong results của nhóm.
 
@@ -11,7 +15,8 @@ python scripts/generate_graph.py grid --rows 32 --cols 32 --out datasets/grid32
 Mặc định vô hướng: mỗi cạnh xuất đúng một lần, loader mirror. `--directed` giữ path tăng ID, star từ tâm ra lá, grid sang phải/xuống. Đây là lựa chọn có chủ đích, không tự coi các chế độ hay nguồn tương đương. Metadata JSON ghi n tường minh; file edge-list không header. Không random nên seed=null; cùng config sinh byte/hash giống nhau. Streaming O(1) bộ nhớ phụ, giới hạn bảo thủ 1 triệu đỉnh để tránh vô tình sinh quá lớn; không bảo đảm BFS vừa RAM máy chưa xác minh. Kích thước ví dụ chỉ là lệnh chuẩn bị, chưa phải tập đo đã chốt. Không overwrite thư mục tồn tại.
 
 ## Gate trước chạy chính thức
-C2 BLOCKED bởi #3/#4 chưa merge/correctness. Các lệnh sau chỉ được dùng sau khi gate được nhóm xác nhận, CLI đã tích hợp, build và kiểm thử trên chính HEAD; không dùng với scaffold.
+Gate C2 đã đạt sau PR #8/#9 merge và correctness PASS trên commit đo ab588fb.
+Các lệnh dưới đây mô tả quy trình tái lập; lần đo mới vẫn cần gate trên chính HEAD.
 
 Chuẩn bị `build/environment.json` với các trường đã xác minh: cpu, physical_cores, logical_cores, ram_bytes, os, compiler (version), flags, openmp (_OPENMP), runtime (version), power, background_load, source, reachable. Không có giá trị mặc định giả. reachable phải từ kết quả kiểm chứng. Affinity được runner ghi từ môi trường, unset được giữ null.
 
@@ -43,7 +48,9 @@ build/analysis-venv/Scripts/python -m unittest discover -s tests -p test_plot_to
 ```
 Nếu môi trường hạn chế quyền thư mục temp, đặt TEMP/TMP vào thư mục build đã tạo trong workspace cho phiên lệnh. Test không phải BFS correctness hay benchmark. Cần kiểm lại CLI/timer/actual-team và full-distance validation sau A/B trước khi dùng đo thật.
 
-## Đối chiếu với protocol và Chương 4 (cleanup 07/11/2026)
+## Đối chiếu lịch sử với protocol và Chương 4 (cleanup 07/11/2026)
+
+Phần dưới lưu trạng thái 07/11/2026 trước tích hợp/đo; không phải hiện trạng.
 Giữ cùng dataset/source/build cho ba thuật toán; `threads_requested` xác định cấu hình, `threads_actual` dùng tính efficiency. Runner thực hiện một warm-up và ít nhất 10 mẫu, analysis dùng nội suy (N-1)q, median serial làm baseline. Đây là phần đã hiện thực của phương pháp Chương 4; timer C `omp_get_wtime()` vẫn thuộc CLI C2 chưa tích hợp, runner không dùng thời gian subprocess thay timer BFS.
 
 Stdout gốc schema CONTRACT được giữ nguyên trong từng tệp `.stdout`; `raw.jsonl` nội bộ bọc mỗi result bằng `{index, result}` để đối chiếu manifest, không thay schema stdout của binary. Warm-up và lỗi ở manifest/stdout/stderr, không vào thống kê measured. Analysis hiện từ chối cả phiên có lỗi hoặc actual team không ổn định; protocol cho phép tách nhóm nhưng công cụ hiện tại chọn từ chối, không tự tách hay bỏ mẫu.

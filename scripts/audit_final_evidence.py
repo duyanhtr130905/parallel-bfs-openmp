@@ -18,6 +18,43 @@ def digest(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
+# Historical publication v1 hashes use CRLF, except publisher (LF).
+# This closed list excludes raw, manifests, datasets, binaries and PDFs.
+PUBLICATION_TEXT_V1 = {
+    'publisher_sha256': 'scripts/publish_experiment.py',
+    'analyzer_sha256': 'scripts/analyze_results.py',
+    'plotter_sha256': 'scripts/plot_results.py',
+    'matrix_sha256': 'docs/experiment-20261112-matrix.json',
+    'summary_csv_sha256': 'results/experiment-20261112/summary.csv',
+    'tables_sha256': 'report/chapters/experiment_tables.tex',
+}
+
+
+def publication_digest_v1(path, root=Path('.')):
+    """Reconstruct historical bytes (publisher LF; other registered text CRLF) for an explicitly registered text file.
+
+    Accept uniform LF or uniform CRLF only; reject bare CR and mixed endings.
+    Preserve every other byte, including BOM, whitespace and final newline.
+    """
+    path = Path(path).as_posix()
+    require(path in PUBLICATION_TEXT_V1.values(), 'unregistered publication text ' + path)
+    data = (root / path).read_bytes()
+    data.decode('utf-8', errors='strict')
+    lf = data.replace(b'\r\n', b'\n')
+    require(b'\r' not in lf, 'bare CR in publication text ' + path)
+    require(b'\r\n' not in data or b'\n' not in data.replace(b'\r\n', b''),
+            'mixed line endings in publication text ' + path)
+    historical = lf if path == PUBLICATION_TEXT_V1['publisher_sha256'] else lf.replace(b'\n', b'\r\n')
+    return hashlib.sha256(historical).hexdigest()
+
+
+def audit_publication_text(root=Path('.')):
+    provenance = load(root / 'results/experiment-20261112/provenance.json')
+    for field, path in PUBLICATION_TEXT_V1.items():
+        require(publication_digest_v1(path, root) == provenance[field],
+                'publication provenance ' + field)
+
+
 def load(path):
     return json.loads(Path(path).read_text(encoding='utf-8'))
 
@@ -138,7 +175,7 @@ def audit(backup):
             table_index += 1
         figroot = Path('report/figures/experiment-20261112') / entry['id']
         provenance = load(figroot / 'provenance.json')
-        require(provenance['manifest_sha256'] == entry['manifest_sha256'] and provenance['plot_script_sha256'] == digest('scripts/plot_results.py') and provenance['dataset'] == manifest['dataset'], 'figure provenance')
+        require(provenance['manifest_sha256'] == entry['manifest_sha256'] and provenance['plot_script_sha256'] == publication_digest_v1('scripts/plot_results.py') and provenance['dataset'] == manifest['dataset'], 'figure provenance')
         for row in provenance['rows']:
             key = (row['algorithm'], row['threads_actual'], row['schedule'])
             for field, value in stats[key].items():
@@ -152,8 +189,8 @@ def audit(backup):
     require(len(set(used)) == len(used) == 12 and all((Path('report') / p).is_file() for p in used), '12 report figures')
     report['report_figures'] = used
     provenance = load('results/experiment-20261112/provenance.json')
-    for field, path in {'index_sha256': backup / 'batch-index.json', 'publisher_sha256': 'scripts/publish_experiment.py', 'analyzer_sha256': 'scripts/analyze_results.py', 'plotter_sha256': 'scripts/plot_results.py', 'matrix_sha256': 'docs/experiment-20261112-matrix.json', 'summary_csv_sha256': 'results/experiment-20261112/summary.csv', 'tables_sha256': 'report/chapters/experiment_tables.tex'}.items():
-        require(digest(path) == provenance[field], 'publication provenance ' + field)
+    audit_publication_text()
+    require(digest(backup / 'batch-index.json') == provenance['index_sha256'], 'publication provenance index_sha256')
     for item in load(backup / 'build-evidence-hashes.json'):
         path = backup / 'build-evidence' / Path(item['Path'].replace('\\', '/')).name
         require(digest(path).lower() == item['Hash'].lower(), 'backup build evidence ' + path.name)

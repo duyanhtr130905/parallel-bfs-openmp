@@ -114,7 +114,7 @@ trả RANGE. Không mở/đọc/đóng file được trả IO. Builder đóng fi
 | BFS_ERR_RUNTIME | 7 | Lỗi runtime được phát hiện |
 
 Không quy định ưu tiên khi nhiều lỗi đồng thời. Mã API khác mã thoát CLI.
-Cập nhật triển khai 12/11/2026: graph/serial và hai bản OpenMP đã merge qua PR #8/#9; nhánh C tích hợp CLI trong Draft PR #7. Quy định API ở trên không đổi.
+Cập nhật triển khai 12/11/2026: graph/serial và hai bản OpenMP đã merge qua PR #8/#9; nhánh C đã tích hợp CLI trong PR #7 (Ready for Review từ 14/11/2026). Quy định API ở trên không đổi.
 
 ## CLI v1
 
@@ -132,7 +132,7 @@ Exit: 0 help hoặc BFS thật thành công; 2 sai CLI; 3 module chưa triển k
 4 lỗi thực thi (graph/BFS/validation). stderr nhận chẩn đoán; lỗi không có result
 trên stdout. Bootstrap trước đây chỉ parse/validate rồi exit3; bản tích hợp gọi BFS thật, exit3 chỉ dành cho status NOT_IMPLEMENTED.
 
-## Kết quả JSONL v1 (CLI tích hợp; chưa có benchmark chính thức)
+## Kết quả JSONL v1 (CLI tích hợp; benchmark chính thức 12/11/2026)
 
 Một JSON object một dòng stdout cho mỗi BFS thành công, locale số C, không NaN/Inf:
 `schema_version`=1, `status`="ok", `algorithm` thuộc enum CLI,

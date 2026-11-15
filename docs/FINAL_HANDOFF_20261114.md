@@ -75,3 +75,8 @@ Sau final CI/PDF PASS: chuyển Ready for Review và mời ducnt05/Terivn
 Không tự approve, merge, bật auto-merge hoặc đóng Issue #5.
 Chưa có quy định nộp chính thức; người dùng cần đối chiếu tên file, định dạng,
 giới hạn dung lượng, nền tảng/hạn nộp và yêu cầu slide/video/in bản nếu có.
+
+## Bổ sung sau review 15/11/2026
+
+Quy ước kiểm hash v1 portable và hash lịch sử được bảo tồn tại
+[PORTABLE_PROVENANCE_V1](PORTABLE_PROVENANCE_V1.md). Không thay bằng chứng đo.

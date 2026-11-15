@@ -37,7 +37,7 @@ check-scaffold:
 	$(PYTHON) scripts/check_scaffold.py
 check-api:
 	$(CC) $(CPPFLAGS) $(CFLAGS) -Werror -fsyntax-only tests/api_contract.c
-test: build check-scaffold check-api test-bfs test-parallel test-tools test-cli-validation test-integration test-cli-failures test-timer
+test: test-provenance build check-scaffold check-api test-bfs test-parallel test-tools test-cli-validation test-integration test-cli-failures test-timer
 	$(PYTHON) tests/test_cli.py --binary $(BIN)
 	$(PYTHON) tests/test_clean.py
 test-bfs: $(GRAPH_TEST) $(SERIAL_TEST)
@@ -93,3 +93,7 @@ test-timer: build/test_wall_timer$(EXEEXT)
 build/test_wall_timer$(EXEEXT): tests/test_wall_timer.c src/wall_timer.h
 	$(PYTHON) -c "from pathlib import Path; Path('build').mkdir(exist_ok=True)"
 	$(CC) $(CPPFLAGS) $(CFLAGS) tests/test_wall_timer.c $(LDFLAGS) $(LDLIBS) -o $@
+
+.PHONY: test-provenance
+test-provenance:
+	$(PYTHON) -m unittest discover -s tests -p test_portable_provenance.py -v
