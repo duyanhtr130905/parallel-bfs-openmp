@@ -1,7 +1,9 @@
-# Kiến trúc hiện hành — Role C, 14/11/2026
+# Kiến trúc hiện hành — 16/11/2026
 
-Loader CSR và serial từ PR #8, basic/optimized từ PR #9 đã merge main.
-Nhánh PR #7 (Ready for Review) nối CLI → loader → output/metrics → timer đúng BFS call →
+PR #7 đã merge vào `main` bằng commit `38842829ddaa9211789bdd3ff2035bf54762ceca`;
+CI sau merge PASS 3/3. Issues #3/#4/#5 đã đóng; Issue #2 chờ PR tài liệu.
+Loader CSR và serial từ PR #8, basic/optimized từ PR #9 cùng CLI tích hợp đã merge.
+Pipeline hiện hành nối CLI → loader → output/metrics → timer đúng BFS call →
 validation toàn distance → JSONL v1. API/header giữ nguyên. Cả ba thuật toán
 build/link production qua BFS_SOURCES trong Makefile; test backend lỗi chỉ
 link vào binary riêng. Xem ROLE_C_ACCEPTANCE.md và PROJECT_STATUS.md cho evidence.

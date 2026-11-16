@@ -114,7 +114,7 @@ trả RANGE. Không mở/đọc/đóng file được trả IO. Builder đóng fi
 | BFS_ERR_RUNTIME | 7 | Lỗi runtime được phát hiện |
 
 Không quy định ưu tiên khi nhiều lỗi đồng thời. Mã API khác mã thoát CLI.
-Cập nhật triển khai 12/11/2026: graph/serial và hai bản OpenMP đã merge qua PR #8/#9; nhánh C đã tích hợp CLI trong PR #7 (Ready for Review từ 14/11/2026). Quy định API ở trên không đổi.
+Cập nhật trạng thái 16/11/2026: PR #7 đã merge vào main tại `38842829`, CI sau merge PASS 3/3; Issues #3/#4/#5 đã đóng, Issue #2 chờ PR tài liệu. Quy định API ở trên không đổi.
 
 ## CLI v1
 

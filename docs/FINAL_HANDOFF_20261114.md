@@ -80,3 +80,12 @@ giới hạn dung lượng, nền tảng/hạn nộp và yêu cầu slide/video/
 
 Quy ước kiểm hash v1 portable và hash lịch sử được bảo tồn tại
 [PORTABLE_PROVENANCE_V1](PORTABLE_PROVENANCE_V1.md). Không thay bằng chứng đo.
+
+
+## Cập nhật trạng thái — 16/11/2026
+
+PR #7 đã merge vào `main` bằng commit
+[`38842829ddaa9211789bdd3ff2035bf54762ceca`](https://github.com/duyanhtr130905/parallel-bfs-openmp/commit/38842829ddaa9211789bdd3ff2035bf54762ceca);
+CI sau merge PASS 3/3. Issues #3, #4, #5 đã đóng. Issue #2 đang được xử lý
+qua PR cập nhật tài liệu riêng và chỉ đóng sau khi PR đó merge. Các ghi chú
+phía trên phản ánh trạng thái ngày 14/11 và được giữ để truy vết.
