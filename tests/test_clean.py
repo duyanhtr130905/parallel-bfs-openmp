@@ -12,7 +12,8 @@ with tempfile.TemporaryDirectory(dir=root / 'build') as directory:
     script = sandbox / 'scripts/clean.py'
     script.write_bytes((root / 'scripts/clean.py').read_bytes())
     deleted = ['report/main.aux', 'report/chapters/chapter1.log',
-               'report/chapters/chapter6.aux', 'build/openmp_probe.exe']
+               'report/chapters/chapter6.aux', 'build/openmp_probe.exe', 'build/test_parallel.exe',
+               'build/test_integration.exe', 'build/cli_fault_backend.exe']
     kept = ['report/main.pdf', 'report/main.tex', 'report/references.bib',
             'report/chapters/chapter1.tex', 'report/chapters/custom.aux']
     for name in deleted + kept:

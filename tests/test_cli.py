@@ -1,7 +1,12 @@
-"""Real CLI contract checks; never BFS correctness/performance evidence."""
+"""Real three-algorithm CLI integration; smoke timings are not benchmark results."""
 import argparse
+import sys
+import tempfile
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+from benchmark import validate
 import subprocess
+import os
 
 p = argparse.ArgumentParser()
 p.add_argument('--binary', required=True)
@@ -10,12 +15,13 @@ if not Path(binary).is_file():
     raise SystemExit('NOT RUN: build the CLI first')
 base = ['--graph', 'datasets/small/disconnected.edgelist', '--vertices', '6',
         '--source', '0', '--algo', 'serial', '--directed']
-cases = [(['--help'], 0), ([], 2), (base, 3)]
+cases = [(['--help'], 0), ([], 2), (base, 0)]
 for algo in ('serial', 'omp-basic', 'omp-opt'):
     for schedule in ('static', 'dynamic', 'guided'):
         args = base.copy()
         args[7] = algo
-        cases.append((args + ['--threads', '2', '--schedule', schedule], 3))
+        for threads in (1, 2, 4, 8):
+            cases.append((args + ['--threads', str(threads), '--schedule', schedule], 0))
 for extra in (['--directed'], ['--undirected'], ['--unknown'], ['--help'],
               ['--threads', '0'], ['--threads', '-1'], ['--threads', '2147483648'],
               ['--threads', '2x'], ['--schedule', 'auto'], ['--threads']):
@@ -27,7 +33,7 @@ for index, value in ((3, '0'), (3, '2147483648'), (3, '-1'), (5, '6'),
     cases.append((args, 2))
 args = base.copy()
 args[-1] = '--undirected'
-cases.append((args, 3))
+cases.append((args, 0))
 cases.append((base[:-1], 2))
 for args, expected in cases:
     result = subprocess.run([binary, *args], capture_output=True, text=True, timeout=10)
@@ -35,6 +41,55 @@ for args, expected in cases:
     if expected != 0:
         assert result.stdout == '', (args, result.stdout)
         assert result.stderr, args
+    if expected == 0 and args != ['--help']:
+        record = validate(result.stdout)
+        assert record['algorithm'] == args[7]
+        assert record['schedule'] == ('none' if args[7] == 'serial' else args[args.index('--schedule')+1])
+        if args[7] == 'serial' or '--threads' not in args:
+            assert record['threads_actual'] == 1
+        assert record['vertices'] == 6 and record['edges'] == (5 if '--directed' in args else 9)
+        assert record['reachable'] == 4 and record['source'] == 0
+        assert record['threads_requested'] == (int(args[args.index('--threads')+1]) if '--threads' in args else 1)
+        assert result.stderr == ''
     if expected == 3:
         assert 'NOT_IMPLEMENTED' in result.stderr, args
-print(f'PASS: {len(cases)} CLI cases; BFS correctness/performance NOT TESTED')
+# Temporary edge files are integration fixtures, never research raw data.
+extra_count = 0
+with tempfile.TemporaryDirectory(prefix='bfs-cli-') as directory:
+    path = Path(directory) / 'graph with spaces.txt'
+    for data, vertices, source, mode, expected, arcs, reachable in (
+        (b'', 1, 0, '--directed', 0, 0, 1),
+        (b'', 3, 2, '--undirected', 0, 0, 1),
+        (b'# fixture\r\n0 1\r\n1 2', 4, 2, '--directed', 0, 2, 1),
+        (b'0 1\n1 2\n2 2\n0 1', 4, 2, '--undirected', 0, 7, 3),
+        (b'0 1\x00 2\n', 3, 0, '--directed', 4, None, None),
+        (b'4294967296 0', 3, 0, '--directed', 4, None, None),
+        (b'0 1 # tail', 3, 0, '--directed', 4, None, None),
+        (b'0 3', 3, 0, '--directed', 4, None, None),
+        (b'\xef\xbb\xbf0 1', 3, 0, '--directed', 4, None, None),
+    ):
+        path.write_bytes(data)
+        args = ['--graph', str(path), '--vertices', str(vertices), '--source', str(source),
+                '--algo', 'serial', mode, '--threads', '4', '--schedule', 'guided']
+        result = subprocess.run([binary, *args], capture_output=True, text=True, timeout=10)
+        assert result.returncode == expected, (args, result.stderr)
+        if expected == 0:
+            validate(result.stdout, dict(vertices=vertices, source=source, edges=arcs,
+                reachable=reachable, directed=mode == '--directed', threads_requested=4))
+            assert not result.stderr
+        else:
+            assert not result.stdout and result.stderr
+        extra_count += 1
+    args[1] = str(Path(directory) / 'missing.txt')
+    result = subprocess.run([binary, *args], capture_output=True, text=True, timeout=10)
+    assert result.returncode == 4 and not result.stdout and result.stderr
+    extra_count += 1
+for algo in ('omp-basic', 'omp-opt'):
+    args = base.copy()
+    args[7] = algo
+    result = subprocess.run([binary, *args, '--threads', '4'], capture_output=True,
+        text=True, timeout=10, env=dict(os.environ, OMP_THREAD_LIMIT='1', OMP_DYNAMIC='FALSE'))
+    assert result.returncode == 0, result.stderr
+    validate(result.stdout, dict(algorithm=algo, threads_requested=4, threads_actual=1))
+    extra_count += 1
+print(f'PASS: {len(cases) + extra_count} CLI cases; three-algorithm integration, no comparison benchmark')

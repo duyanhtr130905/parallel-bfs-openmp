@@ -25,6 +25,11 @@ jobs:
           persist-credentials: false
       - name: Compile and test the real scaffold
         run: make CC=gcc PYTHON=python3 build test check-openmp
+      - name: Verify optional plotting tools with synthetic unit fixtures
+        run: |
+          python3 -m venv build/plot-venv
+          build/plot-venv/bin/python -m pip install matplotlib
+          make PYTHON=build/plot-venv/bin/python test-plots
 
   windows:
     name: bootstrap-windows-ucrt64

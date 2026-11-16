@@ -1,0 +1,188 @@
+\begin{table}[htbp]
+\centering\small
+\caption[path2048-s0: thống kê static]{path2048-s0: median và IQR theo ms, static; 10 mẫu/cấu hình. $S$ so Serial, $E$ theo team thực, $C$ so OpenMP một luồng.}
+\label{tab:path2048-s0}
+\begin{tabular}{lrrrrrr}
+\toprule
+Phiên bản & $p$ & Median & IQR & $S$ & $E$ (\%) & $C$ \\
+\midrule
+Serial & 1 & 0,0097 & 0 & 1 & 100 & -- \\
+Basic & 1 & 0,2198 & 0,0123 & 0,04414 & 4,414 & 1 \\
+Basic & 2 & 59,01 & 2,527 & 0,0001644 & 0,008219 & 0,003724 \\
+Basic & 4 & 123,4 & 3,985 & $7,858\times10^{-5}$ & 0,001965 & 0,00178 \\
+Basic & 8 & 229,4 & 16,84 & $4,228\times10^{-5}$ & 0,0005284 & 0,0009577 \\
+Optimized & 1 & 0,2786 & 0,005475 & 0,03481 & 3,481 & 1 \\
+Optimized & 2 & 97,08 & 2,486 & $9,991\times10^{-5}$ & 0,004996 & 0,00287 \\
+Optimized & 4 & 204,8 & 5,98 & $4,737\times10^{-5}$ & 0,001184 & 0,001361 \\
+Optimized & 8 & 390 & 20,15 & $2,487\times10^{-5}$ & 0,0003109 & 0,0007146 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\caption[path8192-s0: thống kê static]{path8192-s0: median và IQR theo ms, static; 10 mẫu/cấu hình. $S$ so Serial, $E$ theo team thực, $C$ so OpenMP một luồng.}
+\label{tab:path8192-s0}
+\begin{tabular}{lrrrrrr}
+\toprule
+Phiên bản & $p$ & Median & IQR & $S$ & $E$ (\%) & $C$ \\
+\midrule
+Serial & 1 & 0,05185 & 0,006975 & 1 & 100 & -- \\
+Basic & 1 & 0,6653 & 0,01063 & 0,07793 & 7,793 & 1 \\
+Basic & 2 & 238,1 & 10,31 & 0,0002178 & 0,01089 & 0,002794 \\
+Basic & 4 & 493,6 & 15,19 & 0,0001051 & 0,002626 & 0,001348 \\
+Basic & 8 & 922,1 & 45,46 & $5,623\times10^{-5}$ & 0,0007029 & 0,0007215 \\
+Optimized & 1 & 0,8969 & 0,01422 & 0,05781 & 5,781 & 1 \\
+Optimized & 2 & 392 & 4,749 & 0,0001323 & 0,006613 & 0,002288 \\
+Optimized & 4 & 831,2 & 16,72 & $6,238\times10^{-5}$ & 0,001559 & 0,001079 \\
+Optimized & 8 & 1562 & 76,62 & $3,319\times10^{-5}$ & 0,0004149 & 0,0005742 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\caption[path8192-s4096: thống kê static]{path8192-s4096: median và IQR theo ms, static; 10 mẫu/cấu hình. $S$ so Serial, $E$ theo team thực, $C$ so OpenMP một luồng.}
+\label{tab:path8192-s4096}
+\begin{tabular}{lrrrrrr}
+\toprule
+Phiên bản & $p$ & Median & IQR & $S$ & $E$ (\%) & $C$ \\
+\midrule
+Serial & 1 & 0,0372 & 0,0034 & 1 & 100 & -- \\
+Basic & 1 & 0,4464 & 0,0103 & 0,08332 & 8,332 & 1 \\
+Basic & 2 & 116,8 & 4,529 & 0,0003186 & 0,01593 & 0,003824 \\
+Basic & 4 & 243,1 & 6,511 & 0,0001531 & 0,003826 & 0,001837 \\
+Basic & 8 & 468,4 & 18,49 & $7,941\times10^{-5}$ & 0,0009926 & 0,000953 \\
+Optimized & 1 & 0,5499 & 0,008075 & 0,06765 & 6,765 & 1 \\
+Optimized & 2 & 194,3 & 3,152 & 0,0001915 & 0,009575 & 0,002831 \\
+Optimized & 4 & 409,8 & 14,78 & $9,078\times10^{-5}$ & 0,00227 & 0,001342 \\
+Optimized & 8 & 767 & 42,57 & $4,85\times10^{-5}$ & 0,0006062 & 0,0007169 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\caption[star100000-s0: thống kê static]{star100000-s0: median và IQR theo ms, static; 10 mẫu/cấu hình. $S$ so Serial, $E$ theo team thực, $C$ so OpenMP một luồng.}
+\label{tab:star100000-s0}
+\begin{tabular}{lrrrrrr}
+\toprule
+Phiên bản & $p$ & Median & IQR & $S$ & $E$ (\%) & $C$ \\
+\midrule
+Serial & 1 & 0,2825 & 0,1892 & 1 & 100 & -- \\
+Basic & 1 & 1,811 & 0,1583 & 0,156 & 15,6 & 1 \\
+Basic & 2 & 3,459 & 0,5684 & 0,08167 & 4,084 & 0,5236 \\
+Basic & 4 & 3,872 & 1,072 & 0,07296 & 1,824 & 0,4678 \\
+Basic & 8 & 4,332 & 0,9949 & 0,06521 & 0,8151 & 0,4181 \\
+Optimized & 1 & 1,529 & 0,1227 & 0,1848 & 18,48 & 1 \\
+Optimized & 2 & 3,089 & 0,4858 & 0,09145 & 4,572 & 0,4949 \\
+Optimized & 4 & 3,681 & 0,5019 & 0,07675 & 1,919 & 0,4154 \\
+Optimized & 8 & 4,386 & 0,3927 & 0,06441 & 0,8051 & 0,3486 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\caption[star1000000-s0: thống kê static]{star1000000-s0: median và IQR theo ms, static; 10 mẫu/cấu hình. $S$ so Serial, $E$ theo team thực, $C$ so OpenMP một luồng.}
+\label{tab:star1000000-s0}
+\begin{tabular}{lrrrrrr}
+\toprule
+Phiên bản & $p$ & Median & IQR & $S$ & $E$ (\%) & $C$ \\
+\midrule
+Serial & 1 & 3,129 & 0,1779 & 1 & 100 & -- \\
+Basic & 1 & 17,68 & 0,7979 & 0,177 & 17,7 & 1 \\
+Basic & 2 & 23,46 & 1,176 & 0,1334 & 6,67 & 0,7536 \\
+Basic & 4 & 25,23 & 1,81 & 0,124 & 3,101 & 0,7007 \\
+Basic & 8 & 26,42 & 1,165 & 0,1185 & 1,481 & 0,6693 \\
+Optimized & 1 & 15,44 & 0,6806 & 0,2027 & 20,27 & 1 \\
+Optimized & 2 & 23,23 & 1,789 & 0,1347 & 6,735 & 0,6645 \\
+Optimized & 4 & 23,03 & 1,533 & 0,1359 & 3,397 & 0,6702 \\
+Optimized & 8 & 26,49 & 2,311 & 0,1181 & 1,477 & 0,5828 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\caption[star1000000-s1: thống kê static]{star1000000-s1: median và IQR theo ms, static; 10 mẫu/cấu hình. $S$ so Serial, $E$ theo team thực, $C$ so OpenMP một luồng.}
+\label{tab:star1000000-s1}
+\begin{tabular}{lrrrrrr}
+\toprule
+Phiên bản & $p$ & Median & IQR & $S$ & $E$ (\%) & $C$ \\
+\midrule
+Serial & 1 & 3,189 & 0,4142 & 1 & 100 & -- \\
+Basic & 1 & 17,08 & 0,3277 & 0,1867 & 18,67 & 1 \\
+Basic & 2 & 23,34 & 1,094 & 0,1367 & 6,833 & 0,7319 \\
+Basic & 4 & 23,91 & 1,421 & 0,1334 & 3,334 & 0,7142 \\
+Basic & 8 & 26,27 & 1,562 & 0,1214 & 1,517 & 0,6501 \\
+Optimized & 1 & 15,51 & 0,9614 & 0,2056 & 20,56 & 1 \\
+Optimized & 2 & 24,04 & 2,199 & 0,1326 & 6,632 & 0,645 \\
+Optimized & 4 & 23,76 & 0,859 & 0,1342 & 3,355 & 0,6526 \\
+Optimized & 8 & 25,63 & 1,863 & 0,1244 & 1,555 & 0,605 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\caption[grid128-s0: thống kê static]{grid128-s0: median và IQR theo ms, static; 10 mẫu/cấu hình. $S$ so Serial, $E$ theo team thực, $C$ so OpenMP một luồng.}
+\label{tab:grid128-s0}
+\begin{tabular}{lrrrrrr}
+\toprule
+Phiên bản & $p$ & Median & IQR & $S$ & $E$ (\%) & $C$ \\
+\midrule
+Serial & 1 & 0,0912 & 0,0241 & 1 & 100 & -- \\
+Basic & 1 & 0,5634 & 0,02492 & 0,1619 & 16,19 & 1 \\
+Basic & 2 & 8,678 & 0,4216 & 0,01051 & 0,5255 & 0,06492 \\
+Basic & 4 & 16,01 & 0,7455 & 0,005697 & 0,1424 & 0,03519 \\
+Basic & 8 & 30,53 & 2,488 & 0,002987 & 0,03734 & 0,01846 \\
+Optimized & 1 & 0,4789 & 0,01635 & 0,1904 & 19,04 & 1 \\
+Optimized & 2 & 13,25 & 0,1796 & 0,006884 & 0,3442 & 0,03615 \\
+Optimized & 4 & 26,43 & 0,8346 & 0,003451 & 0,08627 & 0,01812 \\
+Optimized & 8 & 49,01 & 4,316 & 0,001861 & 0,02326 & 0,009773 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\caption[grid512-s0: thống kê static]{grid512-s0: median và IQR theo ms, static; 10 mẫu/cấu hình. $S$ so Serial, $E$ theo team thực, $C$ so OpenMP một luồng.}
+\label{tab:grid512-s0}
+\begin{tabular}{lrrrrrr}
+\toprule
+Phiên bản & $p$ & Median & IQR & $S$ & $E$ (\%) & $C$ \\
+\midrule
+Serial & 1 & 1,694 & 0,3032 & 1 & 100 & -- \\
+Basic & 1 & 7,043 & 0,5137 & 0,2405 & 24,05 & 1 \\
+Basic & 2 & 37,73 & 2,058 & 0,04491 & 2,245 & 0,1867 \\
+Basic & 4 & 63,98 & 3,206 & 0,02648 & 0,662 & 0,1101 \\
+Basic & 8 & 112,7 & 8,654 & 0,01504 & 0,188 & 0,06251 \\
+Optimized & 1 & 5,814 & 0,5139 & 0,2914 & 29,14 & 1 \\
+Optimized & 2 & 52,54 & 4,019 & 0,03224 & 1,612 & 0,1106 \\
+Optimized & 4 & 92,22 & 3,916 & 0,01837 & 0,4593 & 0,06305 \\
+Optimized & 8 & 179,7 & 3,178 & 0,009426 & 0,1178 & 0,03235 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\caption[grid512-s131328: thống kê static]{grid512-s131328: median và IQR theo ms, static; 10 mẫu/cấu hình. $S$ so Serial, $E$ theo team thực, $C$ so OpenMP một luồng.}
+\label{tab:grid512-s131328}
+\begin{tabular}{lrrrrrr}
+\toprule
+Phiên bản & $p$ & Median & IQR & $S$ & $E$ (\%) & $C$ \\
+\midrule
+Serial & 1 & 1,871 & 0,2011 & 1 & 100 & -- \\
+Basic & 1 & 7,302 & 0,1272 & 0,2563 & 25,63 & 1 \\
+Basic & 2 & 27,8 & 1,454 & 0,0673 & 3,365 & 0,2626 \\
+Basic & 4 & 39,91 & 1,358 & 0,04688 & 1,172 & 0,1829 \\
+Basic & 8 & 62,39 & 2,516 & 0,02999 & 0,3749 & 0,117 \\
+Optimized & 1 & 6,68 & 0,6215 & 0,2801 & 28,01 & 1 \\
+Optimized & 2 & 30,81 & 2,338 & 0,06072 & 3,036 & 0,2168 \\
+Optimized & 4 & 52,66 & 1,867 & 0,03553 & 0,8883 & 0,1269 \\
+Optimized & 8 & 92,55 & 2,286 & 0,02022 & 0,2527 & 0,07218 \\
+\bottomrule
+\end{tabular}
+\end{table}

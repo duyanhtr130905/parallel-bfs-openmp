@@ -35,3 +35,15 @@ không coi CLI scaffold hoặc probe OpenMP là bằng chứng BFS correctness.
 Race cần review mô hình bộ nhớ; việc lặp test không thay cho review. Benchmark
 phải độc lập với thời gian validation và có provenance theo
 `docs/EXPERIMENT_PROTOCOL.md`.
+
+## C: bước serial-only sau PR #8 (12/11/2026)
+
+`make test` giữ test-bfs + test-tools và thêm test-cli-validation.
+CLI binary link src/graph.c + src/bfs_serial.c thật; Python kiểm schema bằng
+chính validator của runner, exit 0/2/3/4, directed/undirected stored arcs,
+reachable, source khác 0, no-edge/n=1, path có space, CRLF/no-final-newline,
+NUL/BOM/overflow/token thừa/missing file. Không có kết quả OpenMP giả.
+`test_cli_validation.c` đọc fixture thật, so mọi distance với oracle tay,
+kiểm bộ xác minh từ chối output hỏng và reachability giả của self-loop cô lập.
+Timer chỉ quanh bfs_serial; cấp phát/I/O/validation/JSON ở ngoài.
+Các thời gian CLI trong test là smoke, không đưa vào raw/report.
