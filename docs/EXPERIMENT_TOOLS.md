@@ -1,8 +1,9 @@
 # Công cụ C — đã đo chính thức 12/11/2026
 
-Trạng thái 14/11/2026: PR #8/#9 đã merge, ba BFS tích hợp và kiểm thử;
-9 session, 225 warm-up + 2250 mẫu, 225 dòng thống kê, 36 biểu đồ, báo cáo
-42 trang. PR #7 Ready for Review. Xem [bàn giao cuối](FINAL_HANDOFF_20261114.md).
+Trạng thái 16/11/2026: PR #7 đã merge tại `38842829`; CI sau merge PASS 3/3.
+Issues #3/#4/#5 đã đóng; Issue #2 chờ PR tài liệu. Benchmark gồm 9 session,
+225 warm-up + 2250 mẫu, 225 dòng thống kê, 36 biểu đồ; PDF nghiệm thu 42 trang.
+Xem [bàn giao cuối](FINAL_HANDOFF_20261114.md).
 
 Chạy từ root repository với Python 3.9+ (stdlib). Không cần cài thêm cho generator/runner/analysis. `make test` nay gọi `test-tools` trên cả Linux và Windows CI; không sửa workflow hay code A/B. Unit tests chứa SYNTHETIC TEST DATA ONLY, mock subprocess trong thư mục tạm, không tạo raw trong results của nhóm.
 

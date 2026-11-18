@@ -3,8 +3,10 @@
 Bộ bàn giao cuối: [nghiệm thu 14/11/2026](docs/FINAL_HANDOFF_20261114.md),
 [hướng dẫn biên dịch/chạy ba thuật toán/tái lập/nộp](docs/SUBMISSION_README.md).
 
-C11/OpenMP CPU, cùng CSR loader cho Serial, Basic và Optimized. A/B đã merge;
-CLI tích hợp đang ở **PR #7**, nhánh `docs/c1-academic-report`.
+C11/OpenMP CPU, cùng CSR loader cho Serial, Basic và Optimized. PR #7 đã merge
+vào `main` bằng commit `38842829ddaa9211789bdd3ff2035bf54762ceca`;
+CI sau merge PASS 3/3. Issues #3, #4, #5 đã đóng; Issue #2 đang được xử lý
+qua PR cập nhật tài liệu riêng.
 **Đã thực nghiệm thật** trên laptop Windows: 6 đồ thị/9 tổ hợp nguồn,225 cấu hình,
 225 warm-up và2250 mẫu chính thức, không lỗi/timeout. Commit đo ab588fb sau
 correctness local và CI3/3 PASS. Không cấu hình OpenMP nào nhanh hơn Serial;
@@ -37,10 +39,11 @@ Test tools không phải benchmark; fixtures synthetic không dùng làm số li
 ## Báo cáo và thực nghiệm
 
 `make report`: XeLaTeX → BibTeX → XeLaTeX hai lần, output `report/main.pdf`.
-CI lưu PDF artifact theo SHA để tải và xem. Sáu chương và abstract đã điền số
-thật,9 bảng cấu hình chi tiết và12 biểu đồ từ raw (36 figures được lưu để tái tạo).
+CI lưu PDF artifact theo SHA; báo cáo nghiệm thu là bản 42 trang. Sáu chương
+và abstract có kết quả thật, 9 bảng cấu hình chi tiết và 12 biểu đồ từ raw
+(36 figures lưu để tái tạo).
 GCC/libgomp16.2.0, Make4.4.1, Python3.14.10 tại C:/tools/msys64. Windows dùng QPC
-theo ADR-0003; Linux giữ omp_get_wtime. PDF cần được kiểm theo final PR HEAD.
+theo ADR-0003; Linux giữ omp_get_wtime. PDF nghiệm thu và mã nguồn bàn giao được ghi trong HANDOFF bộ nộp.
 
 Raw/hash/backup/lệnh tái lập ở [results README](results/experiment-20261112/README.md).
 Runner cần working tree sạch, correctness log/binary hash đúng SHA và môi trường
@@ -50,9 +53,9 @@ warm-up không tạo warmed team; không suy rộng kết quả sang mọi đồ
 ## Quy trình Git
 
 Canonical https://github.com/duyanhtr130905/parallel-bfs-openmp .
-Giữ feature branch và PR #7; không force push, direct push main, tự approve,
-merge #7 hoặc đóng Issue #5 khi benchmark/report chưa đạt. AGENTS.md là quy trình
-chung; hồ sơ bootstrap cũ trong docs là lịch sử, không phải trạng thái hiện tại.
+PR #7 đã merge; không force push hoặc push trực tiếp main. Issue #2 chỉ đóng
+sau khi PR cập nhật trạng thái tài liệu được merge. AGENTS.md là quy trình chung;
+các mục có ngày trong docs là hồ sơ lịch sử, không phải trạng thái hiện hành.
 
 ## Phân công cuối cùng — chủ dự án chọn 05/11/2026
 

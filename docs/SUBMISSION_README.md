@@ -1,9 +1,13 @@
 # Hướng dẫn bộ nộp Parallel BFS
 
-Đây là bộ nộp tiêu chuẩn; chưa có quy định nộp chính thức của giảng viên.
-Xem HANDOFF.md trong thư mục bàn giao để biết commit và hash sản phẩm.
-PDF báo cáo là bản để đọc/nộp. ZIP nguồn giữ cả LaTeX, tests và công cụ tái lập;
-raw lớn và binary đo được giữ riêng, không nằm trong ZIP nguồn.
+Trạng thái 16/11/2026: PR #7 đã merge tại `38842829`; CI sau merge PASS 3/3.
+Issues #3, #4, #5 đã đóng. Issue #2 đang chờ PR cập nhật tài liệu được review
+và merge. Bộ nộp sẽ được đóng gói lại từ mã nguồn main sau PR đó; giữ nguyên PDF
+nghiệm thu 42 trang. Xem HANDOFF.md để lấy commit nguồn và SHA-256 cuối cùng.
+
+PDF là bản báo cáo để đọc/nộp. ZIP nguồn gồm mã nguồn, LaTeX, tests, README,
+số liệu tổng hợp và biểu đồ cần thiết; không chứa .git, build tạm, token, raw
+dung lượng lớn hoặc binary đo.
 
 ## Biên dịch và kiểm thử
 
@@ -99,5 +103,7 @@ IQR không phải khoảng tin cậy. Backup ổ D vẫn trên cùng thiết b�
 
 Đối chiếu với giảng viên: quy tắc đặt tên, nền tảng/hạn nộp, dung lượng,
 có cần nguồn LaTeX/dataset/raw/slide/video hay bản in không. Không coi việc
-chuẩn bị bộ này là đã nộp hoặc đã được chấm/approval. PR #7 cần approval
-độc lập; người dùng quyết định merge sau đó. Issue #5 chưa đóng.
+chuẩn bị bộ này là đã nộp hoặc đã được chấm. PR #7 đã merge và Issue #5 đã
+đóng. Trước khi nộp, đối chiếu quy định giảng viên về tên file, định dạng,
+dung lượng, nền tảng, hạn nộp và yêu cầu slide/video/bản in nếu có; không tự
+suy đoán yêu cầu chưa được cung cấp.

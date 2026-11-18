@@ -1,23 +1,23 @@
-# Bàn giao cuối 14/11/2026 — Role C / PR #7
+# Trạng thái dự án — 16/11/2026
 
-Nghiệm thu raw độc lập PASS 9 session/2250 mẫu +225 warm-up, 225 dòng thống kê,
-81 dòng bảng static, 36 hình tái vẽ khớp từng pixel; backup 4968 file khớp.
-Không thay raw/kết quả/thuật toán, không đo lại. Bìa sửa **TS Nguyễn Hải Vinh**,
-bỏ câu lịch sử C1 ở Chương 1. Local full correctness/tools/OpenMP và plot tests PASS.
+PR #7 đã merge vào `main` bằng commit
+[`38842829ddaa9211789bdd3ff2035bf54762ceca`](https://github.com/duyanhtr130905/parallel-bfs-openmp/commit/38842829ddaa9211789bdd3ff2035bf54762ceca).
+CI sau merge PASS 3/3. Issues #3, #4, #5 đã đóng. Issue #2 vẫn mở trong khi
+PR tài liệu hiện hành chờ review và merge; không được đánh dấu hoàn tất trước đó.
 
-[Hồ sơ nghiệm thu cuối](FINAL_HANDOFF_20261114.md) và
-[hướng dẫn bộ nộp](SUBMISSION_README.md). Bộ bàn giao riêng ở workspace cha:
-`output/Parallel_BFS_BanGiao_20261114/`; HANDOFF.md/final-acceptance.json ghi
-HEAD, CI cuối, PDF mới/hash/số trang và ZIP sau khi tải artifact đúng HEAD.
-Máy không có XeLaTeX local: build đủ lượt bằng CI; kiểm mọi trang PDF mới.
-PR #7 đã Ready for Review; Dũng yêu cầu sửa hai P2 ngày 14/11/2026.
-Đã sửa trạng thái tài liệu và provenance portable; bằng chứng local tại
-[PORTABLE_PROVENANCE_V1](PORTABLE_PROVENANCE_V1.md). Re-review theo HEAD mới sau CI.
-Chưa có human approval; không tự merge PR #7 hoặc đóng Issue #5.
-Chưa biết quy định nộp chính thức; người dùng đối chiếu trước nộp.
+Nghiệm thu benchmark và báo cáo vẫn theo hồ sơ ngày 14/11: 9 session, 225 warm-up,
+2250 mẫu, 225 dòng thống kê, 81 dòng bảng static và 36 hình đối chiếu; PDF nghiệm
+thu 42 trang. Không thay thuật toán, raw, thống kê, biểu đồ hay nội dung khoa học;
+không chạy lại benchmark. Xem [FINAL_HANDOFF](FINAL_HANDOFF_20261114.md),
+[hướng dẫn bộ nộp](SUBMISSION_README.md) và bộ bàn giao trong workspace cha
+(`output/Parallel_BFS_BanGiao_20261114/HANDOFF.md`).
+
+Bộ nộp sẽ được cập nhật ZIP từ mã nguồn sau khi PR tài liệu merge; PDF nghiệm
+thu 42 trang được giữ nguyên. Trạng thái ZIP mới, commit nguồn và SHA-256 được
+ghi trong HANDOFF và SHA256SUMS sau khi tạo.
 
 ---
-## Lịch sử trước bàn giao cuối
+## Lịch sử trước bàn giao cuối (giữ nguyên theo ngày)
 
 # Role C — thực nghiệm thật, báo cáo và nghiệm thu 12/11/2026
 
