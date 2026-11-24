@@ -79,8 +79,35 @@ jobs:
           persist-credentials: false
       - name: Install report tools on the temporary CI runner
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends texlive-xetex texlive-latex-extra texlive-fonts-recommended
+          set -euo pipefail
+          sources="$RUNNER_TEMP/report-ubuntu.list"
+          apt_options=(-o "Dir::Etc::sourcelist=$sources" -o Dir::Etc::sourceparts=- -o Acquire::Retries=1)
+          packages=(texlive-xetex texlive-latex-extra texlive-fonts-recommended)
+          keyring=/usr/share/keyrings/ubuntu-archive-keyring.gpg
+
+          # Keep a slow regional mirror from consuming the entire job timeout.
+          downloaded=false
+          for mirror in http://azure.archive.ubuntu.com/ubuntu http://archive.ubuntu.com/ubuntu; do
+            cat > "$sources" <<EOF
+          deb [signed-by=$keyring] $mirror noble main restricted universe multiverse
+          deb [signed-by=$keyring] $mirror noble-updates main restricted universe multiverse
+          deb [signed-by=$keyring] $mirror noble-backports main restricted universe multiverse
+          deb [signed-by=$keyring] http://security.ubuntu.com/ubuntu noble-security main restricted universe multiverse
+          EOF
+            echo "Fetching TeX Live from $mirror"
+            if sudo timeout 90s apt-get "${apt_options[@]}" update --error-on=any &&
+               sudo timeout 180s apt-get "${apt_options[@]}" install -y --download-only --no-install-recommends "${packages[@]}"; then
+              downloaded=true
+              break
+            fi
+            echo "Could not download TeX Live via $mirror within the attempt limits." >&2
+          done
+
+          if [[ "$downloaded" != true ]]; then
+            echo "TeX Live packages could not be downloaded from either Ubuntu mirror." >&2
+            exit 1
+          fi
+          sudo apt-get "${apt_options[@]}" install -y --no-download --no-install-recommends "${packages[@]}"
       - name: Compile the real report
         run: make report
       - name: Preserve report for PDF inspection
