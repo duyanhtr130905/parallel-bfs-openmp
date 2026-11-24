@@ -1,27 +1,53 @@
-\chapter{Mở đầu}
-\section{Bối cảnh và ý nghĩa của xử lý đồ thị}
-Đồ thị biểu diễn các đối tượng bằng đỉnh và quan hệ bằng cạnh. Cách biểu diễn này cho phép đặt những câu hỏi về khả năng đi tới, khoảng cách và cấu trúc liên kết trong mạng giao thông, mạng máy tính hoặc mạng quan hệ. Khi quy mô dữ liệu tăng, chi phí duyệt các liên kết trở thành một thành phần đáng quan tâm trong thời gian xử lý. Bài tập lớn lựa chọn bài toán khoảng cách trên đồ thị không trọng số để khảo sát việc khai thác CPU đa nhân qua một thuật toán có đầu ra rõ ràng, dễ kiểm chứng.
+\chapter{Tổng quan và phát biểu bài toán}
 
-Tìm kiếm theo chiều rộng (Breadth-First Search, BFS) xác định khoảng cách ngắn nhất từ nguồn đến các đỉnh theo số cạnh. Với biểu diễn cho phép liệt kê láng giềng, BFS tuần tự có độ phức tạp $O(|V|+|E|)$ trong trường hợp xấu nhất~\cite{cornellbfs}. Tuy nhiên, độ phức tạp tuyến tính không có nghĩa thời gian tuyệt đối luôn nhỏ: lượng dữ liệu phải truy cập vẫn tăng theo kích thước đồ thị. Vì vậy, khai thác nhiều lõi xử lý là hướng nghiên cứu phù hợp, đồng thời cần đánh giá chi phí phát sinh khi chuyển từ xử lý tuần tự sang xử lý đồng thời.
+\section{Bối cảnh và động lực nghiên cứu}
+Đồ thị biểu diễn các đối tượng bằng đỉnh và quan hệ bằng cạnh. Những câu hỏi về khả năng đi tới và khoảng cách xuất hiện, chẳng hạn, trong định tuyến mạng~\cite{cornellbfs}. Trên đồ thị không trọng số, tìm kiếm theo chiều rộng (Breadth-First Search, BFS) duyệt lần lượt theo khoảng cách tính bằng số cạnh và xác định khoảng cách ngắn nhất từ một nguồn đến mọi đỉnh~\cite{cornellbfs}. BFS cũng là một phép toán cơ sở trong xử lý đồ thị quy mô lớn~\cite{beamer2012}.
 
-\section{Động cơ chọn OpenMP và vấn đề nghiên cứu}
-BFS theo tầng tạo ra tập đỉnh đang được mở rộng, gọi là frontier. Các đỉnh cùng tầng có thể cung cấp công việc cho nhiều luồng, nhưng các luồng cũng có thể cùng phát hiện một đỉnh mới. Việc phân chia công việc do đó phải đi kèm cơ chế nhận quyền thăm và đồng bộ giữa các tầng. Frontier hẹp hạn chế lượng công việc đồng thời; frontier có bậc đỉnh không đều có thể gây mất cân bằng tải. Đây là các giả thuyết thiết kế cần kiểm tra, chưa phải kết quả hiệu năng của nhóm.
+CPU đa lõi cho phép nhiều luồng cùng mở rộng các đỉnh ở một mức. Các mức vẫn có quan hệ phụ thuộc: tập đỉnh của mức sau chỉ hoàn chỉnh sau khi xử lý xong mức hiện tại. Trong cùng một mức, bậc đỉnh không đều có thể gây lệch tải, nhiều luồng có thể cùng phát hiện một đỉnh và cách truy cập bộ nhớ phụ thuộc vào thứ tự duyệt cung. Nghiên cứu của Beamer và cộng sự nêu phân bố bậc và tính cục bộ bộ nhớ là các thách thức trong BFS song song~\cite{beamer2012}. Trong hai bản cài đặt của nhóm, việc thu thập tập đỉnh của mức kế tiếp còn đòi hỏi lựa chọn cấu trúc lưu trữ và điểm đồng bộ.
 
-OpenMP phù hợp với phạm vi bài tập vì cho phép diễn đạt xử lý song song bộ nhớ chia sẻ trong chương trình C trên một máy đa nhân. Nhóm có thể tập trung vào phân chia frontier, đồng bộ và lập lịch mà vẫn dùng chung dữ liệu CSR. Giáo trình của Trobec và cộng sự đặt lập trình đa nhân với OpenMP cùng việc đo và phân tích chương trình song song trong một lộ trình học tập thống nhất~\cite{trobec2018}.
+Nhóm chọn OpenMP để triển khai trên một máy có bộ nhớ chia sẻ. Mô hình này cho phép các luồng trong chương trình C cùng đọc một đồ thị, phân phối vòng lặp trên tập đỉnh đang xét và đồng bộ ở ranh giới mức~\cite{trobec2018,openmp52}.
+
+\section{Phát biểu bài toán}
+\label{sec:problem}
+\subsection{Bài toán khoảng cách một nguồn}
+Cho đồ thị tĩnh không trọng số $G=(V,E)$, có hướng hoặc vô hướng, và đỉnh nguồn $s\in V$. Gọi $\mathcal P(s,v)$ là tập đường đi hợp lệ từ $s$ đến $v$ và $|P|$ là số cạnh trên đường đi $P$. Tính mảng $d$ gồm một phần tử cho mỗi $v\in V$:
+\[
+d[v]=
+\begin{cases}
+0, & v=s,\\
+\min\{|P|:P\in\mathcal P(s,v)\}, &
+v\ne s\ \text{và}\ \mathcal P(s,v)\ne\varnothing,\\
+-1, & \mathcal P(s,v)=\varnothing .
+\end{cases}
+\]
+Mỗi cạnh có chi phí một bước. Với đồ thị có hướng, các bước phải tuân theo chiều cung. Nguồn cách chính nó không bước và giá trị $-1$ đánh dấu đỉnh không tới được. Hợp đồng đầu ra chỉ yêu cầu khoảng cách, do đó thứ tự thăm các đỉnh đồng mức hoặc đỉnh cha có thể khác giữa các phiên bản.
+
+\subsection{Bài toán đánh giá các cách triển khai BFS}
+Nhóm triển khai và đối chiếu Serial, OpenMP Basic và OpenMP Optimized trên cùng dữ liệu CSR, cùng nguồn và cùng hợp đồng đầu ra. Điều kiện đúng đắn là cả ba trả đúng toàn bộ mảng $d$. Phép đánh giá hiệu năng dùng thời gian thực thi, hệ số tăng tốc (\emph{speedup}), hiệu suất theo số luồng (\emph{efficiency}) và khả năng mở rộng khi tăng số luồng (\emph{scaling}). Các chỉ số được so sánh trên những tổ hợp đồ thị, nguồn, số luồng và chính sách lập lịch đã đo.
 
 \section{Mục tiêu và câu hỏi nghiên cứu}
-Mục tiêu là xây dựng một BFS tuần tự và hai biến thể OpenMP dễ giải thích, kiểm chứng đầy đủ mảng khoảng cách, rồi so sánh thời gian trên cùng dữ liệu và môi trường. So sánh Basic với Optimized giúp tách tác động của việc bổ sung luồng khỏi tác động của cách tổ chức thu frontier: giảm tranh chấp có thể đổi lấy bộ nhớ tạm và công việc ghép kết quả. Vì vậy, chỉ so tuần tự với một bản song song chưa đủ đánh giá lựa chọn triển khai. Tên OpenMP Optimized chỉ thể hiện định hướng giảm chi phí của bản cơ bản, không hàm ý luôn nhanh hơn.
+\label{sec:questions}
+Mục tiêu là kiểm chứng tính đúng đắn của ba cách triển khai và xác định điều kiện nào có lợi hoặc bất lợi cho việc song song hóa trong phạm vi thực nghiệm.
 \begin{enumerate}
-\item Ba phiên bản có trả cùng khoảng cách ngắn nhất trên các cấu trúc đồ thị và nguồn được chọn hay không?
-\item Khi tăng số luồng thực tế, thời gian, speedup và efficiency thay đổi thế nào với kích thước và cấu trúc đồ thị?
-\item Bản tối ưu và các chính sách static, dynamic, guided có đem lại lợi ích ổn định so với bản cơ bản hay chi phí bổ sung làm giảm lợi ích?
+\item Ba phiên bản có trả cùng kết quả đúng trên các ca kiểm chứng hay không?
+\item OpenMP có đem lại tăng tốc so với Serial trong điều kiện đo của nhóm hay không?
+\item Số luồng, chính sách lập lịch và cách tổ chức tập đỉnh theo mức đi kèm những thay đổi hiệu năng nào trên ma trận đã đo?
+\item Optimized có luôn nhanh hơn Basic ở các cấu hình tương ứng hay không?
 \end{enumerate}
-Câu hỏi thứ nhất được trả lời bằng oracle và kiểm thử. Hai câu hỏi sau chỉ được trả lời bằng dữ liệu nhóm đo sau khi kiểm chứng tính đúng đắn.
 
-\section{Phạm vi và phương pháp thực hiện}
-Đề tài giới hạn ở đồ thị tĩnh không trọng số, có hướng hoặc vô hướng, biểu diễn CSR và BFS một nguồn trên CPU bộ nhớ chia sẻ. Chương trình dùng C11 và OpenMP; môi trường đích là Windows với GCC/UCRT64, còn Linux CI hỗ trợ kiểm tra khả năng xây dựng và hồi quy. Không nghiên cứu GPU, MPI, đồ thị động hay xây dựng hệ thống phân tán. Đầu ra là khoảng cách đến mọi đỉnh, với giá trị $-1$ cho đỉnh không tới được; không yêu cầu thứ tự thăm hoặc cây cha giống nhau.
+\section{Phạm vi và phương pháp nghiên cứu tổng quan}
+Đề tài giới hạn ở BFS một nguồn trên CPU bộ nhớ chia sẻ, với C11, OpenMP và đồ thị tĩnh lưu theo CSR. Bộ kiểm thử khảo sát cả đồ thị có hướng và vô hướng. Phép đo hiệu năng dùng ba họ đồ thị vô hướng có cấu trúc (Path, Star, Grid) trên một laptop Windows. Linux CI phục vụ kiểm tra khả năng xây dựng và hồi quy.
 
-Phương pháp gồm khảo sát tài liệu, phân tích bất biến theo tầng, oracle độc lập và phép đo có kiểm soát. Đóng góp thực tế là ba phiên bản dùng chung hợp đồng CSR/API, bộ kiểm thử tích hợp 1296 lời gọi, môi trường UCRT64 chạy thật và 2250 mẫu đo trên chín tổ hợp đồ thị/nguồn. Dữ liệu gốc, manifest, hash, script phân tích và biểu đồ tạo phép so sánh có thể kiểm tra lại. Nhóm báo cáo cả slowdown, giới hạn timer Windows và ảnh hưởng của mô hình mỗi mẫu mở tiến trình mới; không coi tăng tốc là điều kiện để nhận kết quả.
+Nhóm nghiên cứu tài liệu về BFS, CSR và OpenMP, cài đặt ba phiên bản theo cùng API và phân tích bất biến duyệt theo mức. Các bài kiểm thử so toàn bộ đầu ra với kết quả tính tay hoặc oracle độc lập. Sau khi qua kiểm thử, nhóm đo theo ma trận đã chốt, lưu mẫu cùng hồ sơ truy xuất nguồn gốc và phân tích bằng thống kê mô tả và các chỉ số hiệu năng.
+
+\section{Đóng góp chính của nhóm}
+\begin{enumerate}
+\item \textbf{Triển khai dữ liệu và đường cơ sở.} Nhóm xây dựng bộ đọc edge-list, bộ dựng CSR và BFS tuần tự dùng hàng đợi, kèm kiểm thử parser, CSR và khoảng cách (\href{https://github.com/duyanhtr130905/parallel-bfs-openmp/pull/8}{PR \#8}).
+\item \textbf{Thiết kế kỹ thuật và cài đặt OpenMP.} Nhóm triển khai Basic với bộ đếm frontier dùng chung và Optimized với bộ đệm riêng theo luồng, phép cộng tiền tố và ghép song song. Hai bản dùng chung cơ chế đánh dấu nguyên tử và được kiểm tra bằng cách so từng phần tử khoảng cách (\href{https://github.com/duyanhtr130905/parallel-bfs-openmp/pull/9}{PR \#9}).
+\item \textbf{Tích hợp và kiểm chứng.} Nhóm tích hợp ba bản qua API và CLI thống nhất, ghi số luồng thực tế, kiểm chứng khoảng cách bằng oracle Floyd--Warshall độc lập và bổ sung các ca kiểm thử CLI và đường lỗi (\href{https://github.com/duyanhtr130905/parallel-bfs-openmp/pull/7}{PR \#7}).
+\item \textbf{Thực nghiệm và phân tích.} Nhóm xây dựng công cụ sinh dữ liệu, chạy phép đo, kiểm tra hash, tổng hợp thống kê và sinh biểu đồ. Nhóm công bố dữ liệu tổng hợp, trình bày toàn bộ kết quả chậm hơn Serial và lưu hồ sơ để đối chiếu với dữ liệu đo (\href{https://github.com/duyanhtr130905/parallel-bfs-openmp/pull/7}{PR \#7}).
+\end{enumerate}
+BFS, CSR và OpenMP là nền tảng có sẵn~\cite{cornellbfs,barrett1994,openmp52}. Đóng góp của nhóm nằm ở cách triển khai, tích hợp, kiểm chứng và đánh giá các lựa chọn thiết kế trên ma trận đã xác định.
 
 \section{Bố cục báo cáo}
-Chương 2 trình bày lý thuyết BFS và CSR; Chương 3 trình bày thiết kế hai phiên bản OpenMP. Chương 4 mô tả môi trường, dữ liệu, kiểm chứng và quy trình thực chạy. Chương 5 đưa bảng, biểu đồ, phân tích và đối chiếu câu hỏi nghiên cứu từ raw. Chương 6 tổng hợp đóng góp, kết luận có giới hạn và hướng phát triển. Phần lý thuyết/thuật toán của Đức và Dũng được giữ khi tích hợp kết quả thực nghiệm.
+Chương 1 trình bày bối cảnh, phát biểu bài toán, phương pháp và đóng góp. Chương 2 trình bày cơ sở lý thuyết, thiết kế ba phiên bản và lập luận về tính đúng đắn và chi phí. Chương 3 trình bày quy trình thực nghiệm, kết quả, thảo luận, giới hạn và hướng phát triển.

@@ -4,9 +4,9 @@
 \pagenumbering{roman}
 \chapter*{Tóm tắt}
 \addcontentsline{toc}{chapter}{Tóm tắt}
-Báo cáo nghiên cứu BFS trên CPU đa nhân với ba phiên bản: tuần tự, OpenMP cơ bản và OpenMP tối ưu. Trọng tâm là bảo toàn khoảng cách ngắn nhất, khảo sát khả năng mở rộng theo cấu trúc đồ thị và đánh giá tác động của tổ chức frontier cùng chính sách lập lịch. Phương pháp so sánh dùng cùng CSR và nguồn, đo wall-clock quanh lời gọi BFS, báo median, khoảng tứ phân vị, speedup và efficiency theo số luồng thực tế.
+Nhóm triển khai tìm kiếm theo chiều rộng (BFS) trên CPU đa lõi bằng ba phiên bản Serial, OpenMP Basic và OpenMP Optimized. Cả ba dùng cùng biểu diễn CSR và trả khoảng cách ngắn nhất từ một nguồn trên đồ thị không trọng số. Hai phiên bản OpenMP khác nhau ở cách thu tập đỉnh của mức kế tiếp. Nhóm kiểm chứng đầu ra bằng oracle độc lập và đo thời gian thực quanh một lời gọi BFS để so sánh trung vị, khoảng tứ phân vị, speedup, efficiency và khả năng mở rộng.
 
-Thực nghiệm thật trên laptop Intel Core i5-12450HX, Windows 11 và GCC và libgomp UCRT64 16.2.0 gồm sáu đồ thị path/star/grid, chín tổ hợp đồ thị/nguồn, 225 cấu hình và 2250 mẫu chính thức sau 225 warm-up. Kiểm thử oracle độc lập và toàn bộ lượt thực nghiệm không quan sát lỗi. Do đồng hồ OpenMP Windows có bước 1 ms, nhóm dùng QPC theo quyết định đã được chủ dự án duyệt, giữ cùng ranh giới BFS. Không cấu hình OpenMP nào nhanh hơn Serial: speedup cao nhất 0,2914 ở Optimized một luồng trên grid512. Basic 8/static đạt speedup khoảng 0,1185 trên star một triệu đỉnh, nhưng chỉ 0,00005623 trên path8192. Kết quả cho thấy frontier hẹp, số mức, lập lịch và tổ chức frontier ảnh hưởng mạnh đến hiệu năng lời gọi độc lập; Optimized không thắng nhất quán. Raw, manifest, hash, thống kê và biểu đồ được lưu để tái lập. Kết luận giới hạn ở một máy và mô hình mỗi mẫu mở tiến trình mới, chưa đại diện BFS với team đã nóng hoặc đồ thị thực bất quy tắc.
+Thực nghiệm trên laptop Intel Core i5-12450HX, Windows 11 và GCC/libgomp UCRT64 16.2.0 gồm sáu đồ thị Path, Star và Grid, chín phiên đo, 225 lượt khởi động và 2\,250 mẫu chính thức. Các lượt kiểm chứng và đo ghi nhận kết quả hợp lệ trong phạm vi đã thử. Windows dùng QueryPerformanceCounter để đo các lời gọi ngắn. Cả 216 cấu hình OpenMP đều chậm hơn Serial; speedup cao nhất là 0,2914 ở Optimized một luồng, static, trên Grid $512\times512$ nguồn 0. Optimized có trung vị thấp hơn Basic ở một số cấu hình và cao hơn ở các cấu hình khác. Kết luận áp dụng cho ma trận đã đo, với một lời gọi BFS trong mỗi tiến trình mới.
 \begingroup
 \fontsize{11}{13}\selectfont
 \singlespacing
@@ -21,10 +21,6 @@ Thực nghiệm thật trên laptop Intel Core i5-12450HX, Windows 11 và GCC v�
 \include{chapters/chapter1}
 \include{chapters/chapter2}
 \include{chapters/chapter3}
-\include{chapters/chapter4}
-\include{chapters/chapter5}
-\include{chapters/chapter6}
-\nocite{trobec2018,parallelbfs,svdtemplate}
 \bibliographystyle{plain}
 \phantomsection
 \addcontentsline{toc}{chapter}{Tài liệu tham khảo}
