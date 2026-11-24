@@ -10,9 +10,11 @@ for name in required:
     assert (root / name).is_file(), name
 main = (root / 'report/main.tex').read_text(encoding='utf-8')
 includes = re.findall(r'\\include\{([^}]+)\}', main)
-assert len(includes) == 6
+assert len(includes) == 3 and len(set(includes)) == 3, 'expected three chapter includes'
 for name in includes:
-    assert (root / 'report' / (name + '.tex')).is_file(), name
+    chapter = root / 'report' / (name + '.tex')
+    assert chapter.is_file(), name
+    assert len(re.findall(r'^\\chapter\{', chapter.read_text(encoding='utf-8'), re.M)) == 1, name
 bib = (root / 'report/references.bib').read_text(encoding='utf-8')
 keys = set(re.findall(r'@\w+\{([^,]+),', bib))
 for tex in (root / 'report').rglob('*.tex'):
