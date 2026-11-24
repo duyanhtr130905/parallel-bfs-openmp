@@ -1,12 +1,53 @@
 \chapter{Tổng quan và phát biểu bài toán}
 
-\section{Bài toán}
-Cho đồ thị không trọng số $G=(V,E)$ và đỉnh nguồn $s$. Ta cần tính $d[v]$, số cạnh ít nhất trên đường đi từ $s$ đến $v$. Nếu từ $s$ không đi tới $v$ thì đặt $d[v]=-1$. Với đồ thị có hướng, chỉ được đi theo chiều của cạnh. Giá trị $d[s]$ bằng $0$. BFS giải bài toán bằng cách duyệt lần lượt các đỉnh ở khoảng cách $0,1,2,\ldots$ \cite{cornellbfs}.
+\section{Bối cảnh và động lực nghiên cứu}
+Đồ thị biểu diễn các đối tượng bằng đỉnh và quan hệ bằng cạnh. Những câu hỏi về khả năng đi tới và khoảng cách xuất hiện, chẳng hạn, trong định tuyến mạng~\cite{cornellbfs}. Trên đồ thị không trọng số, tìm kiếm theo chiều rộng (Breadth-First Search, BFS) duyệt lần lượt theo khoảng cách tính bằng số cạnh và xác định khoảng cách ngắn nhất từ một nguồn đến mọi đỉnh~\cite{cornellbfs}. BFS cũng là một phép toán cơ sở trong xử lý đồ thị quy mô lớn~\cite{beamer2012}.
 
-Xét đồ thị gồm sáu đỉnh đánh số từ $0$ đến $5$, với các cạnh $0\to1$, $0\to2$, $1\to3$, $2\to3$ và $4\to4$. Từ nguồn $0$, tầng đầu chứa $0$, tầng kế tiếp chứa $1,2$ rồi đến $3$. Kết quả là $(0,1,1,2,-1,-1)$. Hai cạnh đi vào đỉnh $3$ cũng cho thấy vấn đề khi chia việc cho nhiều luồng. Cả hai luồng có thể gặp cùng một đỉnh mới và chỉ một luồng được đưa đỉnh đó vào tầng kế tiếp.
+CPU đa lõi cho phép nhiều luồng cùng mở rộng các đỉnh ở một mức. Các mức vẫn có quan hệ phụ thuộc: tập đỉnh của mức sau chỉ hoàn chỉnh sau khi xử lý xong mức hiện tại. Trong cùng một mức, bậc đỉnh không đều có thể gây lệch tải, nhiều luồng có thể cùng phát hiện một đỉnh và cách truy cập bộ nhớ phụ thuộc vào thứ tự duyệt cung. Nghiên cứu của Beamer và cộng sự nêu phân bố bậc và tính cục bộ bộ nhớ là các thách thức trong BFS song song~\cite{beamer2012}. Trong hai bản cài đặt của nhóm, việc thu thập tập đỉnh của mức kế tiếp còn đòi hỏi lựa chọn cấu trúc lưu trữ và điểm đồng bộ.
 
-\section{Mục tiêu}
-Chúng em xây dựng ba phiên bản BFS bằng C11. Bản tuần tự dùng hàng đợi làm mốc. Hai bản OpenMP duyệt theo tầng, lần lượt dùng bộ đếm chung và vùng đệm riêng cho từng luồng. Chúng em đặt hai câu hỏi. Chi phí đồng bộ có đáng kể khi mỗi tầng chỉ có ít đỉnh hay không? Khi tầng đủ rộng, việc chia các đỉnh cho nhiều luồng đem lại mức tăng tốc bao nhiêu?
+Nhóm chọn OpenMP để triển khai trên một máy có bộ nhớ chia sẻ. Mô hình này cho phép các luồng trong chương trình C cùng đọc một đồ thị, phân phối vòng lặp trên tập đỉnh đang xét và đồng bộ ở ranh giới mức~\cite{trobec2018,openmp52}.
 
-\section{Phạm vi}
-Cả ba phiên bản chạy trên CPU và dùng chung cấu trúc lưu đồ thị. Kết quả cần trả về là khoảng cách, vì vậy thứ tự xử lý các đỉnh trong một tầng có thể khác nhau. Các công trình như BFS chuyển hướng tìm cách giảm số cạnh cần xét bằng cách đổi giữa hai hướng duyệt \cite{beamer2012}. Trong bài tập lớn này, cả ba bản đều duyệt từ đỉnh đã tìm thấy sang các đỉnh kề để có thể khảo sát cách tổ chức công việc theo tầng.
+\section{Phát biểu bài toán}
+\label{sec:problem}
+\subsection{Bài toán khoảng cách một nguồn}
+Cho đồ thị tĩnh không trọng số $G=(V,E)$, có hướng hoặc vô hướng, và đỉnh nguồn $s\in V$. Gọi $\mathcal P(s,v)$ là tập đường đi hợp lệ từ $s$ đến $v$ và $|P|$ là số cạnh trên đường đi $P$. Tính mảng $d$ gồm một phần tử cho mỗi $v\in V$:
+\[
+d[v]=
+\begin{cases}
+0, & v=s,\\
+\min\{|P|:P\in\mathcal P(s,v)\}, &
+v\ne s\ \text{và}\ \mathcal P(s,v)\ne\varnothing,\\
+-1, & \mathcal P(s,v)=\varnothing .
+\end{cases}
+\]
+Mỗi cạnh có chi phí một bước. Với đồ thị có hướng, các bước phải tuân theo chiều cung. Nguồn cách chính nó không bước và giá trị $-1$ đánh dấu đỉnh không tới được. Hợp đồng đầu ra chỉ yêu cầu khoảng cách, do đó thứ tự thăm các đỉnh đồng mức hoặc đỉnh cha có thể khác giữa các phiên bản.
+
+\subsection{Bài toán đánh giá các cách triển khai BFS}
+Nhóm triển khai và đối chiếu Serial, OpenMP Basic và OpenMP Optimized trên cùng dữ liệu CSR, cùng nguồn và cùng hợp đồng đầu ra. Điều kiện đúng đắn là cả ba trả đúng toàn bộ mảng $d$. Phép đánh giá hiệu năng dùng thời gian thực thi, hệ số tăng tốc (\emph{speedup}), hiệu suất theo số luồng (\emph{efficiency}) và khả năng mở rộng khi tăng số luồng (\emph{scaling}). Các chỉ số được so sánh trên những tổ hợp đồ thị, nguồn, số luồng và chính sách lập lịch đã đo.
+
+\section{Mục tiêu và câu hỏi nghiên cứu}
+\label{sec:questions}
+Mục tiêu là kiểm chứng tính đúng đắn của ba cách triển khai và xác định điều kiện nào có lợi hoặc bất lợi cho việc song song hóa trong phạm vi thực nghiệm.
+\begin{enumerate}
+\item Ba phiên bản có trả cùng kết quả đúng trên các ca kiểm chứng hay không?
+\item OpenMP có đem lại tăng tốc so với Serial trong điều kiện đo của nhóm hay không?
+\item Số luồng, chính sách lập lịch và cách tổ chức tập đỉnh theo mức đi kèm những thay đổi hiệu năng nào trên ma trận đã đo?
+\item Optimized có luôn nhanh hơn Basic ở các cấu hình tương ứng hay không?
+\end{enumerate}
+
+\section{Phạm vi và phương pháp nghiên cứu tổng quan}
+Đề tài giới hạn ở BFS một nguồn trên CPU bộ nhớ chia sẻ, với C11, OpenMP và đồ thị tĩnh lưu theo CSR. Bộ kiểm thử khảo sát cả đồ thị có hướng và vô hướng. Phép đo hiệu năng dùng ba họ đồ thị vô hướng có cấu trúc (Path, Star, Grid) trên một laptop Windows. Linux CI phục vụ kiểm tra khả năng xây dựng và hồi quy.
+
+Nhóm nghiên cứu tài liệu về BFS, CSR và OpenMP, cài đặt ba phiên bản theo cùng API và phân tích bất biến duyệt theo mức. Các bài kiểm thử so toàn bộ đầu ra với kết quả tính tay hoặc oracle độc lập. Sau khi qua kiểm thử, nhóm đo theo ma trận đã chốt, lưu mẫu cùng hồ sơ truy xuất nguồn gốc và phân tích bằng thống kê mô tả và các chỉ số hiệu năng.
+
+\section{Đóng góp chính của nhóm}
+\begin{enumerate}
+\item \textbf{Triển khai dữ liệu và đường cơ sở.} Nhóm xây dựng bộ đọc edge-list, bộ dựng CSR và BFS tuần tự dùng hàng đợi, kèm kiểm thử parser, CSR và khoảng cách (\href{https://github.com/duyanhtr130905/parallel-bfs-openmp/pull/8}{PR \#8}).
+\item \textbf{Thiết kế kỹ thuật và cài đặt OpenMP.} Nhóm triển khai Basic với bộ đếm frontier dùng chung và Optimized với bộ đệm riêng theo luồng, phép cộng tiền tố và ghép song song. Hai bản dùng chung cơ chế đánh dấu nguyên tử và được kiểm tra bằng cách so từng phần tử khoảng cách (\href{https://github.com/duyanhtr130905/parallel-bfs-openmp/pull/9}{PR \#9}).
+\item \textbf{Tích hợp và kiểm chứng.} Nhóm tích hợp ba bản qua API và CLI thống nhất, ghi số luồng thực tế, kiểm chứng khoảng cách bằng oracle Floyd--Warshall độc lập và bổ sung các ca kiểm thử CLI và đường lỗi (\href{https://github.com/duyanhtr130905/parallel-bfs-openmp/pull/7}{PR \#7}).
+\item \textbf{Thực nghiệm và phân tích.} Nhóm xây dựng công cụ sinh dữ liệu, chạy phép đo, kiểm tra hash, tổng hợp thống kê và sinh biểu đồ. Nhóm công bố dữ liệu tổng hợp, trình bày toàn bộ kết quả chậm hơn Serial và lưu hồ sơ để đối chiếu với dữ liệu đo (\href{https://github.com/duyanhtr130905/parallel-bfs-openmp/pull/7}{PR \#7}).
+\end{enumerate}
+BFS, CSR và OpenMP là nền tảng có sẵn~\cite{cornellbfs,barrett1994,openmp52}. Đóng góp của nhóm nằm ở cách triển khai, tích hợp, kiểm chứng và đánh giá các lựa chọn thiết kế trên ma trận đã xác định.
+
+\section{Bố cục báo cáo}
+Chương 1 trình bày bối cảnh, phát biểu bài toán, phương pháp và đóng góp. Chương 2 trình bày cơ sở lý thuyết, thiết kế ba phiên bản và lập luận về tính đúng đắn và chi phí. Chương 3 trình bày quy trình thực nghiệm, kết quả, thảo luận, giới hạn và hướng phát triển.
