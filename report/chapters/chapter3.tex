@@ -1,155 +1,60 @@
 \chapter{Thực nghiệm, đánh giá và kết luận}
-\label{chap:experiment}
 
-\section{Môi trường và thiết kế thực nghiệm}
-Nhóm đo trực tiếp trên laptop Intel Core i5-12450HX (8 lõi vật lý, 12 luồng logic), Windows 11 Home Single Language 10.0.26300 và 24\,866\,680 KiB RAM nhận diện bởi hệ điều hành (khoảng 23,7 GiB). Máy dùng chế độ nguồn Balanced và cắm điện suốt đợt đo. Tải CPU nền ghi trong một giây trước mỗi phiên nằm trong khoảng 1,30--19,01\%; RAM trống thấp nhất khoảng 10,37 GiB. Tải nền trong từng lời gọi và nhiệt độ CPU chưa được đo riêng.
+\section{Thiết kế thực nghiệm}
+Chúng em chạy chương trình trên laptop Windows 11, CPU Intel Core i5-12450HX, với GCC 16.2.0 và libgomp từ MSYS2 UCRT64. Cả ba bản được biên dịch bằng \texttt{-O2 -std=c11 -fopenmp} từ mã BFS tại \texttt{fb990bf}. Hai bản OpenMP dùng tám luồng và lịch phân việc tĩnh. Bản tuần tự chạy một luồng.
 
-Bộ công cụ MSYS2 UCRT64 đã được cập nhật đầy đủ theo hướng dẫn của dự án MSYS2~\cite{msys2update}. Bản đo dùng GCC và libgomp 16.2.0-6, GNU Make 4.4.1, Python 3.14.10 và giá trị \texttt{\_OPENMP=202111}. Hồ sơ môi trường ghi đường dẫn và hash của \texttt{libgomp-1.dll} thực sự được nạp. Ba bản dùng cùng cờ \texttt{-O2}, \texttt{-Wall}, \texttt{-Wextra}, \texttt{-Wpedantic}, \texttt{-Werror}, \texttt{-std=c11}, \texttt{-Iinclude} và \texttt{-fopenmp} khi biên dịch, với \texttt{-fopenmp} khi liên kết.
-
-Thiết kế cố định các mức 1, 2, 4, 8 luồng và ba chính sách static, dynamic, guided cho mỗi bản OpenMP. \texttt{OMP\_DYNAMIC=FALSE}; \texttt{OMP\_PROC\_BIND} và \texttt{OMP\_PLACES} để trống, nên việc đặt luồng do hệ thống và runtime quyết định. Số luồng báo cáo lấy từ team thực thi BFS. Thực nghiệm dùng commit \path{ab588fb8ab535b796f0c8b6d5e98a7efe5ebc76c}. CI Linux và Windows chạy kiểm thử hồi quy; chỉ laptop Windows cung cấp số hiệu năng trong báo cáo.
-
-\section{Bộ dữ liệu và quy trình kiểm chứng}
-\label{sec:datasets}
-Bảng~\ref{tab:measured-datasets} liệt kê sáu đồ thị vô hướng và chín tổ hợp đồ thị/nguồn. Path tạo chuỗi, Star nối tâm 0 với mọi lá và Grid nối các ô kề nhau theo hàng hoặc cột. Mỗi họ có hai kích thước. Ở kích thước lớn, nguồn bổ sung được chọn ở giữa Path, ở lá Star và tại một ô gần tâm Grid. Tất cả đỉnh đều tới được trên các đầu vào này.
+Bộ dữ liệu gồm sáu đồ thị có hướng được sinh trong chương trình đo. Tất cả đều dùng đỉnh nguồn $0$ và đi được tới mọi đỉnh. Cạnh của lưới hướng sang phải và xuống dưới. Đồ thị thang gồm hai đường dài song song, có cạnh nối từ hàng thứ nhất sang hàng thứ hai ở mỗi cột. Cạnh trên cây đi từ cha xuống con. Nhãn các đỉnh của mỗi cây được xáo theo seed cố định, giữ nguyên nhãn gốc.
 
 \begin{table}[htbp]
-\centering\small
-\caption{Sáu đồ thị và chín tổ hợp đồ thị/nguồn; số cung là sau mirror vô hướng.}
-\label{tab:measured-datasets}
-\begin{tabular}{lrrrr}
+\centering
+\small
+\caption{Các đồ thị dùng trong thực nghiệm}
+\begin{tabular}{lrrr}
 \toprule
-Loại/kích thước & $n$ & Cạnh input & Cung CSR & Nguồn \\
+Đồ thị & Số đỉnh & Số cạnh & Độ sâu lớn nhất \\
 \midrule
-Path nhỏ & 2048 & 2047 & 4094 & 0 \\
-Path lớn & 8192 & 8191 & 16382 & 0; 4096 \\
-Star nhỏ & 100000 & 99999 & 199998 & 0 \\
-Star lớn & 1000000 & 999999 & 1999998 & 0; 1 \\
-Grid $128\times128$ & 16384 & 32512 & 65024 & 0 \\
-Grid $512\times512$ & 262144 & 523264 & 1046528 & 0; 131328 \\
+Chu trình & $2\,048$ & $2\,048$ & $2\,047$ \\
+Lưới & $6\,144$ & $12\,128$ & $158$ \\
+Thang & $2\,048$ & $3\,070$ & $1\,024$ \\
+Cây bậc 3 nhỏ & $29\,524$ & $29\,523$ & $9$ \\
+Cây nhị phân lớn & $16\,777\,215$ & $16\,777\,214$ & $23$ \\
+Cây bậc 4 lớn & $5\,592\,405$ & $5\,592\,404$ & $11$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Bộ sinh \path{scripts/generate_graph.py} tạo edge-list xác định từ kích thước, nên metadata để seed là \texttt{null}. Mỗi tập dữ liệu ghi tham số, số đỉnh, số cạnh, số cung, chế độ hướng và SHA-256 của edge-list. \path{docs/experiment-20261112-matrix.json} chốt kích thước, nguồn và hash trước các mẫu chính thức. Nhóm dùng phép chạy thăm dò riêng để kiểm tra tính đúng đắn, bộ nhớ và đồng hồ trước khi đo.
+Mỗi đồ thị được chuyển sang CSR một lần. Sau hai lượt khởi động của mỗi thuật toán, chương trình ghi 12 mẫu chính thức cho mỗi bản, tổng cộng 216 mẫu. Thứ tự của ba thuật toán luân phiên qua từng vòng. Thời gian được đo bằng \texttt{QueryPerformanceCounter} quanh lời gọi BFS \cite{microsoftqpc}. Khoảng đo gồm cả việc khởi tạo dữ liệu bên trong hàm BFS. Việc sinh đồ thị, tạo CSR và kiểm tra kết quả diễn ra ngoài khoảng đo.
 
-\subsection{Đối chiếu khoảng cách}
-Các ca đơn vị kiểm tra đỉnh cô lập, thành phần rời, đường đi, sao, chu trình, diamond, cung trùng và khuyên, với nhiều nguồn và chế độ cạnh. Kiểm thử các bản OpenMP so toàn bộ khoảng cách với oracle trong tệp kiểm thử và với Serial, đồng thời kiểm tra số luồng, đường lỗi và tính bất biến của CSR. Ở cấp tích hợp, oracle Floyd--Warshall tính trực tiếp từ cạnh đầu vào, độc lập với BFS và CSR; bộ kiểm thử đối chiếu từng phần tử khoảng cách và kiểm tra CSR không đổi qua 1\,296 lời gọi. Hồ sơ trước đo còn ghi 70 ca CLI và 15 ca đường lỗi.
+Sau mỗi lần chạy, chương trình so toàn bộ mảng đầu ra với khoảng cách tính theo cấu trúc đồ thị. Ví dụ, với lưới có hướng, khoảng cách đến ô ở hàng $r$, cột $c$ bằng $r+c$. Với các cây, khoảng cách bằng độ sâu. Chương trình cũng kiểm tra số luồng thực tế. Cả 252 lượt, kể cả khởi động, đều hoàn tất và qua kiểm tra.
 
-Trong mỗi lần đo, CLI kiểm tra sau lời gọi BFS rằng nguồn có khoảng cách 0, mỗi giá trị hữu hạn dương có tiền nhiệm ở mức trước và các khoảng cách thỏa điều kiện trên các cung. Bộ chạy kiểm schema JSONL, đầu vào, cấu hình và số đỉnh tới được. Bộ phân tích kiểm số luồng thực tế ổn định trước khi tính chỉ số. Các kiểm tra trên từng mẫu bổ trợ cho đối chiếu oracle ở bộ kiểm thử.
+\section{Kết quả}
+Bảng dưới đây báo cáo trung vị tính bằng mili giây. Cột cuối lấy thời gian Serial chia cho thời gian của bản OpenMP nhanh hơn trong hai bản đã đo.
 
-\subsection{Đồng hồ và ranh giới đo}
-Trên libgomp Windows dùng cho phép chạy thăm dò, \texttt{omp\_get\_wtick()} báo bước 1 ms và một lời gọi Serial trên Path trả thời gian 0. Theo ADR-0003, bản Windows chuyển sang QueryPerformanceCounter (QPC) để đo khoảng thời gian ngắn~\cite{microsoftqpc}. Tần số ghi nhận là 10 MHz, tương ứng chu kỳ đếm 100 ns. Chu kỳ này mô tả độ phân giải danh định của bộ đếm. Độ bất định thực tế còn phụ thuộc chi phí đọc đồng hồ và các biến động của hệ thống. Bản Linux dùng \texttt{omp\_get\_wtime()} theo OpenMP~\cite{openmp52}.
+\begin{table}[htbp]
+\centering
+\small
+\caption{Trung vị thời gian thực thi và hệ số tăng tốc}
+\begin{tabular}{lrrrr}
+\toprule
+Đồ thị & Serial & Basic & Optimized & $S_8$ \\
+\midrule
+Chu trình & $0{,}0105$ & $321{,}5206$ & $516{,}1245$ & $0{,}00003$ \\
+Lưới & $0{,}0357$ & $21{,}5734$ & $36{,}0463$ & $0{,}00165$ \\
+Thang & $0{,}0161$ & $136{,}3073$ & $231{,}4461$ & $0{,}00012$ \\
+Cây bậc 3 nhỏ & $0{,}0951$ & $2{,}8444$ & $3{,}2873$ & $0{,}033$ \\
+Cây nhị phân lớn & $1169{,}4313$ & $765{,}4272$ & $496{,}7921$ & $2{,}354$ \\
+Cây bậc 4 lớn & $163{,}6413$ & $214{,}8783$ & $130{,}3664$ & $1{,}255$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-Cùng một luồng gọi đọc hai dấu thời gian ngay trước và ngay sau một lời gọi BFS. Trên Windows, hiệu hai giá trị đếm nguyên được chia cho tần số để đổi sang giây. Khoảng đo gồm khởi tạo khoảng cách, cấp phát và giải phóng bộ nhớ tạm, thiết lập team trong lời gọi và các bước đồng bộ. Đọc tệp, dựng CSR, cấp phát đầu ra, mở tiến trình, kiểm tra kết quả và tuần tự hóa nằm ngoài khoảng đo. Thống kê chính thức dùng phép đo Windows QPC, với nguyên thời gian đã ghi.
+\subsection{Bốn đồ thị mà bản tuần tự nhanh hơn}
+Ở chu trình, mỗi tầng chỉ có một đỉnh. Trên đồ thị thang, mỗi tầng có tối đa hai đỉnh. Một vòng OpenMP vẫn phải đi qua các điểm đồng bộ, dù lượng công việc trong vòng rất ít. Với lưới, các tầng ở giữa rộng hơn nhưng trung vị Serial vẫn chỉ khoảng $0{,}036$ ms. Cây bậc ba nhỏ có các tầng rộng hơn lưới, song tổng khối lượng duyệt còn nhỏ. Thời gian của hai bản OpenMP trên cây này lần lượt khoảng $2{,}84$ và $3{,}29$ ms, so với $0{,}095$ ms của Serial.
 
-\section{Phương pháp đo và phân tích hiệu năng}
-\label{sec:measure}
-Mỗi phiên đo ứng với một tổ hợp đồ thị/nguồn, gồm một cấu hình Serial và $2\times4\times3=24$ cấu hình OpenMP. Một vòng khởi động chạy một lần mỗi cấu hình, tiếp theo là mười vòng đo chính thức. Trong từng vòng, thứ tự cấu hình được xáo trộn bằng seed 2026 và được lưu. Các tiến trình chạy lần lượt. Mỗi lượt khởi động và mỗi mẫu đo dùng một tiến trình mới.
+\subsection{Hai đồ thị mà OpenMP nhanh hơn}
+Trên cây nhị phân lớn, Basic giảm thời gian từ $1169{,}43$ ms xuống $765{,}43$ ms. Optimized giảm tiếp xuống $496{,}79$ ms, đạt $2{,}35$ lần so với Serial. Trên cây bậc bốn lớn, Basic mất $214{,}88$ ms, lâu hơn Serial ($163{,}64$ ms), còn Optimized mất $130{,}37$ ms và đạt $1{,}26$ lần.
 
-Bộ chạy lưu stdout, stderr, mã thoát, lệnh và thứ tự; manifest gắn số liệu với SHA commit, hash binary đã kiểm thử, dữ liệu, runtime, đồng hồ và hash log. Bộ phân tích đối chiếu SHA-256, kiểm các lượt lặp và so từng bản ghi JSONL với manifest trước khi tổng hợp. Hồ sơ nghiệm thu độc lập đối chiếu cả bản sao lưu, dữ liệu, bảng và hình. Tệp \path{results/experiment-20261112/sessions.json} liên kết từng tổ hợp với session, manifest và hash raw; \path{provenance.json} trong cùng thư mục ghi hash các sản phẩm công bố và script liên quan.
+Tầng lá của hai cây lớn lần lượt có khoảng $8{,}39$ triệu và $4{,}19$ triệu đỉnh. Phần lớn công việc phát hiện lá tập trung ở tầng ngay trước đó. Bản Optimized chia các đỉnh của tầng cho nhiều luồng và ghi kết quả vào các vùng đệm riêng trước khi ghép lại. Kết quả trên hai cây phù hợp với giả thuyết rằng cách này giảm tranh chấp khi có nhiều đỉnh mới. Phép đo chỉ ghi tổng thời gian BFS nên chưa định lượng riêng được chi phí đồng bộ, truy cập bộ nhớ hay ghép vùng đệm.
 
-Thống kê theo cấu hình gồm trung vị (median), min, max, $Q_1$, $Q_3$ và khoảng tứ phân vị $\mathrm{IQR}=Q_3-Q_1$. Với $N$ mẫu đã sắp, các phân vị dùng nội suy tuyến tính tại vị trí $(N-1)q$, tính từ 0. Gọi $\widetilde T_s$ là trung vị Serial, $\widetilde T_{a,p,h}$ là trung vị bản OpenMP $a$, với $p$ luồng thực tế và chính sách $h$, trên cùng đồ thị, nguồn và bản dựng. Khi đường cơ sở và mẫu số dương, các chỉ số là
-\[
-S_{a,p,h}=\frac{\widetilde T_s}{\widetilde T_{a,p,h}},\qquad
-E_{a,p,h}=\frac{S_{a,p,h}}{p},\qquad
-C_{a,p,h}=\frac{\widetilde T_{a,1,h}}{\widetilde T_{a,p,h}}.
-\]
-$S>1$ biểu thị nhanh hơn Serial. $E$ là một tỷ lệ và được đổi sang phần trăm trong bảng. $C>1$ biểu thị nhanh hơn bản OpenMP cùng chính sách ở một luồng thực tế. Bộ phân tích từ chối nhóm có số luồng thực tế thay đổi; cả ma trận này có team thực tế khớp yêu cầu. IQR mô tả độ phân tán của mẫu. Các biểu đồ thời gian và lập lịch hiển thị khoảng $Q_1$ đến $Q_3$, còn biểu đồ speedup dùng thêm mốc lý tưởng $S=p$.
-
-\section{Kết quả thực nghiệm}
-\label{sec:results}
-Thực nghiệm diễn ra từ 16:32:58 đến 16:42:26 (UTC+7) ngày 12/11/2026. Chín phiên hoàn thành đủ 225 lượt khởi động và 2\,250 mẫu chính thức, tổng cộng 2\,475 lượt. Mọi lượt có kết quả hợp lệ, không timeout; toàn bộ mẫu chính thức được giữ. Tệp \path{results/experiment-20261112/summary.csv} có 225 dòng thống kê. Hồ sơ nghiệm thu ngày 14/11 ghi 4\,968 tệp session có bản sao trùng hash và 36 biểu đồ nguồn. Báo cáo sử dụng lại 12 biểu đồ đã chọn trong bản sáu chương.
-
-\textbf{Cả 216 cấu hình OpenMP có $S<1$.} Giá trị lớn nhất xấp xỉ 0,2914, tại Optimized một luồng, static, Grid $512\times512$ nguồn 0 (5,814 ms so với Serial 1,6942 ms). Cả 162 cấu hình từ hai luồng có $C<1$. Giá trị $C$ cao nhất trong số đó xấp xỉ 0,7536, tại Basic hai luồng, static, Star một triệu đỉnh nguồn 0.
-
-\begin{table}[htbp]\centering\small
-\caption{Ba đồ thị lớn, nguồn 0, static, actual 8; median theo ms, speedup so Serial, 10 mẫu/cấu hình.}\label{tab:headline}
-\begin{tabular}{lrrrrr}\toprule
-Đồ thị & Serial & Basic 8 & Opt 8 & $S_{B,8}$ & $S_{O,8}$ \\\midrule
-Path8192 & 0,05185 & 922,0907 & 1562,0243 & 0,00005623 & 0,00003319 \\
-Star1000000 & 3,1294 & 26,4158 & 26,4872 & 0,1185 & 0,1181 \\
-Grid512 & 1,6942 & 112,6744 & 179,7294 & 0,01504 & 0,009426 \\\bottomrule
-\end{tabular}\end{table}
-
-Các bảng chi tiết sau Bảng~\ref{tab:headline} giữ đủ 81 dòng cho Serial và các cấu hình static của chín tổ hợp. CSV lưu cả dynamic và guided, cùng min, max và các phân vị, với thời gian tính bằng giây. Các ô thời gian trong bảng hiển thị mili giây và có làm tròn. Biểu đồ của ba đồ thị lớn, nguồn 0, được trình bày cùng phần thảo luận.
-
-\input{chapters/experiment_tables}
-\clearpage
-
-\section{Phân tích và thảo luận}
-\subsection{Path: frontier hẹp và nhiều mức}
-Với nguồn ở đầu Path 8192, mỗi mức chỉ có một đỉnh. Basic static tăng từ 0,6653 ms ở một luồng lên 922,0907 ms ở tám luồng, trong khi Serial mất 0,05185 ms. Optimized tám luồng mất 1\,562,0243 ms. Từ Path 2048 lên Path 8192, Basic và Optimized tám luồng/static đều có trung vị tăng khoảng bốn lần. Việc thêm luồng không tạo thêm đỉnh cùng mức cho vòng chia việc.
-
-Đổi nguồn từ 0 sang 4096 làm khoảng cách xa nhất giảm từ 8191 xuống 4096. Trung vị Basic và Optimized tám luồng/static giảm lần lượt khoảng 49,2\% và 50,9\%. Kết quả phù hợp với giả thuyết chi phí lặp theo số mức. Hai nguồn thuộc hai phiên đo, và thời gian tổng không cho phép tách đóng góp của barrier, runtime hoặc tải nền. Hình~\ref{fig:path-runtime} đến Hình~\ref{fig:path-schedule} cho thấy kết quả theo team và chính sách.
-
-\begin{figure}[p]\centering\includegraphics[width=.94\textwidth]{figures/experiment-20261112/path8192-s0/median.pdf}
-\caption[Path8192: thời gian]{Path8192, nguồn 0, ab588fb: median và dải $Q_1$--$Q_3$, 10 mẫu/cấu hình; trục thời gian log để thấy cả Serial.}\label{fig:path-runtime}\end{figure}
-
-\begin{figure}[p]\centering\includegraphics[width=.94\textwidth]{figures/experiment-20261112/path8192-s0/speedup.pdf}
-\caption[Path8192: speedup]{Path8192, nguồn 0: speedup so Serial trên trục log; $S=p$ là mốc lý tưởng, không phải số đo.}\label{fig:path-speedup}\end{figure}
-
-\begin{figure}[p]\centering\includegraphics[width=.94\textwidth]{figures/experiment-20261112/path8192-s0/efficiency.pdf}
-\caption[Path8192: efficiency]{Path8192, nguồn 0: efficiency $S/p$ theo team thực, 10 mẫu/cấu hình, commit \texttt{ab588fb}.}\label{fig:path-efficiency}\end{figure}
-
-\begin{figure}[p]\centering\includegraphics[width=.94\textwidth]{figures/experiment-20261112/path8192-s0/scheduling.pdf}
-\caption[Path8192: scheduling]{Path8192, nguồn 0: scheduling trong cùng thuật toán/team; cột là median, thanh sai số là $Q_1$--$Q_3$.}\label{fig:path-schedule}\end{figure}
-\clearpage
-
-\subsection{Star: bậc lệch và lập lịch}
-Ở Star một triệu đỉnh nguồn tâm, Serial có trung vị 3,1294 ms. Basic và Optimized tám luồng/static lần lượt đạt 26,4158 và 26,4872 ms. Chênh lệch 0,0714 ms nhỏ so với IQR của hai cấu hình (1,1649 và 2,3114 ms). Ở bốn luồng/static, Optimized có trung vị thấp hơn Basic khoảng 8,7\%, song cả hai vẫn chậm hơn Serial. Đổi sang nguồn lá 1 làm hai trung vị tám luồng/static lần lượt còn 26,2714 và 25,6343 ms; các thay đổi nhỏ so với độ phân tán quan sát được.
-
-Ở tám luồng, dynamic có trung vị cao gấp 3,74 lần static đối với Basic và 3,82 lần đối với Optimized; guided gần static hơn. Khi duyệt tâm, một luồng phải xử lý cả 999\,999 cung của đỉnh này. Khi duyệt các lá, frontier rộng nhưng mỗi lượt lặp chỉ kiểm một cung về tâm đã thăm. Chi phí cấp nhiều khối nhỏ là một cách giải thích phù hợp với thiết kế và kết quả dynamic, và cần phép đo riêng để định lượng. Xem Hình~\ref{fig:star-runtime} đến Hình~\ref{fig:star-schedule}.
-
-\begin{figure}[p]\centering\includegraphics[width=.94\textwidth]{figures/experiment-20261112/star1000000-s0/median.pdf}
-\caption[Star1000000: thời gian]{Star1000000, nguồn 0: median và dải IQR thời gian, 10 mẫu/cấu hình, commit \texttt{ab588fb}.}\label{fig:star-runtime}\end{figure}
-
-\begin{figure}[p]\centering\includegraphics[width=.94\textwidth]{figures/experiment-20261112/star1000000-s0/speedup.pdf}
-\caption[Star1000000: speedup]{Star1000000, nguồn 0: speedup so Serial và mốc $S=p$ trên trục log; mọi cấu hình dưới 1.}\label{fig:star-speedup}\end{figure}
-
-\begin{figure}[p]\centering\includegraphics[width=.94\textwidth]{figures/experiment-20261112/star1000000-s0/efficiency.pdf}
-\caption[Star1000000: efficiency]{Star1000000, nguồn 0: efficiency theo team thực, đơn vị phần số, không phải phần trăm.}\label{fig:star-efficiency}\end{figure}
-
-\begin{figure}[p]\centering\includegraphics[width=.94\textwidth]{figures/experiment-20261112/star1000000-s0/scheduling.pdf}
-\caption[Star1000000: scheduling]{Star1000000, nguồn 0: median và $Q_1$--$Q_3$ của ba schedule tại cùng team; dynamic chậm rõ ở nhiều luồng.}\label{fig:star-schedule}\end{figure}
-\clearpage
-
-\subsection{Grid: kích thước, frontier và vị trí nguồn}
-Từ Grid $128\times128$ lên Grid $512\times512$ ở nguồn góc, số đỉnh gấp 16 và số mức gần gấp 4. Trung vị Basic tám luồng/static tăng từ 30,5277 lên 112,6744 ms (3,69 lần); trung vị Serial tăng khoảng 18,6 lần. Trên Grid lớn, chuyển sang nguồn 131328 làm khoảng cách xa nhất giảm từ 1022 xuống 512. Basic và Optimized tám luồng/static giảm trung vị lần lượt khoảng 44,6\% và 48,5\%, trong khi Serial tăng từ 1,6942 lên 1,87115 ms. Số mức và hình dạng frontier thay đổi cùng vị trí nguồn, và các phiên có thể khác nhau về điều kiện tải.
-
-Tại nguồn góc, dynamic với tám luồng cao hơn static 27,4\% cho Basic và 24,7\% cho Optimized; guided cho trung vị ở giữa. Với static một luồng, Optimized nhanh hơn Basic về trung vị (5,814 so với 7,0432 ms); với tám luồng, Optimized chậm hơn khoảng 59,5\%. Cộng tiền tố, sao chép và đồng bộ sau khi ghép là chi phí bổ sung có thể góp phần vào chênh lệch; phép đo hiện tại chỉ quan sát tổng thời gian. Xem Hình~\ref{fig:grid-runtime} đến Hình~\ref{fig:grid-schedule}.
-
-\begin{figure}[p]\centering\includegraphics[width=.94\textwidth]{figures/experiment-20261112/grid512-s0/median.pdf}
-\caption[Grid512: thời gian]{Grid512, nguồn 0: median và dải IQR thời gian; 10 mẫu/cấu hình, commit \texttt{ab588fb}.}\label{fig:grid-runtime}\end{figure}
-
-\begin{figure}[p]\centering\includegraphics[width=.94\textwidth]{figures/experiment-20261112/grid512-s0/speedup.pdf}
-\caption[Grid512: speedup]{Grid512, nguồn 0: speedup và mốc lý tưởng trên trục log. Optimized một luồng tốt nhất ma trận nhưng vẫn dưới 1.}\label{fig:grid-speedup}\end{figure}
-
-\begin{figure}[p]\centering\includegraphics[width=.94\textwidth]{figures/experiment-20261112/grid512-s0/efficiency.pdf}
-\caption[Grid512: efficiency]{Grid512, nguồn 0: efficiency theo actual team; không lấy requested threads thay team thực.}\label{fig:grid-efficiency}\end{figure}
-
-\begin{figure}[p]\centering\includegraphics[width=.94\textwidth]{figures/experiment-20261112/grid512-s0/scheduling.pdf}
-\caption[Grid512: scheduling]{Grid512, nguồn 0: median và $Q_1$--$Q_3$ của schedule tại cùng thuật toán/team.}\label{fig:grid-schedule}\end{figure}
-\clearpage
-
-\subsection{Độ phân tán và cách đọc kết quả}
-IQR chia trung vị lớn nhất xấp xỉ 67,0\%, tại Serial trên Star 100\,000 đỉnh. Trung vị là 0,2825 ms, với min 0,1870 ms, max 0,6137 ms, $Q_1=0{,}1926$ ms và $Q_3=0{,}381825$ ms. Các so sánh trên sử dụng tỷ số của trung vị. Khi chênh lệch nhỏ so với độ phân tán, dữ liệu mô tả này chưa đủ để kết luận có khác biệt ổn định. Thứ hạng giữa Basic và Optimized thay đổi theo cấu hình; kết quả theo lập lịch cũng phụ thuộc họ đồ thị và số luồng.
-
-\section{Giới hạn nghiên cứu}
-\begin{itemize}
-\item Phép đo dùng một laptop, một bản dựng và chủ yếu khảo sát đồ thị có cấu trúc. Chưa tái lập độc lập trên máy thứ hai hoặc mở rộng sang đồ thị thực có frontier lớn, bất quy tắc.
-\item Mỗi mẫu đo dùng tiến trình mới. Lượt khởi động không duy trì team đã khởi tạo cho mẫu kế tiếp. Chi phí runtime phát sinh trong lời gọi được tính, và phép đo chưa đo chế độ nhiều BFS liên tiếp trong một tiến trình.
-\item Thứ tự được xáo trộn trong từng phiên. Các đồ thị và nguồn khác nhau vẫn chạy theo khối, với khả năng khác tải nền theo thời điểm. Việc phân luồng theo loại lõi và nhiệt độ chưa được kiểm soát bằng phép đo riêng.
-\item Thời gian tổng chưa định lượng khởi tạo team, thời gian chờ barrier, tranh chấp nguyên tử, cache miss, băng thông hoặc throttling. IQR là thống kê mô tả trên mười mẫu mỗi cấu hình, không phải khoảng tin cậy.
-\end{itemize}
-
-\section{Kết luận và hướng phát triển}
-\subsection{Trả lời câu hỏi nghiên cứu}
-\begin{enumerate}
-\item \textbf{Tính đúng đắn.} Ba bản nhất quán với oracle trên các ca đối chiếu toàn mảng. Các lượt thực nghiệm cũng qua kiểm tra đầu ra của CLI. Bằng chứng được giới hạn ở các ca đã chạy và lập luận về đồng bộ theo mức.
-\item \textbf{Tăng tốc so với Serial.} Chưa đạt tăng tốc trên ma trận này: 216 cấu hình OpenMP có $S<1$ và $S$ cao nhất xấp xỉ 0,2914. Tất cả cấu hình nhiều luồng còn chậm hơn đường cơ sở OpenMP một luồng cùng phiên bản và chính sách.
-\item \textbf{Số luồng, lập lịch và frontier.} Path có ít việc đồng thời mỗi mức và chậm mạnh khi tăng team. Trên Star lớn và Grid lớn, dynamic tám luồng cao hơn static trong các so sánh đã nêu. Frontier, số mức và cách thu đỉnh là các yếu tố thiết kế phù hợp để khảo sát tiếp; mức đóng góp riêng chưa được định lượng.
-\item \textbf{Basic và Optimized.} Optimized có trung vị thấp hơn Basic ở một số cấu hình, như Grid lớn/static một luồng, và cao hơn ở cấu hình khác, như cùng dữ liệu với tám luồng. Việc thay bộ đếm chung bằng bộ đệm riêng tạo đánh đổi cần đánh giá theo điều kiện chạy.
-\end{enumerate}
-
-\subsection{Hướng phát triển chưa triển khai}
-Một bước tiếp theo là profiling riêng thiết lập team, giành quyền thăm, chờ đồng bộ và ghép frontier. Có thể đo thêm mô hình nhiều lời gọi trong cùng tiến trình với team đã khởi tạo, với một đường cơ sở riêng cho mô hình đó. Các hướng thuật toán gồm chia việc theo cung để xử lý đỉnh bậc cao và khảo sát chuyển hướng duyệt theo Beamer và cộng sự~\cite{beamer2012}. Về thực nghiệm, có thể đăng ký trước dữ liệu phân tầng, đồ thị ngẫu nhiên có seed cố định và đồ thị thực, đồng thời thay đổi thứ tự giữa các khối và tái lập trên máy thứ hai.
+\section{Kết luận}
+Trong sáu đồ thị được chọn, Serial nhanh nhất ở bốn trường hợp và Optimized nhanh nhất ở hai trường hợp. So sánh giữa các đồ thị cho thấy số đỉnh chỉ giải thích một phần kết quả. Số tầng, bề rộng tầng và cách tập hợp đỉnh mới cũng ảnh hưởng đến mức tăng tốc. Sáu đồ thị tổng hợp được chọn để minh họa hai tình huống đối lập. Kết quả áp dụng cho máy, số luồng và lịch phân việc đã đo. Bộ dữ liệu này chưa dùng để suy ra một ngưỡng kích thước chung cho BFS trên đồ thị thực.

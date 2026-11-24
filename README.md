@@ -1,72 +1,46 @@
-# Parallel BFS Using OpenMP
+# BFS song song với OpenMP
 
-Bộ bàn giao cuối: [nghiệm thu 14/11/2026](docs/FINAL_HANDOFF_20261114.md),
-[hướng dẫn biên dịch/chạy ba thuật toán/tái lập/nộp](docs/SUBMISSION_README.md).
+Bài tập lớn học phần **Tính toán song song**. Dự án viết bằng C11 và dùng OpenMP để so sánh ba cách duyệt BFS trên CPU. Cả ba dùng cùng đồ thị CSR, nhận một đỉnh nguồn và tính khoảng cách ngắn nhất trên đồ thị không trọng số.
 
-C11/OpenMP CPU, cùng CSR loader cho Serial, Basic và Optimized. PR #7 đã merge
-vào `main` bằng commit `38842829ddaa9211789bdd3ff2035bf54762ceca`;
-CI sau merge PASS 3/3. Issues #3, #4, #5 đã đóng; Issue #2 đang được xử lý
-qua PR cập nhật tài liệu riêng.
-**Đã thực nghiệm thật** trên laptop Windows: 6 đồ thị/9 tổ hợp nguồn,225 cấu hình,
-225 warm-up và2250 mẫu chính thức, không lỗi/timeout. Commit đo ab588fb sau
-correctness local và CI3/3 PASS. Không cấu hình OpenMP nào nhanh hơn Serial;
-max speedup0,2914 ở Optimized1/static/grid512. Không dùng timing CI làm số đo.
-[Dữ liệu và tái lập](results/experiment-20261112/README.md),
-[hồ sơ nghiệm thu mới](docs/EXPERIMENT_20261112_RESULTS.md),
-[ma trận trước đo](docs/experiment-20261112-matrix.json).
+| Tùy chọn | Cách triển khai |
+|---|---|
+| `serial` | Hàng đợi FIFO |
+| `omp-basic` | Duyệt theo tầng, dùng bộ đếm nguyên tử để ghi vào danh sách đỉnh kế tiếp |
+| `omp-opt` | Duyệt theo tầng, ghi vào vùng đệm theo luồng rồi ghép danh sách đỉnh kế tiếp |
 
-Đọc [hồ sơ nghiệm thu](docs/ROLE_C_ACCEPTANCE.md), [trạng thái](docs/PROJECT_STATUS.md),
-[API v1](docs/CONTRACT.md) và [protocol](docs/EXPERIMENT_PROTOCOL.md).
+## Biên dịch và chạy thử
 
-## Build và test
-
-Cần GCC + libgomp, GNU Make và Python3. Windows dùng MSYS2 UCRT64 đã cài đủ
-`mingw-w64-ucrt-x86_64-{gcc,libgomp,python,make}`; không tự cài hoặc đổi PATH hệ thống.
+Trên Linux cần GCC, libgomp, GNU Make và Python 3. Trên Windows dùng môi trường MSYS2 UCRT64 với GCC, libgomp, Python và Make.
 
 ```sh
-# Linux; Windows UCRT64 dùng mingw32-make và PYTHON=python
+# Linux
 make CC=gcc PYTHON=python3 build test check-openmp
-make CC=gcc PYTHON=python3 test-bfs test-parallel test-integration test-cli-failures
-./build/bfs --graph datasets/small/disconnected.edgelist --vertices 6 --source 0 --algo omp-opt --threads 4 --schedule guided --directed
+
+# Windows, trong shell UCRT64
+mingw32-make CC=gcc PYTHON=python build test check-openmp
 ```
 
-Lệnh CLI thành công xuất một JSONL schema v1; thời gian chỉ gồm lời gọi BFS,
-actual team lấy từ metrics. Error diagnostics ở stderr; không xuất result sai.
-Test tools không phải benchmark; fixtures synthetic không dùng làm số liệu báo cáo.
-`make test-plots` cần matplotlib, chạy riêng trên Linux CI bằng môi trường tạm.
-`make clean` chỉ xóa known outputs, giữ PDF/datasets/results.
+```sh
+./build/bfs --graph datasets/small/disconnected.edgelist --vertices 6 --source 0 --algo omp-opt --threads 4 --schedule static --directed
+```
 
-## Báo cáo và thực nghiệm
+Trên Windows chạy `./build/bfs.exe`. Tệp đồ thị chứa một cặp đỉnh trên mỗi dòng. Đỉnh được đánh số từ 0. Dùng đúng một trong hai cờ `--directed` và `--undirected`. Ví dụ trên đi tới 4 đỉnh. Chương trình xuất JSON gồm trạng thái, số luồng thực tế, số đỉnh đi tới được và thời gian tính bằng giây. Thời gian chỉ tính lời gọi BFS.
 
-`make report`: XeLaTeX → BibTeX → XeLaTeX hai lần, output `report/main.pdf`.
-CI lưu PDF artifact theo SHA; báo cáo nghiệm thu là bản 42 trang. Sáu chương
-và abstract có kết quả thật, 9 bảng cấu hình chi tiết và 12 biểu đồ từ raw
-(36 figures lưu để tái tạo).
-GCC/libgomp16.2.0, Make4.4.1, Python3.14.10 tại C:/tools/msys64. Windows dùng QPC
-theo ADR-0003; Linux giữ omp_get_wtime. PDF nghiệm thu và mã nguồn bàn giao được ghi trong HANDOFF bộ nộp.
+## Kết quả thực nghiệm
 
-Raw/hash/backup/lệnh tái lập ở [results README](results/experiment-20261112/README.md).
-Runner cần working tree sạch, correctness log/binary hash đúng SHA và môi trường
-đã xác minh. Không overwrite session cũ. Fresh process/team startup được tính,
-warm-up không tạo warmed team; không suy rộng kết quả sang mọi đồ thị/runtime.
+Đo trên laptop Intel Core i5-12450HX, Windows 11, GCC 16.2.0. Mỗi ô là trung vị của 12 lượt đo sau khởi động, tính bằng ms. Hai bản OpenMP chạy 8 luồng với `static`.
 
-## Quy trình Git
+| Đồ thị | Đỉnh | Serial | Basic | Optimized | Nhanh nhất |
+|---|---:|---:|---:|---:|---|
+| Chu trình | 2.048 | 0,0105 | 321,5206 | 516,1245 | Serial |
+| Lưới | 6.144 | 0,0357 | 21,5734 | 36,0463 | Serial |
+| Thang | 2.048 | 0,0161 | 136,3073 | 231,4461 | Serial |
+| Cây bậc 3 nhỏ | 29.524 | 0,0951 | 2,8444 | 3,2873 | Serial |
+| Cây nhị phân lớn | 16.777.215 | 1169,4313 | 765,4272 | 496,7921 | Optimized |
+| Cây bậc 4 lớn | 5.592.405 | 163,6413 | 214,8783 | 130,3664 | Optimized |
 
-Canonical https://github.com/duyanhtr130905/parallel-bfs-openmp .
-PR #7 đã merge; không force push hoặc push trực tiếp main. Issue #2 chỉ đóng
-sau khi PR cập nhật trạng thái tài liệu được merge. AGENTS.md là quy trình chung;
-các mục có ngày trong docs là hồ sơ lịch sử, không phải trạng thái hiện hành.
+Optimized đạt **2,35×** trên cây nhị phân lớn và **1,26×** trên cây bậc 4 lớn. Serial nhanh nhất trên bốn đồ thị còn lại. Xem cách tái lập và dữ liệu từng lượt trong [thư mục thực nghiệm](results/experiment-20261124/).
 
-## Phân công cuối cùng — chủ dự án chọn 05/11/2026
+## Báo cáo
 
-| Vai trò | Branch | Phạm vi |
-|---|---|---|
-| A — Graph & Sequential BFS | feat/graph-serial-bfs | CSR, edge-list parser, serial BFS, graph/oracle tests, lý thuyết BFS |
-| B — Parallel BFS & Optimization | feat/parallel-bfs | Top-down basic và optimized; synchronization/atomic visited/frontier; static/dynamic/guided; correctness/stress; thiết kế song song |
-| C — Benchmark & Report Integration | feat/benchmark-report | CLI, automation, protocol, raw CSV/JSONL/manifest, biểu đồ, LaTeX tiếng Việt, thực nghiệm/kết luận từ dữ liệu thật |
-
-A cung cấp graph + serial; B phụ thuộc graph API; C phụ thuộc cả ba BFS APIs.
-Cả ba có thể chuẩn bị độc lập sau bootstrap theo CONTRACT: A/B nhận tham số cuối
-`BFSMetrics *metrics`, C chuẩn bị caller/timing/serialization. Tích hợp theo
-A → B → C; benchmark chỉ sau correctness. B sở hữu basic lẫn optimized; C sở hữu
-CLI/benchmark/report. Trạng thái triển khai và bằng chứng hiện hành xem hồ sơ nghiệm thu.
+Mã LaTeX ở [report/](report/). Chạy `make report` với XeLaTeX và BibTeX để tạo `report/main.pdf`. Báo cáo có ba chương. Xem thêm [giao diện lập trình](docs/CONTRACT.md) và [thiết kế](docs/ARCHITECTURE.md).

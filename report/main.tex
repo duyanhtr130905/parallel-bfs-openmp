@@ -4,18 +4,10 @@
 \pagenumbering{roman}
 \chapter*{Tóm tắt}
 \addcontentsline{toc}{chapter}{Tóm tắt}
-Nhóm triển khai tìm kiếm theo chiều rộng (BFS) trên CPU đa lõi bằng ba phiên bản Serial, OpenMP Basic và OpenMP Optimized. Cả ba dùng cùng biểu diễn CSR và trả khoảng cách ngắn nhất từ một nguồn trên đồ thị không trọng số. Hai phiên bản OpenMP khác nhau ở cách thu tập đỉnh của mức kế tiếp. Nhóm kiểm chứng đầu ra bằng oracle độc lập và đo thời gian thực quanh một lời gọi BFS để so sánh trung vị, khoảng tứ phân vị, speedup, efficiency và khả năng mở rộng.
+Bài tập lớn tìm hiểu khi nào duyệt đồ thị theo chiều rộng (BFS) có thể hưởng lợi từ OpenMP. Chúng em cài đặt một phiên bản tuần tự và hai phiên bản song song trên cùng biểu diễn đồ thị CSR. Hai bản song song cùng duyệt theo tầng nhưng khác cách ghi danh sách đỉnh mới.
 
-Thực nghiệm trên laptop Intel Core i5-12450HX, Windows 11 và GCC/libgomp UCRT64 16.2.0 gồm sáu đồ thị Path, Star và Grid, chín phiên đo, 225 lượt khởi động và 2\,250 mẫu chính thức. Các lượt kiểm chứng và đo ghi nhận kết quả hợp lệ trong phạm vi đã thử. Windows dùng QueryPerformanceCounter để đo các lời gọi ngắn. Cả 216 cấu hình OpenMP đều chậm hơn Serial; speedup cao nhất là 0,2914 ở Optimized một luồng, static, trên Grid $512\times512$ nguồn 0. Optimized có trung vị thấp hơn Basic ở một số cấu hình và cao hơn ở các cấu hình khác. Kết luận áp dụng cho ma trận đã đo, với một lời gọi BFS trong mỗi tiến trình mới.
-\begingroup
-\fontsize{11}{13}\selectfont
-\singlespacing
-\tableofcontents
-\endgroup
-\clearpage
-\listoffigures
-\clearpage
-\listoftables
+Chúng em đo cả ba phiên bản trên sáu đồ thị có hướng tự sinh. BFS tuần tự nhanh hơn trên bốn đồ thị, còn OpenMP nhanh hơn trên hai cây lớn. Kết quả được kiểm tra sau mỗi lượt bằng khoảng cách tính từ cấu trúc đồ thị. Qua đó, báo cáo xem xét vai trò của số tầng và bề rộng mỗi tầng đối với chi phí điều phối luồng.
+{\small\tableofcontents}
 \clearpage
 \pagenumbering{arabic}
 \include{chapters/chapter1}
@@ -24,9 +16,5 @@ Thực nghiệm trên laptop Intel Core i5-12450HX, Windows 11 và GCC/libgomp U
 \bibliographystyle{plain}
 \phantomsection
 \addcontentsline{toc}{chapter}{Tài liệu tham khảo}
-\begingroup
-\small
-\raggedright
-\bibliography{references}
-\endgroup
+{\small\raggedright\bibliography{references}}
 \end{document}
