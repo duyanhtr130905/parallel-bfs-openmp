@@ -69,7 +69,7 @@ chậm hơn. [Kế hoạch, raw và lệnh kiểm thử](results/experiment-scal
 
 Mã LaTeX ở [report/](report/). Chạy `make report` với XeLaTeX và BibTeX để tạo `report/main.pdf`. Báo cáo có ba chương. Xem thêm [giao diện lập trình](docs/CONTRACT.md) và [thiết kế](docs/ARCHITECTURE.md).
 
-[Bản PDF bàn giao](report/published/main.pdf) và [nhật ký biên tập](CHANGELOG_BAOCAO.md).
+[Bản PDF bàn giao](report/published/main.pdf) và [nhật ký biên tập](CHANGELOG_BAOCAO.md). Bản PDF mới nhất của nguồn LaTeX có thể tải từ artifact `bootstrap-report-*` của GitHub Actions tại commit tương ứng.
 Dùng `make tables figures supplement-artifacts review-artifacts report` để tái tạo từ dữ liệu đã lưu. Cần Python 3.11+, Matplotlib, psutil, XeLaTeX và BibTeX. Trong UCRT64, dùng `mingw32-make` thay cho `make`.
 
 ## Kịch bản khảo sát đồ thị SNAP

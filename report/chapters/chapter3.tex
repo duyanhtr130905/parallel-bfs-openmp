@@ -1,8 +1,8 @@
-\chapter{Thực nghiệm, đánh giá và kết luận}
+\chapter{Thực nghiệm và đánh giá}
 \label{chap:experiment}
 
 \section{Môi trường thực nghiệm}
-Bảng~\ref{tab:environment} đối chiếu cấu hình đã biết của hai phiên đo. Trình đo kiểm tra số luồng thực tế sau mỗi lần gọi BFS. Thông tin quan sát trong phiên ngày 25/11/2026 chỉ mô tả phiên đó.
+Các thí nghiệm được thực hiện trên một máy tính sử dụng bộ xử lý Intel Core i5-12450HX, có kiến trúc kết hợp nhân hiệu năng cao và nhân tiết kiệm điện. Bảng~\ref{tab:environment} trình bày cấu hình phần cứng, phần mềm và các tham số đo. Những thông số không được ghi nhận đầy đủ trong các đợt đo được chú thích riêng để tránh suy diễn.
 
 \begin{table}[!htbp]
 \centering\small
@@ -15,15 +15,15 @@ Thành phần & Cấu hình \\
 CPU & Intel Core i5-12450HX \\
 Nhân và luồng logic & 8 nhân, 12 luồng logic. Theo đặc tả \href{https://www.intel.com/content/www/us/en/products/sku/228794/}{Intel}, CPU có 4 P-core và 4 E-core. \\
 Bộ nhớ đệm & Intel công bố \num{12} MB Smart Cache; chưa đối chiếu độc lập tổng dung lượng L2. \\
-RAM & Phiên 25/11: hệ điều hành nhận \num{23.71} GiB. Dung lượng lắp đặt và số kênh chưa xác minh được. \\
-Hệ điều hành & Windows 11. Phiên 25/11: 26H2, build 26300.9974. \\
+RAM & Hệ điều hành nhận \num{23.71} GiB. Dung lượng lắp đặt và số kênh chưa xác minh được. \\
+Hệ điều hành & Windows 11. 26H2, build 26300.9974. \\
 Trình biên dịch & GCC 16.2.0, MSYS2 UCRT64 \\
-Cờ biên dịch & \texttt{-O2 -std=c11 -Wall -Wextra -Werror -fopenmp} \\
-Thư viện OpenMP & libgomp UCRT64 16.2.0-6 khi kiểm tra sau phiên 25/11. Phiên 24/11 không ghi nhận phiên bản gói. \\
+Cờ biên dịch & \texttt{-O2 -std=c11 -Wall -Wextra -Werror -fopenmp}; nhóm B và khảo sát số luồng thêm \texttt{-Wpedantic} \\
+Thư viện OpenMP & libgomp UCRT64 16.2.0-6 (xác minh sau phép đo nhóm B); nhóm A không lưu phiên bản gói. \\
 Số luồng so sánh chính & Serial 1 luồng. Basic và Optimized 8 luồng \\
 Chính sách lập lịch & \texttt{static}. Chương trình tắt tự điều chỉnh số luồng \\
-Gắn luồng, chế độ chờ & Phiên 24/11 không ghi nhận. Phiên 25/11 để mặc định runtime, vị trí luồng chưa được đo. \\
-Chế độ nguồn, tải nền & Phiên 24/11 không ghi nhận. Phiên 25/11 dùng Balanced, có cắm điện khi lấy mẫu môi trường. \\
+Gắn luồng, chế độ chờ & Nhóm A không ghi nhận; nhóm B và khảo sát số luồng dùng mặc định của runtime. Chưa đo vị trí luồng. \\
+Chế độ nguồn, tải nền & Nhóm B và khảo sát số luồng dùng Balanced, có cắm điện khi lấy mẫu. Nhóm A không ghi nhận. \\
 Bộ đếm thời gian & \texttt{QueryPerformanceCounter} trên Windows \\
 Số lượt mỗi cấu hình & 2 lượt khởi động và 12 mẫu chính thức \\
 \bottomrule
@@ -32,8 +32,8 @@ Số lượt mỗi cấu hình & 2 lượt khởi động và 12 mẫu chính th
 
 \section{Bộ dữ liệu thực nghiệm}
 \label{sec:datasets}
-\subsection{Đồ thị ngày 24/11}
-Nhóm sinh sáu đồ thị có hướng trong bộ nhớ và chuyển từng đồ thị sang CSR. Từ nguồn $s=0$, BFS đi tới mọi đỉnh trong các đầu vào này. Độ sâu $D$ trong Bảng~\ref{tab:graphs} là khoảng cách lớn nhất tính từ nguồn. Số tầng chứa đỉnh là $L=D+1$ và bề rộng trung bình là $n/L$. Bề rộng cực đại lấy trực tiếp từ các công thức của từng cấu trúc.
+\subsection{Chu trình, lưới, thang và cây}
+Để đánh giá ảnh hưởng của độ sâu, bề rộng tầng và quy mô đầu vào, nhóm sử dụng 12 đồ thị tổng hợp. Bộ dữ liệu được chia thành hai nhóm theo cách xây dựng và giao thức đo: nhóm A gồm chu trình, lưới, thang và ba cây; nhóm B gồm đường đi, sao, hai lưới rời, vòng có cung ngẫu nhiên và hai đồ thị phân tầng. Việc phân nhóm giúp đối chiếu đúng các phép đo có cùng giao thức. Sáu đồ thị có hướng thuộc nhóm A được sinh trong bộ nhớ và chuyển sang CSR. Từ nguồn $s=0$, BFS đi tới mọi đỉnh trong các đầu vào này. Độ sâu $D$ trong Bảng~\ref{tab:graphs} là khoảng cách lớn nhất tính từ nguồn. Số tầng chứa đỉnh là $L=D+1$ và bề rộng trung bình là $n/L$. Bề rộng cực đại lấy trực tiếp từ các công thức của từng cấu trúc.
 
 \begin{table}[!htbp]
 \centering\footnotesize
@@ -58,7 +58,7 @@ Hai nhóm sơ đồ ở Hình~\ref{fig:graph-structures} và Hình~\ref{fig:grap
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=.96\textwidth]{figures/graph-structures-24.pdf}
-\caption[Mẫu cấu trúc ngày 24/11]{Sáu mẫu thu nhỏ của phiên 24/11. Mũi tên biểu thị hướng cung.}
+\caption[Cấu trúc chu trình, lưới, thang và cây]{Minh họa sáu cấu trúc đồ thị thuộc nhóm A. Mũi tên biểu thị hướng cung.}
 \label{fig:graph-structures}
 \end{figure}
 
@@ -76,35 +76,35 @@ Trên cây bậc $b$, tầng $k$ chứa đúng $b^k$ đỉnh. Hình~\ref{fig:wid
 
 Chu trình giữ nhãn theo thứ tự dọc chu trình, nên khoảng cách bằng nhãn. Thang đánh nhãn lần lượt theo từng cột, lưới theo từng hàng. Khoảng cách trên thang và lưới được tính từ tọa độ, vì vậy thường khác nhãn số. Với các cây, bộ sinh xáo nhãn của các đỉnh khác gốc theo hạt giống cố định, giữ gốc bằng $0$. Việc xáo nhãn giữ nguyên các quan hệ cha con và bề rộng tầng, nhưng thay vị trí của các đỉnh trong các mảng được lập chỉ số bằng nhãn.
 
-\subsection{Đồ thị ngày 25/11}
+\subsection{Đường đi, sao và các đồ thị có cấu trúc mở rộng}
 \input{chapters/supplement}
 
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=.96\textwidth]{figures/graph-structures-25.pdf}
-\caption[Mẫu cấu trúc ngày 25/11]{Sáu mẫu thu nhỏ của phiên 25/11. Hai lưới rời là vô hướng. Hai mẫu phân tầng dùng mũi tên đại diện, theo chiều từ trái sang phải.}
+\caption[Cấu trúc các đồ thị nhóm B]{Minh họa sáu cấu trúc đồ thị thuộc nhóm B. Hai lưới rời là vô hướng; mũi tên trong hai mẫu phân tầng biểu thị một số cung đại diện theo chiều từ trái sang phải.}
 \label{fig:graph-structures-new}
 \end{figure}
 
 \section{Phương pháp thực nghiệm}
 \label{sec:measurement}
 \subsection{Kiểm chứng khoảng cách}
-Ngày 24/11, chương trình đo tính đáp án từ quy tắc dựng đồ thị. Khoảng cách tới hai nút ở cột $j$ của thang là $j$ và $j+1$. Lưới dùng $r+c$, còn cây dùng độ sâu của đỉnh trong cấu trúc trước khi xáo nhãn. Mảng đối chiếu của cây được ghi theo nhãn đã xáo để so trực tiếp với đầu ra BFS. Sau mỗi lời gọi, chương trình chỉ ghi mẫu khi hàm trả trạng thái thành công, số luồng đúng yêu cầu và toàn bộ mảng khoảng cách trùng với đáp án.
+Đối với nhóm A, chương trình xác định khoảng cách tham chiếu từ quy tắc xây dựng đồ thị. Khoảng cách tới hai nút ở cột $j$ của thang là $j$ và $j+1$. Lưới dùng $r+c$, còn cây dùng độ sâu của đỉnh trong cấu trúc trước khi xáo nhãn. Mảng đối chiếu của cây được ghi theo nhãn đã xáo để so trực tiếp với đầu ra BFS. Sau mỗi lời gọi, chương trình chỉ ghi mẫu khi hàm trả trạng thái thành công, số luồng đúng yêu cầu và toàn bộ mảng khoảng cách trùng với đáp án.
 
-Ngày 25/11, chương trình so từng phần tử khoảng cách với BFS tham chiếu có cài đặt riêng, chạy trên cùng CSR. Kiểm chứng này bao phủ đầu ra duyệt, còn việc tạo CSR có các kiểm thử parser riêng. Trình đo xác thực cả số luồng thực thi và trạng thái trả về.
+Đối với nhóm B và khảo sát số luồng, chương trình so sánh từng phần tử khoảng cách với kết quả của một cài đặt BFS tham chiếu độc lập trên cùng CSR. Kiểm chứng này bao phủ đầu ra duyệt, còn việc tạo CSR có các kiểm thử parser riêng. Trình đo xác thực cả số luồng thực thi và trạng thái trả về.
 
 \subsection{Phạm vi đo và thống kê}
-Với mỗi đồ thị, chương trình dựng CSR một lần rồi dùng lại trong một tiến trình. Mỗi vòng gọi ba thuật toán theo thứ tự xoay vòng. Hai vòng đầu mang chỉ số $-2,-1$ và làm nhiệm vụ khởi động. Mười hai vòng tiếp theo mang chỉ số $0$ đến $11$. Do thứ tự luân phiên theo chu kỳ ba, mỗi thuật toán đứng ở mỗi vị trí đúng bốn lần trong 12 vòng chính thức. Dữ liệu gốc có 252 lượt qua kiểm tra, trong đó 216 mẫu chính thức dùng để tính thống kê.
+Với mỗi đồ thị, chương trình dựng CSR một lần rồi dùng lại trong một tiến trình. Mỗi vòng gọi ba thuật toán theo thứ tự xoay vòng. Hai vòng đầu mang chỉ số $-2,-1$ và làm nhiệm vụ khởi động. Mười hai vòng tiếp theo mang chỉ số $0$ đến $11$. Do thứ tự luân phiên theo chu kỳ ba, mỗi thuật toán đứng ở mỗi vị trí đúng bốn lần trong 12 vòng chính thức. Mỗi nhóm có 252 lượt đo hợp lệ, trong đó 216 mẫu chính thức được sử dụng để tính thống kê.
 
 Chương trình gọi bộ đếm thời gian Windows ngay trước và sau hàm BFS.\footnote{Xem \href{https://learn.microsoft.com/en-us/windows/win32/api/profileapi/nf-profileapi-queryperformancecounter}{tài liệu QueryPerformanceCounter của Microsoft}.} Khoảng đo bao gồm các thao tác trong hàm, kể cả khởi tạo khoảng cách, cấp phát và giải phóng vùng đệm. Việc dựng CSR, cấp phát mảng đầu ra của phía gọi, kiểm tra khoảng cách và ghi CSV nằm ngoài khoảng đo. Nhóm tính các chỉ số theo Mục~\ref{sec:metrics} từ mẫu chính thức, giữ nguyên các quan sát và thứ tự vòng.
 
-Hai phiên chính có tổng cộng 504 lượt, gồm 72 lượt khởi động và 432 mẫu chính thức. Phiên 24/11 sinh CSR từ các cung dựng trong bộ nhớ. Phiên 25/11 đọc danh sách liên kết từ tệp và ghi thêm dấu thời gian, số luồng yêu cầu/thực thi và hồ sơ các tầng. Mỗi phiên dùng nguồn $0$, hai lượt khởi động, 12 mẫu chính thức, thứ tự thuật toán xoay theo vòng và lịch tĩnh. Đồng hồ QPC có tần số \num{10000000} Hz trong phiên 25/11. Hai bộ đầu vào được báo cáo theo từng phiên, với khác biệt về cách dựng đồ thị và điều kiện máy.
+Thực nghiệm so sánh ba phiên bản có tổng cộng 504 lượt, gồm 72 lượt khởi động và 432 mẫu chính thức. Nhóm A tạo CSR trực tiếp từ danh sách cung trong bộ nhớ; nhóm B đọc danh sách liên kết từ tệp và lưu thêm số luồng yêu cầu, số luồng thực tế và hồ sơ các tầng. Cả hai nhóm sử dụng nguồn $0$, lịch tĩnh và cùng số lần lặp. Tần số bộ đếm QPC ghi nhận khi đo nhóm B là \num{10000000} Hz. Do các nhóm được đo ở những thời điểm khác nhau, mọi hệ số tăng tốc đều sử dụng thời gian Serial đo trên cùng đồ thị và trong cùng đợt thực nghiệm. Thông tin về thời điểm đo và cách tái lập được lưu trong Phụ lục~\ref{app:reproduce}.
 
 \section{Kết quả thực nghiệm}
 \label{sec:results}
-\subsection{Phiên ngày 24/11}
-Script Matplotlib đọc trực tiếp các mẫu chính thức từ tệp CSV của phép đo. Từ các mẫu đó, script vẽ thời gian thực thi, hệ số tăng tốc, thời gian Serial theo vòng và thời gian trung vị chia số tầng. Hình bề rộng tầng ở Mục~\ref{sec:datasets} được tính từ cấu trúc đồ thị.
-Bảng~\ref{tab:results} gộp thời gian, hệ số tăng tốc và hiệu suất. Chữ đậm chọn trung vị thấp nhất của mỗi đồ thị. Cột cuối dùng $1/S_8$ khi OpenMP mất nhiều thời gian hơn Serial. Phụ lục~\ref{app:quartiles} cung cấp các tứ phân vị riêng, độ rộng khoảng tứ phân vị và hai cực trị.
+\subsection{So sánh hiệu năng trên chu trình, lưới, thang và cây}
+Các biểu đồ thời gian thực thi và hệ số tăng tốc được xây dựng từ 12 mẫu chính thức của mỗi cấu hình. Nhóm sử dụng trung vị để so sánh thời gian điển hình và khoảng tứ phân vị để biểu diễn độ phân tán của các phép đo.
+Bảng~\ref{tab:results} gộp thời gian, hệ số tăng tốc và hiệu suất. Giá trị trung vị thấp nhất trên mỗi đồ thị được in đậm. Cột cuối dùng $1/S_8$ khi OpenMP mất nhiều thời gian hơn Serial. Phụ lục~\ref{app:quartiles} cung cấp các tứ phân vị riêng, độ rộng khoảng tứ phân vị và hai cực trị.
 
 \begin{table}[!htbp]
 \centering\footnotesize
@@ -131,13 +131,13 @@ Bảng~\ref{tab:results} gộp thời gian, hệ số tăng tốc và hiệu su�
 {fig:speedup}
 {Ba trong 12 điểm của Hình~\ref{fig:speedup} vượt mốc $1$. Basic vượt mốc trên cây nhị phân lớn, Optimized vượt mốc trên cả hai cây lớn. Trên chu trình, hệ số của Basic khoảng $\num{3.3e-5}$ (Bảng~\ref{tab:results}).}
 
-\subsection{Phiên ngày 25/11}
+\subsection{So sánh hiệu năng trên đường đi, sao và đồ thị nhiều cung}
 Bảng~\ref{tab:supplement-results} ghi trung vị từng phiên bản và hệ số của Optimized so với Serial. Hình~\ref{fig:supplement-performance} bổ sung khoảng từ $Q_1$ đến $Q_3$ và hệ số của cả hai bản OpenMP. Hình~\ref{fig:supplement-frontier} thể hiện vị trí và độ rộng của các tầng.
 
 \begin{table}[!htbp]
 \centering\footnotesize
 \setlength{\tabcolsep}{3pt}
-\caption{Trung vị thời gian (ms), hệ số tăng tốc $S_8$ và hiệu suất $E_8$ của Optimized trong phiên 25/11}
+\caption{Thời gian trung vị (ms), hệ số tăng tốc và hiệu suất trên nhóm B}
 \label{tab:supplement-results}
 \begin{tabular}{@{}l *{3}{S[table-format=3.5]} S[table-format=1.5e-1]
 S[table-format=2.6] @{\hspace{6pt}}l@{}}
@@ -151,19 +151,19 @@ S[table-format=2.6] @{\hspace{6pt}}l@{}}
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=.88\textwidth]{figures/supplement-performance.pdf}
-\caption[Thời gian, IQR và hệ số tăng tốc ngày 25/11]{Trung vị, khoảng $[Q_1,Q_3]$ và hệ số tăng tốc từ 12 mẫu chính thức trên mỗi cấu hình ngày 25/11. Hai trục đứng dùng thang logarit.}
+\caption[Thời gian và hệ số tăng tốc trên nhóm B]{Thời gian trung vị, khoảng $[Q_1,Q_3]$ và hệ số tăng tốc của các phiên bản trên nhóm B. Hai trục tung sử dụng thang logarit.}
 \label{fig:supplement-performance}
 \end{figure}
 
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=.88\textwidth]{figures/supplement-frontier.pdf}
-\caption[Bề rộng frontier trong phiên bổ sung]{Bề rộng frontier theo tầng từ nguồn $s=0$ trong phiên 25/11. Trục bề rộng dùng thang logarit.}
+\caption[Bề rộng các tầng của đồ thị nhóm B]{Số đỉnh tại mỗi tầng BFS tính từ nguồn $s=0$ trên nhóm B. Trục bề rộng sử dụng thang logarit.}
 \label{fig:supplement-frontier}
 \end{figure}
 
-\subsection{Đối chiếu 12 đồ thị}
-Bảng~\ref{tab:comparison} đặt các trung vị cạnh nhau và ghi rõ ngày của từng nhóm. Serial đứng đầu ở 7 đồ thị, Optimized ở 5 đồ thị, còn Basic không có trung vị thấp nhất trong bộ đầu vào này. Đây là kết quả trên 12 đầu vào cố định. Phụ lục~\ref{app:quartiles} lưu các thống kê phân tán của cả 36 cặp đồ thị--phiên bản.
+\subsection{Tổng hợp và so sánh hiệu năng}
+Bảng~\ref{tab:comparison} tổng hợp thời gian trung vị và hệ số tăng tốc của Optimized trên toàn bộ 12 đồ thị, phân theo hai nhóm dữ liệu. Serial đạt thời gian trung vị thấp nhất trên 7 đồ thị, Optimized trên 5 đồ thị. Basic không đạt trung vị thấp nhất trên đồ thị nào trong bộ dữ liệu này. Đây là kết quả trên 12 đầu vào cố định. Phụ lục~\ref{app:quartiles} lưu các thống kê phân tán của cả 36 cặp đồ thị--phiên bản.
 
 \begin{table}[!htbp]
 \centering\footnotesize
@@ -234,33 +234,33 @@ Bảng~\ref{tab:per-level} chia trung vị thời gian tổng cho số tầng. P
 {fig:per-layer}
 {Trong Hình~\ref{fig:per-layer}, Basic dao động từ \num{0.133} đến \num{0.157} ms/tầng. Optimized dao động từ \num{0.226} đến \num{0.252} ms/tầng. Tỷ số số rào là $5/3\approx\num{1.667}$ (Bảng~\ref{tab:design}), gần các tỷ số thời gian trong Bảng~\ref{tab:per-level}. Kết quả phù hợp với mô hình ở Mục~\ref{sec:metrics} nếu chi phí lặp theo tầng chiếm phần lớn thời gian. Rào ngầm và rào tường minh có thể có chi phí khác nhau, vì vậy phép đối chiếu chưa cho phép quy phần chênh lệch cho các rào riêng lẻ.}
 
-\subsection{Đối chiếu với các nghiên cứu liên quan}
+\subsection{So sánh với các nghiên cứu liên quan}
 Beamer và cộng sự \cite{beamer2013,gap2015} giảm công việc duyệt bằng cách chọn hướng theo trạng thái của BFS. Các phiên bản trong báo cáo đều duyệt top-down. Chênh lệch ở đây đến từ việc tổ chức thực thi trên cùng hướng duyệt và cùng đầu ra, vì thế các hệ số ở Bảng~\ref{tab:results} có mốc so sánh khác kết quả của GAP.
 
-Trong phiên 24/11, Optimized nhanh hơn Basic trên hai cây lớn và chậm hơn trên bốn đồ thị còn lại (Bảng~\ref{tab:results}). Nghiên cứu của Gonzaga de Oliveira và cộng sự \cite{oliveira2024} cung cấp thêm một thiết kế BFS trên OpenMP với cấu trúc bag. Khác biệt về cách tập hợp đỉnh khiến thời gian từ hai hiện thực không thể dùng để định lượng riêng lợi ích của bộ đệm trong phép đo này.
+Trên nhóm A, Optimized nhanh hơn Basic trên hai cây lớn và chậm hơn trên bốn đồ thị còn lại (Bảng~\ref{tab:results}). Nghiên cứu của Gonzaga de Oliveira và cộng sự \cite{oliveira2024} cung cấp thêm một thiết kế BFS trên OpenMP với cấu trúc bag. Khác biệt về cách tập hợp đỉnh khiến thời gian từ hai hiện thực không thể dùng để định lượng riêng lợi ích của bộ đệm trong phép đo này.
 
 ParallelBFS \cite{parallelbfs} là ví dụ độc lập về ghép bộ đệm theo tổng tiền tố trên bộ nhớ chia sẻ. Dự án ghi nhận bản dùng hàng đợi nguyên tử có thể mất \num{10}--\num{100} lần thời gian tuần tự ở các đầu vào nhỏ mà họ thử. Bản Basic trong báo cáo cũng ghi qua bộ đếm chung, nhưng dùng một vùng song song duy trì qua mọi tầng. Hai cài đặt và môi trường đo khác nhau, nên chỉ so sánh xu hướng trên các đầu vào có ít việc.
 
-\subsection{Lượng cung và bề rộng trong phiên 25/11}
-Trong phiên 25/11, Serial dẫn đầu ở đường đi, sao và hai lưới tách rời. Đường đi có 513 tầng, mỗi tầng đúng một đỉnh, nên việc mở rộng mỗi tầng gần như không chia được. Trong đồ thị sao, tầng rộng nhất có \num{262143} đỉnh lá nhưng không có cung đi ra. Toàn bộ công việc xét cung tập trung ở đỉnh nguồn, được giao cho một luồng trong vòng chia việc theo đỉnh. Ví dụ này cho thấy cần xét bậc ra cùng với bề rộng frontier.
+\subsection{Ảnh hưởng của bậc đỉnh và khối lượng công việc}
+Trên nhóm B, Serial có trung vị thấp nhất ở đường đi, sao và hai lưới tách rời. Đường đi có 513 tầng, mỗi tầng đúng một đỉnh, nên việc mở rộng mỗi tầng gần như không chia được. Trong đồ thị sao, tầng rộng nhất có \num{262143} đỉnh lá nhưng không có cung đi ra. Toàn bộ công việc xét cung tập trung ở đỉnh nguồn, được giao cho một luồng trong vòng chia việc theo đỉnh. Ví dụ này cho thấy cần xét bậc ra cùng với bề rộng frontier.
 
-Optimized dẫn đầu trên ba đầu vào còn lại. Bản này tăng tốc khoảng \num{1.17} lần trên vòng có cung ngẫu nhiên, \num{1.38} lần trên đồ thị phân tầng hội tụ và \num{2.12} lần trên đồ thị phân tầng hoán vị. Basic cũng nhanh hơn Serial trên hai đồ thị phân tầng, nhưng chậm hơn Serial trên vòng có cung ngẫu nhiên. Các phép đo phù hợp với khả năng phân chia lượng cung lớn giữa nhiều luồng. Vì quy mô, số tầng và cách nối đỉnh cùng thay đổi giữa các đầu vào, số đo chưa định lượng được chi phí của ghi nguyên tử, hàng rào hoặc truy cập bộ nhớ.
+Optimized có trung vị thấp nhất trên ba đồ thị còn lại. Bản này tăng tốc khoảng \num{1.17} lần trên vòng có cung ngẫu nhiên, \num{1.38} lần trên đồ thị phân tầng hội tụ và \num{2.12} lần trên đồ thị phân tầng hoán vị. Basic cũng nhanh hơn Serial trên hai đồ thị phân tầng, nhưng chậm hơn Serial trên vòng có cung ngẫu nhiên. Các phép đo phù hợp với khả năng phân chia lượng cung lớn giữa nhiều luồng. Vì quy mô, số tầng và cách nối đỉnh cùng thay đổi giữa các đầu vào, số đo chưa định lượng được chi phí của ghi nguyên tử, hàng rào hoặc truy cập bộ nhớ.
 
 Trên vòng có cung ngẫu nhiên, IQR của Optimized nhỏ hơn IQR của Serial. Các khoảng cực trị vẫn chồng lấn: \num{17.43}--\num{22.204} ms với Optimized và \num{20.104}--\num{28.3104} ms với Serial (Bảng~\ref{tab:quartiles-new}). Hệ số \num{1.169} mô tả trung vị ở cấu hình đã đo. Phép so sánh chưa có kiểm định ý nghĩa thống kê.
 
 \section{Hạn chế và các yếu tố ảnh hưởng đến tính hợp lệ}
-Nhật ký thực nghiệm lưu tỷ lệ CPU bận lấy mẫu trong một giây trước từng đầu vào ngày 25/11: đường đi \num{33.3}\%, sao \num{34.0}\%, hai lưới rời \num{68.3}\%, vòng có cung ngẫu nhiên \num{43.6}\%, phân tầng hội tụ \num{26.4}\% và phân tầng hoán vị \num{34.9}\%. Các quan sát này mô tả từng thời điểm trước phép đo. Nhiệt độ, tần số và tải liên tục trong mỗi lời gọi chưa được ghi. Phiên khảo sát luồng có nhật ký điều kiện riêng.
+Tải CPU là một yếu tố có thể ảnh hưởng đến kết quả đo. Trước khi đo mỗi đồ thị nhóm B, tỷ lệ CPU bận được lấy mẫu trong một giây: đường đi \num{33.3}\%, sao \num{34.0}\%, hai lưới rời \num{68.3}\%, vòng có cung ngẫu nhiên \num{43.6}\%, phân tầng hội tụ \num{26.4}\% và phân tầng hoán vị \num{34.9}\%. Các quan sát này mô tả từng thời điểm trước phép đo. Nhiệt độ, tần số và tải liên tục trong mỗi lời gọi chưa được ghi. Trong khảo sát số luồng, tải CPU trước ba đồ thị lần lượt là 14,9\%, 5,3\% và 10,1\%. Các giá trị này chỉ phản ánh điều kiện tại thời điểm lấy mẫu, không phải tải trong toàn bộ phép đo.
 
 \begin{itemize}
-\item \textbf{Máy và cách bố trí luồng.} Phép đo dùng một CPU có nhân lai, tám luồng và lịch \texttt{static}. Vị trí luồng trên P-core, E-core và các luồng logic cùng nhân có thể thay đổi thời gian. Chương trình chỉ xác nhận số luồng thực tế.
+\item \textbf{Máy và cách bố trí luồng.} So sánh chính sử dụng tám luồng và lịch \texttt{static}; khảo sát khả năng mở rộng sử dụng 1--12 luồng trên cùng CPU có kiến trúc nhân lai. Vị trí luồng trên P-core, E-core và các luồng logic cùng nhân có thể thay đổi thời gian. Chương trình chỉ xác nhận số luồng thực tế.
 \item \textbf{Đầu vào và nguồn.} Cả 12 đồ thị đều tổng hợp và dùng $s=0$. Đồ thị thực có phân bố bậc, số đỉnh tới được và hình dạng tầng thay đổi theo nguồn. Tỷ lệ phiên bản dẫn đầu chỉ mô tả từng bộ đầu vào.
 \item \textbf{Nhãn đỉnh và cấu trúc.} Ba cây dùng nhãn xáo, còn chu trình, thang và lưới giữ thứ tự cấu trúc. Các cây lớn vừa có bề rộng lớn vừa có vị trí truy cập kém tuần tự hơn theo nhãn. Việc nhiều luồng có thể chồng lấp độ trễ truy cập là một giả thuyết. Đợt đo không có cặp trước và sau xáo trên cùng đồ thị để kiểm tra giả thuyết này.
 \item \textbf{Độ phân tán và cơ chế.} Các vòng Serial trên cây nhị phân tách theo thứ tự đo. Bảng~\ref{tab:sensitivity} giúp định lượng ảnh hưởng của mốc Serial. Thời gian tổng và dữ liệu về số vòng chưa xác định được nguồn dao động hay chi phí từng pha.
 \end{itemize}
 
 \section{Kết luận và hướng phát triển}
-\subsection{Trả lời câu hỏi nghiên cứu}
-Serial có trung vị thấp nhất trên 7 trong 12 đồ thị. Optimized dẫn đầu ở 5 đầu vào có lượng công việc đủ lớn trong cấu hình đã đo. So với Basic, việc dùng bộ đệm riêng có lợi trên hai cây lớn và ba đầu vào có nhiều cung của phiên 25/11, nhưng chi phí chuẩn bị và ghép bộ đệm đi kèm thời gian cao hơn trên nhiều đầu vào nhỏ hoặc có tầng hẹp. Bề rộng tầng chỉ có ý nghĩa khi xét cùng số cung đi ra và cách phân việc theo đỉnh. Phép đo theo số luồng cho thấy tăng số luồng có thể làm chậm đường đi, trong khi giảm thời gian trên đồ thị phân tầng hoán vị. Các kết luận dựa trên thời gian toàn lời gọi, nên chưa tách được chi phí của từng pha.
+\subsection{Kết luận}
+Qua quá trình nghiên cứu và triển khai, nhóm đã xây dựng được hai phiên bản BFS song song bằng OpenMP và kiểm chứng kết quả bằng toàn bộ mảng khoảng cách. Thực nghiệm trên 12 đồ thị cho thấy Serial có trung vị thấp nhất trên 7 đồ thị, còn Optimized có trung vị thấp nhất trên 5 đồ thị. Optimized giảm thời gian so với Basic trên hai cây lớn, đồ thị sao, vòng có cung ngẫu nhiên và hai đồ thị phân tầng; riêng đồ thị sao, cả hai phiên bản song song vẫn chậm hơn Serial. Trên các đồ thị còn lại, chi phí tổ chức và ghép bộ đệm có thể góp phần làm Optimized chậm hơn Basic. Bề rộng tầng chỉ có ý nghĩa khi xét cùng số cung đi ra và cách phân việc theo đỉnh. Phép đo theo số luồng cho thấy tăng số luồng có thể làm chậm đường đi, trong khi giảm thời gian trên đồ thị phân tầng hoán vị. Các kết luận dựa trên thời gian toàn lời gọi, nên chưa tách được chi phí của từng pha.
 
 \subsection{Hướng phát triển}
 \begin{enumerate}

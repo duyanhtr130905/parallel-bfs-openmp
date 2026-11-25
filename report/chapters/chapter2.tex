@@ -64,7 +64,7 @@ Gọi $T_{\mathrm{Serial}}$ và $T_{\mathrm{OMP},p}$ lần lượt là trung v�
 \]
 OpenMP có trung vị thấp hơn Serial khi $S_p>1$. Khi $S_p<1$, nghịch đảo $1/S_p$ cho biết OpenMP mất bao nhiêu lần thời gian của Serial. Bảng kết quả biểu diễn $E_8$ theo phần trăm. Đại lượng này chuẩn hóa tỷ số theo số luồng, nên không trực tiếp cho biết tỷ lệ CPU bận.
 
-Khả năng mở rộng (scaling) cần so chính một cài đặt OpenMP ở nhiều số luồng trên cùng đầu vào. Chỉ số nội bộ $S_{\text{nội},p}=T_{\mathrm{OMP},1}/T_{\mathrm{OMP},p}$ giữ nguyên thuật toán. Chỉ số $S_p$ dùng Serial làm mốc để trả lời câu hỏi lựa chọn phiên bản. Phiên khảo sát luồng lấy cả hai mốc ngay trong phiên; hiệu suất $E_p$ tính theo mốc Serial và đổi sang phần trăm bằng cách nhân $100$.
+Khả năng mở rộng (scaling) cần so chính một cài đặt OpenMP ở nhiều số luồng trên cùng đầu vào. Chỉ số nội bộ $S_{\text{nội},p}=T_{\mathrm{OMP},1}/T_{\mathrm{OMP},p}$ giữ nguyên thuật toán. Chỉ số $S_p$ dùng Serial làm mốc để trả lời câu hỏi lựa chọn phiên bản. Thực nghiệm về khả năng mở rộng đo cả hai mốc trong cùng điều kiện; hiệu suất $E_p$ tính theo mốc Serial và đổi sang phần trăm bằng cách nhân $100$.
 
 \subsection{Trung vị và tứ phân vị}
 Với $N$ mẫu đã sắp tăng dần, đánh chỉ số từ $0$, vị trí của phân vị tại $q$ là $h=(N-1)q$. Nếu $i=\lfloor h\rfloor$ và $j=\lceil h\rceil$, giá trị phân vị là $x_i+(h-i)(x_j-x_i)$. Nhóm dùng $q=\num{0.25},\num{0.5},\num{0.75}$ để tính $Q_1$, trung vị và $Q_3$. Khoảng $[Q_1;Q_3]$ mô tả nửa giữa của phân bố theo các phân vị nội suy, còn độ rộng khoảng tứ phân vị (IQR) là $Q_3-Q_1$. Các đoạn sai số trong hình biểu thị khoảng này.
@@ -135,11 +135,11 @@ if (atomic_exchange_explicit(&visited[v], 1u,
 \end{algorithm}
 
 \subsection{Optimized: ghép các bộ đệm riêng}
-Ở Optimized, luồng $t$ ghi đỉnh mới vào bộ đệm riêng theo luồng (thread-local buffer) $L_t$ và đặt lại số phần tử khi bắt đầu tầng. Bộ đệm có thể tăng dung lượng và được tái sử dụng ở tầng sau. Khi vòng lặp duyệt kết thúc, một luồng tính độ dời
+Ở Optimized, luồng $t$ ghi đỉnh mới vào bộ đệm riêng theo luồng (thread-local buffer) $L_t$ và đặt lại số phần tử khi bắt đầu tầng. Bộ đệm có thể tăng dung lượng và được tái sử dụng ở tầng sau. Khi vòng lặp duyệt kết thúc, một luồng tính chỉ số bắt đầu của từng đoạn ghi
 \[
  o_0=0,\qquad o_t=\sum_{j=0}^{t-1}|L_j|,\qquad |F'|=o_p.
 \]
-Sau khi các độ dời đã được công bố, mỗi luồng chép bộ đệm của mình vào đoạn $[o_t,o_{t+1})$ của $F'$. Một rào tường minh bảo đảm mọi đoạn đã được chép trước khi hoán đổi tập đỉnh biên. Thuật toán~\ref{alg:opt} liệt kê năm rào mỗi tầng trong mỗi tầng được xử lý đầy đủ.
+Sau khi các chỉ số bắt đầu đã được xác định, mỗi luồng chép bộ đệm của mình vào đoạn $[o_t,o_{t+1})$ của $F'$. Một rào tường minh bảo đảm mọi đoạn đã được chép trước khi hoán đổi tập đỉnh biên. Thuật toán~\ref{alg:opt} sử dụng năm rào đồng bộ trong mỗi tầng được xử lý hoàn chỉnh.
 
 \begin{algorithm}[htbp]
 \caption{BFS OpenMP với bộ đệm theo luồng (Optimized)}
@@ -171,11 +171,11 @@ Sau khi các độ dời đã được công bố, mỗi luồng chép bộ đ�
 \label{fig:design}
 \end{figure}
 
-Hình~\ref{fig:design} tách các pha phải hoàn tất trước khi chuyển sang pha kế tiếp. Basic xin chỉ số ghi trong khi duyệt. Optimized dời bước ghép đến sau khi biết kích thước từng bộ đệm và cần thêm hai rào. Bảng~\ref{tab:design} tóm tắt các thao tác làm nên sự khác biệt.
+Hình~\ref{fig:design} tách các pha phải hoàn tất trước khi chuyển sang pha kế tiếp. Basic cấp chỉ số ghi ngay khi phát hiện đỉnh mới. Optimized ghép các bộ đệm sau khi xác định số phần tử của từng luồng, do đó cần thêm hai rào đồng bộ. Bảng~\ref{tab:design} tóm tắt các thao tác làm nên sự khác biệt.
 
 \begin{table}[htbp]
 \centering
-\caption[So sánh thiết kế OpenMP]{So sánh thiết kế trên đường thực thi thành công của một tầng}
+\caption[So sánh thiết kế OpenMP]{So sánh các thao tác khi xử lý một tầng}
 \label{tab:design}
 \begin{tabularx}{\textwidth}{@{}p{.27\textwidth}XX@{}}
 \toprule
@@ -192,7 +192,7 @@ Rào mỗi tầng & 3 rào ngầm & 4 rào ngầm, 1 rào tường minh \\
 
 \section{Phân tích tính đúng đắn và chi phí}
 \subsection{Bất biến và thứ tự bộ nhớ}
-Thao tác với \texttt{memory\_order\_relaxed} bảo đảm đúng một luồng nhận cờ cũ bằng $0$ và ghi $d[v]$. Các luồng còn lại bỏ qua $v$ mà không đọc $d[v]$ trong tầng đó. Basic cấp chỉ số riêng bằng phép tăng nguyên tử. Optimized dùng các đoạn riêng xác định bằng tổng tiền tố.
+Tính nguyên tử của phép \texttt{atomic\_exchange\_explicit} bảo đảm chỉ một luồng nhận giá trị cờ cũ bằng $0$ và ghi $d[v]$. Thứ tự bộ nhớ \texttt{memory\_order\_relaxed} đủ cho việc xác nhận đỉnh mới vì sự đồng bộ giữa các pha được thực hiện bằng các rào OpenMP. Các luồng còn lại bỏ qua $v$ mà không đọc $d[v]$ trong tầng đó. Basic cấp chỉ số riêng bằng phép tăng nguyên tử. Optimized dùng các đoạn riêng xác định bằng tổng tiền tố.
 
 Rào OpenMP bảo đảm việc ghi $d$ và tập đỉnh biên hoàn tất trước khi các luồng đọc dữ liệu ở pha sau. Hai cách tập hợp sinh cùng tập $F'$ theo lập luận ở Mục~\ref{sec:layers}. Bất biến về khoảng cách của các đỉnh trong $F$ vì thế được duy trì đến khi không còn tầng mới.
 

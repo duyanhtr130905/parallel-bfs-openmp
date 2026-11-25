@@ -1,11 +1,11 @@
-\subsection{Khảo sát theo số luồng}
+\subsection{Đánh giá khả năng mở rộng theo số luồng}
 \label{sec:scaling}
-Phiên riêng ngày 25/11 dùng lại đường đi, vòng có cung ngẫu nhiên và phân tầng hoán vị sau khi xác minh SHA-256 của danh sách cung và đối chiếu hồ sơ các tầng. Mỗi đồ thị có 11 cấu hình, gồm Serial một luồng và hai bản OpenMP với $p\in\{1,2,4,8,12\}$, lịch tĩnh. Thứ tự cấu hình xoay giữa các vòng. Phiên hoàn thành 66 lượt khởi động và 396 mẫu chính thức. Mỗi lượt đều được kiểm tra bằng mảng khoảng cách tham chiếu và số luồng thực tế. Mốc Serial được đo cùng phiên.
+Để đánh giá khả năng mở rộng, nhóm lựa chọn ba đồ thị đại diện cho các dạng phân bố công việc khác nhau: đường đi (nhiều tầng hẹp), vòng có cung ngẫu nhiên (cấu trúc không đều) và phân tầng hoán vị (nhiều cung trên các tầng rộng). Các đầu vào được xác nhận giống hệt dữ liệu đã dùng trong phép so sánh tám luồng bằng SHA-256 của danh sách cung và hồ sơ các tầng. Mỗi đồ thị có 11 cấu hình, gồm Serial một luồng và hai bản OpenMP với $p\in\{1,2,4,8,12\}$, lịch tĩnh. Thứ tự cấu hình xoay giữa các vòng. Tổng cộng có 66 lượt khởi động và 396 mẫu chính thức. Mỗi lượt đều được kiểm tra bằng mảng khoảng cách tham chiếu và số luồng thực tế. Thời gian Serial được đo lại trong cùng thực nghiệm để làm mốc tính hệ số tăng tốc.
 
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=.95\textwidth]{figures/thread-scaling.pdf}
-\caption[Thời gian và hệ số theo số luồng]{Phiên khảo sát luồng với 12 mẫu chính thức mỗi cấu hình. Hàng trên là trung vị và khoảng $[Q_1,Q_3]$. Hai hàng dưới lần lượt dùng Serial và OpenMP một luồng làm mốc. Các trục đứng dùng thang logarit.}
+\caption[Thời gian và hệ số theo số luồng]{Khả năng mở rộng của các phiên bản OpenMP với 12 mẫu chính thức mỗi cấu hình. Hàng trên là trung vị và khoảng $[Q_1,Q_3]$. Hai hàng dưới lần lượt dùng Serial và OpenMP một luồng làm mốc. Các trục đứng dùng thang logarit.}
 \label{fig:scaling}
 \end{figure}
 

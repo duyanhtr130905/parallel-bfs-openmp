@@ -13,12 +13,12 @@ Chúng em cảm ơn TS Nguyễn Hải Vinh đã hướng dẫn học phần Tín
 Nhóm sinh viên thực hiện
 \end{flushright}
 
-\frontsection{Tóm tắt}
-Duyệt đồ thị theo chiều rộng (Breadth-First Search, BFS) tìm khoảng cách ngắn nhất từ một đỉnh nguồn trên đồ thị không trọng số. Nhóm cài đặt ba phiên bản sử dụng cùng biểu diễn CSR trên CPU đa lõi: BFS tuần tự (Serial), OpenMP Basic dùng bộ đếm nguyên tử chung và OpenMP Optimized dùng bộ đệm riêng theo luồng kết hợp tổng tiền tố. Mỗi lời gọi được kiểm tra bằng toàn bộ mảng khoảng cách.
+\frontsection{Tóm tắt nội dung}
+Duyệt đồ thị theo chiều rộng (Breadth-First Search, BFS) là một thuật toán cơ bản trong lý thuyết đồ thị, được sử dụng để tìm khoảng cách ngắn nhất từ một đỉnh nguồn đến các đỉnh còn lại trên đồ thị không trọng số. Bài tập lớn tập trung nghiên cứu khả năng song song hóa BFS trên kiến trúc bộ nhớ chia sẻ bằng OpenMP. Nhóm triển khai ba phiên bản trên cùng cấu trúc dữ liệu CSR: BFS tuần tự (Serial), BFS song song sử dụng bộ đếm nguyên tử chung (Basic) và BFS song song sử dụng bộ đệm riêng theo luồng kết hợp tổng tiền tố (Optimized).
 
-Trên 12 đồ thị tổng hợp, Serial có trung vị thấp nhất ở 7 đồ thị. Optimized đứng đầu ở 5 đồ thị còn lại, với hệ số tăng tốc từ \num{1.17} đến \num{2.35} ở cấu hình tám luồng, lịch tĩnh. Mức \num{2.35} trên cây nhị phân lớn nhạy với mốc thời gian Serial. Đồ thị sao cho thấy một tầng có nhiều đỉnh vẫn có thể ít việc để chia nếu các cung cần xét tập trung ở tầng nguồn.
+Tính đúng đắn của các phiên bản được kiểm tra thông qua toàn bộ mảng khoảng cách. Kết quả thực nghiệm trên 12 đồ thị tổng hợp cho thấy phiên bản tuần tự có thời gian trung vị thấp nhất trên 7 đồ thị, trong khi Optimized đạt kết quả tốt nhất trên 5 đồ thị còn lại. Với tám luồng và lịch tĩnh, hệ số tăng tốc của Optimized trên năm đồ thị này nằm trong khoảng \num{1.17}--\num{2.35} lần. Giá trị cao nhất trên cây nhị phân lớn chịu ảnh hưởng của độ phân tán thời gian tuần tự.
 
-Trong phép đo theo số luồng riêng, Optimized đạt trung vị tốt nhất với 12 luồng trên vòng có cung ngẫu nhiên và đồ thị phân tầng hoán vị. Trên đường đi, tăng số luồng làm cả hai bản OpenMP chậm hơn. Kết quả gắn với bộ đồ thị, môi trường và cấu hình đã khảo sát.
+Khảo sát khả năng mở rộng trên ba đồ thị đại diện cho thấy việc tăng số luồng không nhất thiết làm giảm thời gian thực thi. Optimized đạt trung vị thấp nhất ở 12 luồng trên đồ thị vòng có cung ngẫu nhiên và đồ thị phân tầng hoán vị, nhưng cả hai phiên bản song song đều chậm hơn khi tăng số luồng trên đồ thị đường đi. Qua đó, nhóm nhận thấy hiệu quả song song hóa BFS phụ thuộc vào cấu trúc các tầng, lượng cung cần xử lý và chi phí đồng bộ; các kết quả này được giới hạn trong phạm vi cấu hình và dữ liệu đã khảo sát.
 
 \begingroup\fontsize{11}{13}\selectfont\singlespacing\tableofcontents\endgroup
 \listmedia

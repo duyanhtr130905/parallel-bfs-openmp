@@ -44,7 +44,7 @@ def comparison(directory):
                 detail.append([name if algo == "serial" else "", LABELS[algo], record["n"],
                                *(f"{record[key]:.5f}" for key in ("q1", "median", "q3", "iqr", "min", "max"))])
         table(directory, f"statistics-{day}", detail)
-        combined.append(r"\textbf{" + day + r"/11/2026} & {} & {} & {} & {} & {} \\")
+        combined.append(r"\textbf{Nhóm " + ("A" if day == "24" else "B") + r"} & {} & {} & {} & {} & {} \\")
         combined.extend(" & ".join(row) + r" \\" for row in overview)
         combined.append(r"\midrule" if day == "24" else r"\bottomrule")
     (directory / "comparison.tex").write_text("\n".join(combined) + "\n",

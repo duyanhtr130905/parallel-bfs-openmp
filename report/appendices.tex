@@ -2,7 +2,7 @@
 \label{app:reproduce}
 
 \section{Mã và dữ liệu sử dụng}
-Ba phiên dùng mã BFS lần lượt tại \texttt{fb990bf}, \texttt{0d5a53b} và \texttt{11b86b5}. Thư mục \path{results/} lưu CSV ngày 24/11, kế hoạch và nhật ký của phiên 25/11 và phiên khảo sát luồng.
+Thực nghiệm nhóm A (24/11/2026), nhóm B (25/11/2026) và khảo sát số luồng (25/11/2026) sử dụng mã BFS lần lượt tại \texttt{fb990bf}, \texttt{0d5a53b} và \texttt{11b86b5}. Thư mục \path{results/} lưu dữ liệu gốc, kế hoạch, manifest và nhật ký điều kiện đo. Các ngày đo được ghi tại đây để đối chiếu dữ liệu, không dùng làm tiêu chí phân tích hiệu năng.
 
 \section{Lệnh biên dịch và chạy trên máy của nhóm}
 Đặt trình đo cùng cây mã BFS nêu trên và chạy từ thư mục gốc. Trên Windows, dùng GCC và libgomp của MSYS2 UCRT64. Lệnh PowerShell sau ghi tệp mới cho phiên lặp.
@@ -19,7 +19,7 @@ cmd /c ".\benchmark_six_graphs.exe > benchmark_repeat.csv"
 if ($LASTEXITCODE -ne 0) { throw 'Loi phep do' }
 \end{verbatim}
 \end{quote}
-Để lặp phiên 25/11 hoặc khảo sát luồng, chạy \path{scripts/run_supplement.py} hoặc \path{scripts/run_scaling.py} với \texttt{--commit} và \texttt{--output} trỏ tới thư mục mới. Mỗi manifest lưu cấu hình lúc chạy và SHA-256 của đầu vào, mã, nhị phân và dữ liệu.
+Để lặp phép đo nhóm B hoặc khảo sát số luồng, chạy \path{scripts/run_supplement.py} hoặc \path{scripts/run_scaling.py} với \texttt{--commit} và \texttt{--output} trỏ tới thư mục mới. Mỗi manifest lưu cấu hình lúc chạy và SHA-256 của đầu vào, mã, nhị phân và dữ liệu.
 
 \section{Tạo lại bảng, hình và báo cáo}
 Quy trình cần Python với Matplotlib và \texttt{psutil}, cùng XeLaTeX và BibTeX.
@@ -42,7 +42,7 @@ Các thống kê có thêm chữ số so với Bảng~\ref{tab:results} để th
 \begin{table}[H]
 \centering\footnotesize
 \setlength{\tabcolsep}{2.3pt}
-\caption{Thống kê chi tiết theo ms, ngày 24/11}
+\caption{Thống kê chi tiết thời gian (ms) của nhóm A}
 \label{tab:quartiles}
 \begin{tabularx}{\textwidth}{@{}Yl r *{6}{S[table-format=4.5]}@{}}
 \toprule
@@ -55,7 +55,7 @@ Các thống kê có thêm chữ số so với Bảng~\ref{tab:results} để th
 \begin{table}[H]
 \centering\footnotesize
 \setlength{\tabcolsep}{2.3pt}
-\caption{Thống kê chi tiết theo ms, ngày 25/11}
+\caption{Thống kê chi tiết thời gian (ms) của nhóm B}
 \label{tab:quartiles-new}
 \begin{tabularx}{\textwidth}{@{}Yl r *{6}{S[table-format=3.5]}@{}}
 \toprule

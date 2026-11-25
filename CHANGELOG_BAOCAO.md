@@ -130,3 +130,8 @@ powercfg /getactivescheme
 - Bản bàn giao có 39 trang, ba chương, 11 hình, 11 bảng và 10 mục tham khảo. SHA-256 PDF là `9c692007d668bb3fc42a4f3d5d0753afaa9ec3057a6bf2e9100bc0fb617be407`. Cấu hình bìa và ngày ký giữ theo bản gốc.
 - UCRT64 đã chạy build, test, check-openmp, test-plots và test-supplement. Windows thiếu lệnh xelatex độc lập, nên bản PDF cục bộ được biên dịch bằng XeTeX và BibTeX đi kèm Tectonic, với cùng font Latin Modern Roman và gói TeX đã có. Quy trình XeLaTeX/BibTeX của Makefile được giữ để chạy trên CI.
 
+
+## Biên tập học thuật (25/11/2026)
+
+- Tổ chức nội dung theo bài toán, cấu trúc đồ thị, so sánh hiệu năng và khả năng mở rộng; thời điểm đo được ghi trong phụ lục tái lập.
+- Giữ ba chương, toàn bộ hình, dữ liệu gốc, thuật toán và danh mục tài liệu; sửa diễn đạt về phép nguyên tử và đồng bộ, ghi rõ cờ biên dịch và điều kiện đo.

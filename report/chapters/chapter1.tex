@@ -1,10 +1,10 @@
-\chapter{Tổng quan và phát biểu bài toán}
+\chapter{Mở đầu}
 \label{chap:intro}
 
-\section{Bối cảnh và động lực}
-BFS trả lời câu hỏi một đỉnh cách nguồn bao nhiêu bước. Khi mạng liên kết được biểu diễn bằng đồ thị không trọng số, mỗi bước có thể tương ứng với một chặng định tuyến hoặc một liên kết giữa hai đối tượng. Trên đồ thị lớn, lượng cung phải xét có thể vượt xa số đỉnh ở tầng đầu tiên \cite{clrs2022}.
+\section{Giới thiệu bài toán}
+Trong nhiều bài toán như định tuyến mạng, phân tích mạng xã hội và tìm kiếm trạng thái, dữ liệu có thể được biểu diễn dưới dạng đồ thị. BFS là phương pháp duyệt theo từng lớp khoảng cách tính từ đỉnh nguồn. Đối với đồ thị không trọng số, phương pháp này xác định khoảng cách ngắn nhất bằng số cung trên đường đi. Khi kích thước đồ thị tăng, việc duyệt các danh sách kề có thể tiêu tốn đáng kể thời gian và tài nguyên bộ nhớ \cite{clrs2022}.
 
-Các đỉnh cùng tầng có thể được xét đồng thời, nhưng hai luồng có thể gặp cùng một đỉnh mới hoặc nhận số cung phải xử lý rất khác nhau. Nhóm dùng OpenMP để khảo sát hai vấn đề đó trên CPU đa lõi có bộ nhớ chia sẻ. Các phiên bản dùng chung CSR và chỉ khác cách tổ chức duyệt, từ đó tập trung phép so sánh vào việc chia công việc, phát hiện đỉnh và chuẩn bị tầng kế tiếp.
+Các đỉnh ở cùng một tầng có thể được xử lý đồng thời. Tuy nhiên, việc song song hóa BFS đặt ra hai vấn đề: nhiều luồng có thể cùng phát hiện một đỉnh chưa thăm, và khối lượng công việc của các luồng có thể mất cân bằng do sự khác biệt về bậc ra. OpenMP được lựa chọn vì phù hợp với kiến trúc CPU đa lõi có bộ nhớ chia sẻ và cho phép tổ chức các vùng song song trực tiếp trong chương trình C. Để đánh giá ảnh hưởng của cách tổ chức thuật toán, cả ba phiên bản sử dụng chung biểu diễn đồ thị CSR.
 
 \section{Các nghiên cứu liên quan}
 \subsection{Đổi hướng duyệt}
@@ -45,8 +45,8 @@ Nhóm kiểm tra toàn bộ mảng khoảng cách sau mỗi lời gọi và dùn
 Câu hỏi thứ ba được trả lời bằng cách đối chiếu cấu trúc, thời gian tổng và mã thực thi. Mức đóng góp riêng của từng yếu tố cần thí nghiệm kiểm soát tương ứng.
 
 \section{Phạm vi và phương pháp}
-Nhóm khảo sát 12 đồ thị tổng hợp, mỗi đồ thị dùng nguồn $s=0$. Hai phiên so sánh dùng cùng cấu hình luồng. Phiên riêng khảo sát 1, 2, 4, 8 và 12 luồng trên ba đầu vào đã xác định. Trung vị mô tả thời gian điển hình, còn khoảng giữa hai tứ phân vị thể hiện độ phân tán. Chương~\ref{chap:experiment} mô tả cách kiểm chứng toàn bộ mảng khoảng cách trong mỗi phiên.
+Nhóm khảo sát 12 đồ thị tổng hợp, mỗi đồ thị dùng nguồn $s=0$. Thực nghiệm so sánh ba phiên bản sử dụng tám luồng cho hai bản OpenMP. Ngoài ra, khả năng mở rộng được đánh giá tại 1, 2, 4, 8 và 12 luồng trên ba đồ thị đại diện. Trung vị mô tả thời gian điển hình, còn khoảng giữa hai tứ phân vị thể hiện độ phân tán. Chương~\ref{chap:experiment} mô tả cách kiểm chứng toàn bộ mảng khoảng cách trong mỗi phiên.
 
 \section{Đóng góp và bố cục}
-Nhóm triển khai ba cách tổ chức BFS, xây dựng hai bộ đồ thị có thể tái tạo và đánh giá hiệu năng theo cấu trúc đầu vào và số luồng. Chương~\ref{chap:design} trình bày bất biến và thiết kế. Chương~\ref{chap:experiment} phân tích thời gian, độ phân tán và độ nhạy theo mốc Serial. Các phụ lục lưu lệnh tái lập và thống kê chi tiết.
+Nhóm triển khai ba phiên bản BFS, xây dựng bộ dữ liệu gồm 12 đồ thị có thể tái tạo và đánh giá hiệu năng theo cấu trúc đầu vào và số luồng. Chương~\ref{chap:design} trình bày bất biến và thiết kế. Chương~\ref{chap:experiment} phân tích thời gian, độ phân tán và độ nhạy theo mốc Serial. Các phụ lục lưu lệnh tái lập và thống kê chi tiết.
 
