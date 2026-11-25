@@ -1,0 +1,57 @@
+\chapter{Tái lập thí nghiệm}
+\label{app:reproduce}
+
+\section{Mã và dữ liệu sử dụng}
+Mã BFS trong \href{https://github.com/duyanhtr130905/parallel-bfs-openmp}{kho mã Parallel BFS}
+được lấy tại commit
+\href{https://github.com/duyanhtr130905/parallel-bfs-openmp/commit/fb990bf2ddb3adb6bac5e218ef32fd40adfc35cd}{\texttt{fb990bf}}.
+Lịch sử dự án lưu bộ dữ liệu thực nghiệm khác để đối chiếu khi cần.
+\begin{itemize}
+\item Trình đo \path{scripts/benchmark_six_graphs.c}.
+\item Số liệu \path{results/experiment-20261124/raw.csv}.
+\end{itemize}
+
+\section{Lệnh biên dịch và chạy trên máy của nhóm}
+Đặt trình đo cùng cây mã BFS nêu trên và chạy từ thư mục gốc. Trên Windows, dùng GCC và libgomp của MSYS2 UCRT64. Lệnh PowerShell sau ghi tệp mới cho phiên lặp.
+\begin{quote}\small\singlespacing
+\begin{verbatim}
+$flags = '-O2','-std=c11','-Wall','-Wextra','-Werror',
+    '-fopenmp','-Iinclude','-Isrc'
+$files = 'scripts/benchmark_six_graphs.c','src/graph.c',
+    'src/bfs_serial.c','src/bfs_parallel_basic.c',
+    'src/bfs_parallel_optimized.c'
+gcc @flags @files -o benchmark_six_graphs.exe
+if ($LASTEXITCODE -ne 0) { throw 'Loi bien dich' }
+cmd /c ".\benchmark_six_graphs.exe > benchmark_repeat.csv"
+if ($LASTEXITCODE -ne 0) { throw 'Loi phep do' }
+\end{verbatim}
+\end{quote}
+Khi lặp phép đo, ghi lại cấu hình thực tế tại thời điểm chạy và giữ từng tệp CSV theo phiên riêng. Trên một máy khác, kết quả thu được thuộc một môi trường khác và cần trình bày riêng.
+
+\section{Tạo lại bảng, hình và báo cáo}
+Từ gốc thư mục bàn giao, chạy \texttt{make tables} để tạo bảng với Python,
+\texttt{make figures} để tạo PDF vector với Matplotlib và TikZ.
+Lệnh \texttt{make report} cập nhật các bảng, hình rồi sinh \path{report/main.pdf}
+bằng XeLaTeX và BibTeX. Kịch bản \path{scripts/benchmark_extended.py}
+dành cho phép đo mở rộng. Tài liệu kèm mã nguồn ghi cách gọi.
+
+\chapter{Thống kê đầy đủ của từng cấu hình}
+\label{app:quartiles}
+Bảng~\ref{tab:quartiles} ghi thời gian của 18 cặp đồ thị và phiên bản.
+Mỗi hàng dùng đúng 12 mẫu chính thức. Hai cột cực trị cho biết phạm vi mẫu,
+còn cột IQR đo bề rộng của khoảng giữa hai tứ phân vị.
+Các thống kê có thêm chữ số so với Bảng~\ref{tab:results} để thuận tiện đối chiếu.
+
+\begin{table}[!htbp]
+\centering\footnotesize
+\setlength{\tabcolsep}{3pt}
+\caption[Tứ phân vị và cực trị thời gian]{Tứ phân vị, độ rộng IQR và cực trị thời gian (ms)}
+\label{tab:quartiles}
+\begin{tabular}{@{}ll *{6}{S[table-format=4.5]}@{}}
+\toprule
+Đồ thị & Bản BFS & {$Q_1$} & {Trung vị} & {$Q_3$} & {IQR} & {Min} & {Max} \\
+\midrule
+\input{generated/quartiles}
+\end{tabular}
+\end{table}
+

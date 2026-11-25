@@ -44,3 +44,23 @@ Optimized đạt **2,35×** trên cây nhị phân lớn và **1,26×** trên c�
 ## Báo cáo
 
 Mã LaTeX ở [report/](report/). Chạy `make report` với XeLaTeX và BibTeX để tạo `report/main.pdf`. Báo cáo có ba chương. Xem thêm [giao diện lập trình](docs/CONTRACT.md) và [thiết kế](docs/ARCHITECTURE.md).
+
+[Bản PDF bàn giao](report/published/main.pdf) và [nhật ký biên tập](CHANGELOG_BAOCAO.md).
+Dùng `make tables` để tái tạo bảng từ CSV gốc. Dùng `make figures` để tái tạo hình với Python 3.11+, Matplotlib và XeLaTeX.
+
+## Phép đo mở rộng
+
+Xem kế hoạch mà chưa gọi BFS:
+
+```powershell
+python scripts/benchmark_extended.py
+```
+
+Trên máy của nhóm, dùng bản CLI đã biên dịch từ commit đo. Cung cấp edge list SNAP gốc dạng văn bản hoặc gzip từ [roadNet-CA](https://snap.stanford.edu/data/roadNet-CA.html) và [web-Stanford](https://snap.stanford.edu/data/web-Stanford.html).
+
+```powershell
+python scripts/benchmark_extended.py --run --bfs build/bfs.exe --road roadNet-CA.txt.gz --web web-Stanford.txt.gz --output extended.jsonl
+```
+
+Script ánh xạ các nhãn đỉnh xuất hiện trong edge list về một đoạn liên tiếp. Mỗi đồ thị dùng ba nguồn theo thứ tự nhãn gốc. roadNet-CA giữ ngữ nghĩa vô hướng, còn web-Stanford giữ hướng cung. Mỗi cặp đồ thị và nguồn dùng hai vòng khởi động, 12 vòng chính thức và thứ tự cấu hình xáo bằng hạt giống cố định. Mốc Serial dùng một luồng. Hai bản OpenMP thử sáu số luồng và ba chính sách lập lịch. Script tạo tệp kết quả mới và để nguyên CSV ngày 24/11/2026.
+

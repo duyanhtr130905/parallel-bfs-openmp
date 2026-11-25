@@ -48,6 +48,14 @@ check-openmp:
 	$(CC) $(CFLAGS) tests/openmp_probe.c $(LDFLAGS) $(LDLIBS) -o build/openmp_probe$(EXEEXT)
 	./build/openmp_probe$(EXEEXT) --strict
 	$(PYTHON) tests/test_openmp_probe.py build/openmp_probe$(EXEEXT)
+.PHONY: tables figures
+tables:
+	$(PYTHON) scripts/analysis/summarize.py
+
+figures:
+	$(PYTHON) scripts/figures/plot.py
+	$(PYTHON) scripts/figures/render_tikz.py
+
 report:
 	cd report && xelatex -interaction=nonstopmode -halt-on-error main.tex
 	cd report && bibtex main

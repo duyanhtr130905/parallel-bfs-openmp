@@ -82,7 +82,7 @@ jobs:
           set -euo pipefail
           sources="$RUNNER_TEMP/report-ubuntu.list"
           apt_options=(-o "Dir::Etc::sourcelist=$sources" -o Dir::Etc::sourceparts=- -o Acquire::Retries=1)
-          packages=(texlive-xetex texlive-latex-extra texlive-fonts-recommended)
+          packages=(texlive-xetex texlive-latex-extra texlive-fonts-recommended texlive-science)
           keyring=/usr/share/keyrings/ubuntu-archive-keyring.gpg
 
           # Keep a slow regional mirror from consuming the entire job timeout.

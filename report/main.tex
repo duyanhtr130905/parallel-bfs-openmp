@@ -1,32 +1,58 @@
 \input{preamble}
 \begin{document}
+\hypersetup{pageanchor=false}
 \input{bia}
 \pagenumbering{roman}
-\chapter*{Tóm tắt}
-\addcontentsline{toc}{chapter}{Tóm tắt}
-Nhóm triển khai tìm kiếm theo chiều rộng (BFS) trên CPU đa lõi bằng ba phiên bản Serial, OpenMP Basic và OpenMP Optimized. Cả ba dùng cùng biểu diễn CSR và trả khoảng cách ngắn nhất từ một nguồn trên đồ thị không trọng số. Hai phiên bản OpenMP khác nhau ở cách thu tập đỉnh của mức kế tiếp. Nhóm kiểm chứng đầu ra bằng oracle độc lập và đo thời gian thực quanh một lời gọi BFS để so sánh trung vị, khoảng tứ phân vị, speedup, efficiency và khả năng mở rộng.
+\hypersetup{pageanchor=true}
 
-Thực nghiệm trên laptop Intel Core i5-12450HX, Windows 11 và GCC/libgomp UCRT64 16.2.0 gồm sáu đồ thị Path, Star và Grid, chín phiên đo, 225 lượt khởi động và 2\,250 mẫu chính thức. Các lượt kiểm chứng và đo ghi nhận kết quả hợp lệ trong phạm vi đã thử. Windows dùng QueryPerformanceCounter để đo các lời gọi ngắn. Cả 216 cấu hình OpenMP đều chậm hơn Serial; speedup cao nhất là 0,2914 ở Optimized một luồng, static, trên Grid $512\times512$ nguồn 0. Optimized có trung vị thấp hơn Basic ở một số cấu hình và cao hơn ở các cấu hình khác. Kết luận áp dụng cho ma trận đã đo, với một lời gọi BFS trong mỗi tiến trình mới.
-\begingroup
-\fontsize{11}{13}\selectfont
-\singlespacing
-\tableofcontents
-\endgroup
-\clearpage
-\listoffigures
-\clearpage
-\listoftables
+\frontsection{Lời cảm ơn}
+Chúng em cảm ơn TS Nguyễn Hải Vinh đã hướng dẫn học phần Tính toán song song và góp ý về cách trình bày kết quả thực nghiệm. Chúng em cũng cảm ơn các thầy cô Khoa Toán -- Cơ -- Tin học đã trang bị kiến thức về thuật toán, lập trình và cấu trúc dữ liệu, giúp chúng em thực hiện bài tập lớn này.
+
+\begin{flushright}
+\textit{Hà Nội, thứ Ba, ngày 24 tháng 11 năm 2026}\\
+Nhóm sinh viên thực hiện
+\end{flushright}
+
+\frontsection{Tóm tắt}
+Duyệt đồ thị theo chiều rộng (BFS) xác định khoảng cách ngắn nhất từ một đỉnh nguồn trên đồ thị không trọng số. Việc xử lý nhiều đỉnh cùng tầng bằng OpenMP có thể rút ngắn thời gian duyệt, nhưng mỗi tầng cũng phát sinh công việc điều phối. Báo cáo khảo sát sự đánh đổi này qua ba phiên bản trên cùng biểu diễn CSR: Serial dùng hàng đợi, Basic ghi đỉnh mới qua một bộ đếm chung và Optimized tập hợp đỉnh mới trong bộ đệm riêng của từng luồng.
+
+Nhóm đo sáu đồ thị tổng hợp có hướng, lấy 12 mẫu chính thức cho mỗi cặp đồ thị và phiên bản, rồi báo cáo trung vị cùng khoảng giữa hai tứ phân vị. Serial có trung vị thấp nhất ở bốn trong sáu đồ thị. Trên chu trình, thang và lưới, bản OpenMP nhanh hơn trong hai bản vẫn mất khoảng 604 đến 30\,768 lần thời gian của Serial. Trên cây nhị phân lớn và cây bậc bốn lớn, Optimized đạt hệ số tăng tốc tương ứng 2,35 và 1,26. Trung vị Serial trên cây nhị phân lớn nhạy với sự phân tách giữa các vòng đo. Nếu dùng tứ phân vị dưới của Serial, hệ số tăng tốc của Optimized trên cây này còn khoảng 1,20.
+
+Kết quả thuộc một máy thử, với tám luồng OpenMP và chính sách lập lịch tĩnh.
+
+\begingroup\fontsize{11}{13}\selectfont\singlespacing\tableofcontents\endgroup
+\listmedia
+
+\frontsection{Danh mục viết tắt}
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+Ký hiệu & Nghĩa \\
+\midrule
+BFS & Duyệt theo chiều rộng (Breadth-First Search) \\
+CPU & Bộ xử lý trung tâm (Central Processing Unit) \\
+CSR & Dạng nén theo hàng (Compressed Sparse Row) \\
+FIFO & Vào trước, ra trước (First In, First Out) \\
+GCC & Bộ công cụ biên dịch GNU (GNU Compiler Collection) \\
+IQR & Độ rộng khoảng tứ phân vị (Interquartile Range) \\
+OMP & OpenMP, giao diện lập trình song song trên bộ nhớ chia sẻ \\
+QPC & Bộ đếm hiệu năng của Windows (QueryPerformanceCounter) \\
+RAM & Bộ nhớ truy cập ngẫu nhiên (Random Access Memory) \\
+\bottomrule
+\end{tabularx}
+
 \clearpage
 \pagenumbering{arabic}
-\include{chapters/chapter1}
-\include{chapters/chapter2}
-\include{chapters/chapter3}
+\input{chapters/chapter1}
+\input{chapters/chapter2}
+\input{chapters/chapter3}
 \bibliographystyle{plain}
+\cleardoublepage
 \phantomsection
 \addcontentsline{toc}{chapter}{Tài liệu tham khảo}
-\begingroup
-\small
-\raggedright
-\bibliography{references}
-\endgroup
+{\fontsize{11}{12.5}\selectfont\singlespacing\raggedright\bibliography{refs}}
+\appendix
+\titleformat{\chapter}[block]{\bfseries\centering\fontsize{16}{20}\selectfont}{Phụ lục \thechapter.}{1em}{}
+\renewcommand{\chaptername}{Phụ lục}
+\input{appendices}
 \end{document}
+

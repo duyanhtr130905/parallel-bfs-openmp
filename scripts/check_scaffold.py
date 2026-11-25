@@ -5,17 +5,19 @@ import re
 root = Path(__file__).resolve().parents[1]
 required = ['include/graph.h', 'include/bfs.h', 'include/status.h', 'src/main.c',
             'docs/CONTRACT.md', 'docs/ARCHITECTURE.md', 'docs/CONTRIBUTING.md',
-            'docs/EXPERIMENT_PROTOCOL.md', 'report/references.bib', 'Makefile']
+            'docs/EXPERIMENT_PROTOCOL.md', 'report/refs.bib', 'Makefile']
 for name in required:
     assert (root / name).is_file(), name
 main = (root / 'report/main.tex').read_text(encoding='utf-8')
-includes = re.findall(r'\\include\{([^}]+)\}', main)
-assert len(includes) == 3 and len(set(includes)) == 3, 'expected three chapter includes'
+includes = re.findall(r'\\(?:input|include)\{(chapters/[^}]+)\}', main)
+assert includes == ['chapters/chapter1', 'chapters/chapter2', 'chapters/chapter3'], (
+    'expected exactly three chapters in order'
+)
 for name in includes:
     chapter = root / 'report' / (name + '.tex')
     assert chapter.is_file(), name
     assert len(re.findall(r'^\\chapter\{', chapter.read_text(encoding='utf-8'), re.M)) == 1, name
-bib = (root / 'report/references.bib').read_text(encoding='utf-8')
+bib = (root / 'report/refs.bib').read_text(encoding='utf-8')
 keys = set(re.findall(r'@\w+\{([^,]+),', bib))
 for tex in (root / 'report').rglob('*.tex'):
     for group in re.findall(r'\\(?:cite|nocite)\{([^}]+)\}', tex.read_text(encoding='utf-8')):

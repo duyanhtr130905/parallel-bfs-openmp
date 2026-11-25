@@ -1,0 +1,20 @@
+\begin{tikzpicture}[x=2.20cm,y=1cm,>=Stealth,thick,
+  vertex/.style={circle,draw,fill=blue!7,minimum size=7mm,inner sep=0pt},
+  off/.style={vertex,fill=gray!12},font=\small]
+\node at (0,1.85) {Tầng $0$};
+\node at (1,1.85) {Tầng $1$};
+\node at (2,1.85) {Tầng $2$};
+\node at (3.6,1.85) {Ngoài phần tới được};
+\node[vertex] (v0) at (0,.65) {$0$};
+\node[vertex] (v1) at (1,1.15) {$1$};
+\node[vertex] (v2) at (1,.15) {$2$};
+\node[vertex] (v3) at (2,.65) {$3$};
+\node[off] at (3.6,1.15) {$4$};
+\node[off] at (3.6,.15) {$5$};
+\draw[->] (v0) -- (v1);
+\draw[->] (v0) -- (v2);
+\draw[->] (v1) -- (v3);
+\draw[->] (v2) -- (v3);
+\draw[densely dotted] (2.77,-.25) -- (2.77,2.1);
+\end{tikzpicture}
+
