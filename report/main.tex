@@ -1,32 +1,60 @@
 \input{preamble}
 \begin{document}
+\hypersetup{pageanchor=false}
 \input{bia}
 \pagenumbering{roman}
-\chapter*{Tóm tắt}
-\addcontentsline{toc}{chapter}{Tóm tắt}
-Nhóm triển khai tìm kiếm theo chiều rộng (BFS) trên CPU đa lõi bằng ba phiên bản Serial, OpenMP Basic và OpenMP Optimized. Cả ba dùng cùng biểu diễn CSR và trả khoảng cách ngắn nhất từ một nguồn trên đồ thị không trọng số. Hai phiên bản OpenMP khác nhau ở cách thu tập đỉnh của mức kế tiếp. Nhóm kiểm chứng đầu ra bằng oracle độc lập và đo thời gian thực quanh một lời gọi BFS để so sánh trung vị, khoảng tứ phân vị, speedup, efficiency và khả năng mở rộng.
+\hypersetup{pageanchor=true}
 
-Thực nghiệm trên laptop Intel Core i5-12450HX, Windows 11 và GCC/libgomp UCRT64 16.2.0 gồm sáu đồ thị Path, Star và Grid, chín phiên đo, 225 lượt khởi động và 2\,250 mẫu chính thức. Các lượt kiểm chứng và đo ghi nhận kết quả hợp lệ trong phạm vi đã thử. Windows dùng QueryPerformanceCounter để đo các lời gọi ngắn. Cả 216 cấu hình OpenMP đều chậm hơn Serial; speedup cao nhất là 0,2914 ở Optimized một luồng, static, trên Grid $512\times512$ nguồn 0. Optimized có trung vị thấp hơn Basic ở một số cấu hình và cao hơn ở các cấu hình khác. Kết luận áp dụng cho ma trận đã đo, với một lời gọi BFS trong mỗi tiến trình mới.
-\begingroup
-\fontsize{11}{13}\selectfont
-\singlespacing
-\tableofcontents
-\endgroup
-\clearpage
-\listoffigures
-\clearpage
-\listoftables
+\frontsection{Lời cảm ơn}
+Chúng em cảm ơn TS Nguyễn Hải Vinh đã hướng dẫn học phần Tính toán song song và góp ý về cách trình bày kết quả thực nghiệm. Chúng em cũng cảm ơn các thầy cô Khoa Toán -- Cơ -- Tin học đã trang bị kiến thức về thuật toán, lập trình và cấu trúc dữ liệu, giúp chúng em thực hiện bài tập lớn này.
+
+\begin{flushright}
+\textit{Hà Nội, thứ Ba, ngày 24 tháng 11 năm 2026}\\
+Nhóm sinh viên thực hiện
+\end{flushright}
+
+\frontsection{Tóm tắt nội dung}
+Duyệt đồ thị theo chiều rộng (Breadth-First Search, BFS) là một thuật toán cơ bản trong lý thuyết đồ thị, được sử dụng để tìm khoảng cách ngắn nhất từ một đỉnh nguồn đến các đỉnh còn lại trên đồ thị không trọng số. Bài tập lớn tập trung nghiên cứu khả năng song song hóa BFS trên kiến trúc bộ nhớ chia sẻ bằng OpenMP. Nhóm triển khai ba phiên bản trên cùng cấu trúc dữ liệu CSR: BFS tuần tự (Serial), BFS song song sử dụng bộ đếm nguyên tử chung (Basic) và BFS song song sử dụng bộ đệm riêng theo luồng kết hợp tổng tiền tố (Optimized).
+
+Tính đúng đắn của các phiên bản được kiểm tra thông qua toàn bộ mảng khoảng cách. Kết quả thực nghiệm trên 12 đồ thị tổng hợp cho thấy phiên bản tuần tự có thời gian trung vị thấp nhất trên 7 đồ thị, trong khi Optimized đạt kết quả tốt nhất trên 5 đồ thị còn lại. Với tám luồng và lịch tĩnh, hệ số tăng tốc của Optimized trên năm đồ thị này nằm trong khoảng \num{1.17}--\num{2.35} lần. Giá trị cao nhất trên cây nhị phân lớn chịu ảnh hưởng của độ phân tán thời gian tuần tự.
+
+Khảo sát khả năng mở rộng trên ba đồ thị đại diện cho thấy việc tăng số luồng không nhất thiết làm giảm thời gian thực thi. Optimized đạt trung vị thấp nhất ở 12 luồng trên đồ thị vòng có cung ngẫu nhiên và đồ thị phân tầng hoán vị, nhưng cả hai phiên bản song song đều chậm hơn khi tăng số luồng trên đồ thị đường đi. Qua đó, nhóm nhận thấy hiệu quả song song hóa BFS phụ thuộc vào cấu trúc các tầng, lượng cung cần xử lý và chi phí đồng bộ; các kết quả này được giới hạn trong phạm vi cấu hình và dữ liệu đã khảo sát.
+
+\begingroup\fontsize{11}{13}\selectfont\singlespacing\tableofcontents\endgroup
+\listmedia
+
+\frontsection{Danh mục viết tắt}
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+Ký hiệu & Nghĩa \\
+\midrule
+BFS & Duyệt theo chiều rộng (Breadth-First Search) \\
+CPU & Bộ xử lý trung tâm (Central Processing Unit) \\
+CSR & Dạng nén theo hàng (Compressed Sparse Row) \\
+FIFO & Vào trước, ra trước (First In, First Out) \\
+GCC & Bộ công cụ biên dịch GNU (GNU Compiler Collection) \\
+IQR & Độ rộng khoảng tứ phân vị (Interquartile Range) \\
+OMP & OpenMP, giao diện lập trình song song trên bộ nhớ chia sẻ \\
+QPC & Bộ đếm hiệu năng của Windows (QueryPerformanceCounter) \\
+RAM & Bộ nhớ truy cập ngẫu nhiên (Random Access Memory) \\
+\bottomrule
+\end{tabularx}
+
 \clearpage
 \pagenumbering{arabic}
-\include{chapters/chapter1}
-\include{chapters/chapter2}
-\include{chapters/chapter3}
+\input{chapters/chapter1}
+\input{chapters/chapter2}
+\input{chapters/chapter3}
 \bibliographystyle{plain}
+\cleardoublepage
 \phantomsection
 \addcontentsline{toc}{chapter}{Tài liệu tham khảo}
-\begingroup
-\small
-\raggedright
-\bibliography{references}
-\endgroup
+{\fontsize{10.5}{11.5}\selectfont\singlespacing\raggedright\interlinepenalty=10000
+\apptocmd{\thebibliography}{\setlength{\itemsep}{1.5pt}\setlength{\parsep}{0pt}}{}{}
+\bibliography{refs}}
+\appendix
+\titleformat{\chapter}[block]{\bfseries\centering\fontsize{16}{20}\selectfont}{Phụ lục \thechapter.}{1em}{}
+\renewcommand{\chaptername}{Phụ lục}
+\input{appendices}
 \end{document}
+

@@ -1,0 +1,17 @@
+Nhóm B được xây dựng nhằm khảo sát sự khác biệt giữa bề rộng tầng và lượng công việc thực tế. Đường đi có nhiều tầng hẹp; đồ thị sao có một đỉnh bậc ra lớn; hai lưới vô hướng tách rời kiểm tra khả năng xử lý đồ thị không liên thông. Ba đồ thị còn lại cung cấp nhiều cung hơn cho các tầng có nhiều đỉnh. \texttt{ring-random} ghép một vòng có hướng với sáu cung ngẫu nhiên phân biệt đi ra từ mỗi đỉnh. Hai đồ thị phân tầng xáo nhãn đỉnh. \texttt{layered-overlap} tập trung nhiều cung vào một nhóm nhỏ đỉnh ở tầng kế tiếp, còn \texttt{layered-permuted} dùng các phép dịch vòng để phân bố cung đều hơn. Quy tắc sinh, kích thước và hạt giống được xác định trước khi tiến hành đo để bảo đảm khả năng tái lập. Do không tải được dữ liệu SNAP trong môi trường thực nghiệm, phạm vi khảo sát được giới hạn ở các đồ thị tổng hợp. Các nghiên cứu chuẩn hóa benchmark như GAP cung cấp tiền lệ cho việc công bố cả quy tắc đầu vào và phương pháp đánh giá \cite{gap2015}.
+
+Bảng~\ref{tab:supplement-graphs} dùng $m_{\mathrm{in}}$ cho số liên kết đầu vào. Hai lưới rời có \num{65024} cạnh và \num{130048} cung trong CSR. Từ nguồn, BFS tới \num{16384} đỉnh và xét \num{65024} cung. Trên đồ thị có hướng, mỗi liên kết đầu vào là một cung. Hạt giống của vòng có cung ngẫu nhiên, phân tầng hội tụ và phân tầng hoán vị lần lượt là \num{34178}, \num{39014} và \num{46029}.
+
+\begin{table}[!htbp]
+\centering\footnotesize
+\setlength{\tabcolsep}{3pt}
+\caption{Đặc trưng của sáu đồ thị nhóm B với nguồn $s=0$}
+\label{tab:supplement-graphs}
+\begin{tabular}{@{}ll S[table-format=7.0] S[table-format=7.0] S[table-format=7.0]
+S[table-format=3.0] S[table-format=6.0]@{}}
+\toprule
+Đồ thị & Hướng & {$n$} & {$m_{\mathrm{in}}$} & {Tới được} & {Tầng} & {Rộng nhất} \\
+\midrule
+\input{generated/supplement-graphs}
+\end{tabular}
+\end{table}

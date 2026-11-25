@@ -28,8 +28,12 @@ jobs:
       - name: Verify optional plotting tools with synthetic unit fixtures
         run: |
           python3 -m venv build/plot-venv
-          build/plot-venv/bin/python -m pip install matplotlib
-          make PYTHON=build/plot-venv/bin/python test-plots
+          build/plot-venv/bin/python -m pip install matplotlib psutil
+          make PYTHON=build/plot-venv/bin/python test-plots test-supplement test-review
+      - name: Verify regenerated report tables from committed samples
+        run: |
+          make PYTHON=build/plot-venv/bin/python tables supplement-artifacts review-artifacts
+          git diff --exit-code -- report/generated/
 
   windows:
     name: bootstrap-windows-ucrt64
@@ -82,7 +86,7 @@ jobs:
           set -euo pipefail
           sources="$RUNNER_TEMP/report-ubuntu.list"
           apt_options=(-o "Dir::Etc::sourcelist=$sources" -o Dir::Etc::sourceparts=- -o Acquire::Retries=1)
-          packages=(texlive-xetex texlive-latex-extra texlive-fonts-recommended)
+          packages=(texlive-xetex texlive-latex-extra texlive-fonts-recommended texlive-science)
           keyring=/usr/share/keyrings/ubuntu-archive-keyring.gpg
 
           # Keep a slow regional mirror from consuming the entire job timeout.

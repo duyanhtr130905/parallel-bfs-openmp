@@ -1,0 +1,87 @@
+\chapter{Tái lập thí nghiệm}
+\label{app:reproduce}
+
+\section{Mã và dữ liệu sử dụng}
+Thực nghiệm nhóm A (24/11/2026), nhóm B (25/11/2026) và khảo sát số luồng (25/11/2026) sử dụng mã BFS lần lượt tại \texttt{fb990bf}, \texttt{0d5a53b} và \texttt{11b86b5}. Thư mục \path{results/} lưu dữ liệu gốc, kế hoạch, manifest và nhật ký điều kiện đo. Các ngày đo được ghi tại đây để đối chiếu dữ liệu, không dùng làm tiêu chí phân tích hiệu năng.
+
+\section{Lệnh biên dịch và chạy trên máy của nhóm}
+Đặt trình đo cùng cây mã BFS nêu trên và chạy từ thư mục gốc. Trên Windows, dùng GCC và libgomp của MSYS2 UCRT64. Lệnh PowerShell sau ghi tệp mới cho phiên lặp.
+\begin{quote}\small\singlespacing
+\begin{verbatim}
+$flags = '-O2','-std=c11','-Wall','-Wextra','-Werror',
+    '-fopenmp','-Iinclude','-Isrc'
+$files = 'scripts/benchmark_six_graphs.c','src/graph.c',
+    'src/bfs_serial.c','src/bfs_parallel_basic.c',
+    'src/bfs_parallel_optimized.c'
+gcc @flags @files -o benchmark_six_graphs.exe
+if ($LASTEXITCODE -ne 0) { throw 'Loi bien dich' }
+cmd /c ".\benchmark_six_graphs.exe > benchmark_repeat.csv"
+if ($LASTEXITCODE -ne 0) { throw 'Loi phep do' }
+\end{verbatim}
+\end{quote}
+Để lặp phép đo nhóm B hoặc khảo sát số luồng, chạy \path{scripts/run_supplement.py} hoặc \path{scripts/run_scaling.py} với \texttt{--commit} và \texttt{--output} trỏ tới thư mục mới. Mỗi manifest lưu cấu hình lúc chạy và SHA-256 của đầu vào, mã, nhị phân và dữ liệu.
+
+\section{Tạo lại bảng, hình và báo cáo}
+Quy trình cần Python với Matplotlib và \texttt{psutil}, cùng XeLaTeX và BibTeX.
+Từ thư mục gốc, chạy lệnh sau để tái tạo các bảng, hình và PDF từ dữ liệu đã lưu.
+\begin{quote}\small
+\begin{verbatim}
+make tables figures supplement-artifacts review-artifacts report
+\end{verbatim}
+\end{quote}
+Khi bảng và hình đã có, có thể chạy riêng \texttt{make report}.
+Kịch bản \path{scripts/benchmark_extended.py} dùng CLI trong tiến trình mới cho mỗi mẫu, khác giao thức trong báo cáo.
+
+\chapter{Thống kê đầy đủ của từng cấu hình}
+\label{app:quartiles}
+Bảng~\ref{tab:quartiles} và Bảng~\ref{tab:quartiles-new} ghi thời gian của 36 cặp đồ thị và phiên bản.
+Mỗi hàng dùng đúng 12 mẫu chính thức. Hai cột cực trị cho biết phạm vi mẫu,
+còn cột IQR đo bề rộng của khoảng giữa hai tứ phân vị.
+Các thống kê có thêm chữ số so với Bảng~\ref{tab:results} để thuận tiện đối chiếu.
+
+\begin{table}[H]
+\centering\footnotesize
+\setlength{\tabcolsep}{2.3pt}
+\caption{Thống kê chi tiết thời gian (ms) của nhóm A}
+\label{tab:quartiles}
+\begin{tabularx}{\textwidth}{@{}Yl r *{6}{S[table-format=4.5]}@{}}
+\toprule
+Đồ thị & Bản BFS & Mẫu & {$Q_1$} & {Trung vị} & {$Q_3$} & {IQR} & {Min} & {Max} \\
+\midrule
+\input{generated/statistics-24}
+\end{tabularx}
+\end{table}
+
+\begin{table}[H]
+\centering\footnotesize
+\setlength{\tabcolsep}{2.3pt}
+\caption{Thống kê chi tiết thời gian (ms) của nhóm B}
+\label{tab:quartiles-new}
+\begin{tabularx}{\textwidth}{@{}Yl r *{6}{S[table-format=3.5]}@{}}
+\toprule
+Đồ thị & Bản BFS & Mẫu & {$Q_1$} & {Trung vị} & {$Q_3$} & {IQR} & {Min} & {Max} \\
+\midrule
+\input{generated/statistics-25}
+\end{tabularx}
+\end{table}
+
+\chapter{Thống kê khảo sát theo số luồng}
+\label{app:scaling}
+Mỗi hàng dùng 12 mẫu chính thức. Các thống kê thời gian tính theo ms. $S$ và $E$ dùng Serial trong phiên khảo sát làm mốc. Cột $S_{\text{nội}}$ dùng phiên bản OpenMP tương ứng chạy một luồng làm mốc.
+
+\newcommand{\scalingtable}[2]{%
+\begin{table}[H]
+\centering\footnotesize
+\setlength{\tabcolsep}{3pt}
+\caption{Thống kê khảo sát luồng trên #1}
+\begin{tabular}{@{}lr *{9}{r}@{}}
+\toprule
+Bản BFS & $p$ & Trung vị & $Q_1$ & $Q_3$ & IQR & Min & Max & $S$ & $E$ (\%) & $S_{\text{nội}}$ \\
+\midrule
+\input{generated/scaling-detail-#2}
+\end{tabular}
+\end{table}}
+\scalingtable{đường đi}{1}
+\scalingtable{vòng có cung ngẫu nhiên}{2}
+\scalingtable{phân tầng hoán vị}{3}
+

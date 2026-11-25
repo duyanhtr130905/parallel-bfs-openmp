@@ -1,0 +1,15 @@
+csr_arcs,5799936
+scanned_arcs,5799936
+frontier,0,1
+frontier,1,32768
+frontier,2,32768
+frontier,3,32768
+frontier,4,32768
+frontier,5,32768
+frontier,6,32768
+frontier,7,32768
+frontier,8,32768
+frontier,9,32768
+frontier,10,32768
+frontier,11,32768
+frontier,12,32768

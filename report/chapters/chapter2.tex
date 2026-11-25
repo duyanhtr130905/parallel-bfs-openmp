@@ -1,230 +1,203 @@
 \chapter{Cơ sở lý thuyết và thiết kế giải pháp}
 \label{chap:design}
 
-\section{Cơ sở lý thuyết về đồ thị và BFS}
-\label{sec:bfs-theory}
-Trong $G=(V,E)$, một cung $(u,v)$ cho phép đi từ $u$ tới $v$. Với đồ thị vô hướng, một cạnh cho phép đi theo cả hai chiều. Đường đi từ $s$ tới $v$ là một dãy đỉnh nối nhau bằng các cạnh hợp lệ; trong đồ thị không trọng số, độ dài là số cạnh~\cite{cornellbfs}. Hình~\ref{fig:chapter2-example} cho một ví dụ có hướng với hai đỉnh cô lập.
+\section{BFS và tính đúng đắn}
+\label{sec:layers}
+Với nguồn $s$, gọi $F_k=\{v\mid d[v]=k\}$ là tập đỉnh biên (frontier) tại tầng $k$. BFS bắt đầu tại $F_0=\{s\}$ và xét các cung đi ra từ $F_k$ để tìm $F_{k+1}$. Một đỉnh được đưa vào tập kế tiếp khi chưa được phát hiện. Khi tập kế tiếp rỗng, mọi đỉnh tới được từ nguồn đã có khoảng cách \cite{clrs2022}.
 
-\begin{figure}[ht]
-\centering
-\setlength{\unitlength}{1mm}
-\begin{picture}(125,42)
-  \put(12,29){\circle*{3}} \put(9,23){\makebox(6,4){0}}
-  \put(43,29){\circle*{3}} \put(40,23){\makebox(6,4){1}}
-  \put(43,9){\circle*{3}}  \put(40,3){\makebox(6,4){2}}
-  \put(74,19){\circle*{3}} \put(71,13){\makebox(6,4){3}}
-  \put(103,29){\circle*{3}} \put(100,23){\makebox(6,4){4}}
-  \put(103,9){\circle*{3}}  \put(100,3){\makebox(6,4){5}}
-  \put(15,29){\vector(1,0){25}}
-  \put(15,27){\vector(3,-2){25}}
-  \put(46,27){\vector(3,-1){25}}
-  \put(46,10){\vector(3,1){25}}
-  \put(94,33){\makebox(16,4){cô lập}}
-  \put(94,13){\makebox(16,4){cô lập}}
-\end{picture}
-\caption{Đồ thị có hướng sáu đỉnh. Các cung là $0\to1$, $0\to2$, $1\to3$ và $2\to3$. Đỉnh 4 và 5 cô lập.}
-\label{fig:chapter2-example}
-\end{figure}
-
-BFS bắt đầu ở mức $L_0=\{s\}$. Gọi $L_k$ là tập đỉnh có khoảng cách ngắn nhất bằng $k$. \emph{Frontier} là tập đỉnh đang được mở rộng, \emph{visited} cho biết đỉnh nào đã được phát hiện, và $d$ lưu khoảng cách. Trong triển khai đồng bộ theo mức, frontier hiện tại là đúng một $L_k$. Hàng đợi FIFO của Serial duy trì cùng thứ tự theo mức, dù cuối hàng có thể đã chứa đỉnh mức sau~\cite{cornellbfs}.
-
-Giả sử đã phát hiện đúng các đỉnh từ $L_0$ đến $L_k$. Một láng giềng chưa thăm của $u\in L_k$ có đường đi dài $k+1$ qua $u$. Nếu có đường ngắn hơn, đỉnh đó phải thuộc một mức đã phát hiện. Ngược lại, mọi đỉnh có khoảng cách $k+1$ có ít nhất một tiền nhiệm trong $L_k$ trên một đường ngắn nhất. Quét hết các cung đi ra từ $L_k$ vì vậy phát hiện đủ và đúng $L_{k+1}$. Khi frontier rỗng, các đỉnh chưa phát hiện giữ giá trị $-1$. Bảng~\ref{tab:chapter2-frontier} và~\ref{tab:chapter2-distance} minh họa kết quả với nguồn 0.
-
-\begin{table}[ht]
-\centering
-\caption{Các frontier của BFS theo từng mức}
-\label{tab:chapter2-frontier}
-\begin{tabular}{c|c|c}
-Mức & Frontier được xử lý & Đỉnh mới phát hiện\\
-\midrule
-$L_0$ & \{0\} & \{1,2\}\\
-$L_1$ & \{1,2\} & \{3\}\\
-$L_2$ & \{3\} & \{\} \\
-\end{tabular}
-\end{table}
-
-\begin{table}[ht]
-\centering
-\caption{Khoảng cách BFS từ nguồn $0$ trên ví dụ sáu đỉnh}
-\label{tab:chapter2-distance}
-\begin{tabular}{c|cccccc}
-Đỉnh & 0 & 1 & 2 & 3 & 4 & 5\\
-\midrule
-Khoảng cách & 0 & 1 & 1 & 2 & -1 & -1
-\end{tabular}
-\end{table}
-
-Với danh sách kề, mỗi đỉnh tới được được đưa vào frontier một lần, và mỗi cung từ đỉnh tới được được xét một lần. Gọi $n=|V|$, $m$ là số cung lưu trữ và $m_r$ là số cung đi ra từ các đỉnh tới được. Tính cả khởi tạo $n$ phần tử đầu ra, BFS tuần tự dùng $O(n+m_r)$ thời gian, hay $O(n+m)$ trong trường hợp xấu nhất~\cite{cornellbfs}. Đối với đồ thị vô hướng thông thường, việc lưu hai chiều cho mỗi cạnh giữ bậc độ phức tạp $O(|V|+|E|)$.
-
-\section{Biểu diễn đồ thị CSR}
-Trong biểu diễn Compressed Sparse Row (CSR), các vị trí khác không của một hàng nằm liên tiếp. Một mảng lưu chỉ số cột và một mảng lưu điểm đầu các hàng~\cite{barrett1994}. Áp dụng vào danh sách kề, nhóm dùng \texttt{row\_offsets} dài $n+1$ và \texttt{col\_indices} dài $m$. Các láng giềng của $u$ nằm trong đoạn nửa mở
-\[
-[\texttt{row\_offsets}[u],\,\texttt{row\_offsets}[u+1]),
-\qquad \texttt{row\_offsets}[n]=m .
-\]
-Số phần tử của đoạn là bậc ra của $u$. Hai offset liền nhau bằng nhau biểu thị một danh sách kề rỗng. Cài đặt lưu từng cung, kể cả cung trùng, và chỉ cần chỉ số đỉnh đích cho đồ thị không trọng số.
-
-Ví dụ có hướng với $n=3$ và edge-list gồm $(0,1)$, $(0,2)$, $(1,2)$ có số cung theo hàng là $(2,1,0)$. Cộng tiền tố cho các điểm đầu của hàng, sau đó điền đích theo từng hàng:
-\begin{verbatim}
-row_offsets = [0, 2, 3, 3]
-col_indices = [1, 2, 2]
-\end{verbatim}
-Chẳng hạn, hàng 1 dùng đoạn $[2,3)$, chứa đúng đỉnh 2. Với bộ dựng của nhóm, đếm cung, cộng tiền tố và điền theo con trỏ ghi của từng hàng mất $O(n+m)$ thời gian. Hai mảng CSR chiếm $O(n+m)$ bộ nhớ. Lưu liên tiếp giúp ba phiên bản quét láng giềng theo đoạn mảng và chia sẻ một CSR chỉ đọc. Truy cập vào \texttt{visited} và \texttt{distance} vẫn phụ thuộc ID đỉnh đích.
-
-\paragraph{Quy ước nạp dữ liệu.}
-Số đỉnh được truyền riêng, $1\le n\le\texttt{INT32\_MAX}$; ID nằm trong $[0,n)$ nên đỉnh cô lập vẫn có mặt. Mỗi dòng dữ liệu chứa hai số nguyên thập phân không dấu \texttt{src dst}, cách nhau bằng dấu cách hoặc tab. Bộ đọc chấp nhận ASCII/UTF-8 theo cú pháp này, LF/CRLF, dòng cuối thiếu LF, dòng trắng và chú thích nguyên dòng bắt đầu bằng \texttt{\#} sau khoảng trắng. Cú pháp loại tiêu đề $n/m$, trọng số, chú thích cuối dòng và BOM. Chế độ có hướng giữ một cung cho mỗi cặp đầu vào. Chế độ vô hướng thêm cung ngược cho cạnh thường và giữ một cung cho mỗi khuyên. Cạnh trùng được giữ và thứ tự láng giềng không thuộc hợp đồng. Bộ dựng kiểm tra miền và tràn kích thước trước khi công bố CSR.
-
-\section{Cơ sở tính toán song song và OpenMP}
-Trong bộ nhớ chia sẻ, một tiến trình có thể chứa nhiều luồng cùng truy cập dữ liệu chung và giữ trạng thái riêng theo luồng. Trong vùng \texttt{parallel}, OpenMP tổ chức các luồng thành một nhóm (\emph{team}). Cấu trúc chia việc \texttt{for} phân phối các lượt lặp trong team; \texttt{single} chọn một luồng thực thi một khối. Hai cấu trúc có barrier ngầm ở cuối khi không dùng \texttt{nowait}. Barrier đợi cả team tại cùng điểm và bảo đảm các truy cập cần thiết được đồng bộ theo mô hình bộ nhớ. Hai truy cập xung đột lên cùng vị trí từ nhiều luồng, ít nhất một truy cập ghi và thiếu đồng bộ thích hợp, tạo tranh chấp dữ liệu (\emph{data race})~\cite{trobec2018,openmp52}.
-
-Thao tác nguyên tử cho phép đọc--sửa--ghi một vị trí như một thao tác không thể xen ngang trên vị trí đó. Đặc tả OpenMP có chỉ thị \texttt{atomic}; mã BFS của nhóm dùng các thao tác nguyên tử của C11 trên \texttt{visited} và bộ đếm hoặc cờ lỗi, kết hợp barrier của OpenMP ở ranh giới giữa các bước~\cite{openmp52}. Tính nguyên tử của một ô và việc công bố dữ liệu frontier là hai yêu cầu đồng bộ riêng.
-
-Ba chính sách \texttt{schedule} trong đặc tả OpenMP~\cite{openmp52} được sử dụng như sau:
-\begin{itemize}
-\item \textbf{Static} chia trước công việc. Khi không chỉ định kích thước khối, số lượt lặp mỗi luồng nhận gần bằng nhau; chi phí quét cung vẫn phụ thuộc bậc của từng đỉnh.
-\item \textbf{Dynamic} cấp khối mới khi luồng hết việc, với kích thước mặc định một lượt lặp. Việc cấp thêm khối có thể hỗ trợ cân bằng tải và phát sinh chi phí điều phối.
-\item \textbf{Guided} cũng cấp khối khi luồng cần việc, nhưng giảm kích thước khối khi phần việc còn lại giảm. Kích thước tối thiểu mặc định là một lượt lặp.
-\end{itemize}
-Nhóm dùng các chính sách trên cho vòng phân phối đỉnh trong frontier. Mỗi lượt lặp xử lý toàn bộ láng giềng của một đỉnh. Một mức có ít đỉnh hoặc có một đỉnh bậc rất lớn giới hạn mức chia việc theo cấu trúc của vòng lặp.
-
-Với kích thước bài toán cố định, speedup lấy thời gian Serial chia cho thời gian bản OpenMP tại cùng đầu vào. Efficiency chia speedup cho số luồng thực tế. Scaling trong báo cáo lấy đường cơ sở OpenMP một luồng của cùng phiên bản và cùng chính sách, giúp đánh giá việc tăng số luồng trong một cách triển khai. Phương pháp tính từ mẫu đo ở Mục~\ref{sec:measure}.
-
-\section{Thiết kế và triển khai ba phiên bản}
-Ba hàm \texttt{bfs\_serial}, \texttt{bfs\_parallel\_basic} và
-\texttt{bfs\_parallel\_optimized} nhận cùng năm tham số gồm CSR chỉ đọc, nguồn, mảng khoảng cách, cấu hình và metrics. Bên gọi cấp phát mảng đầu ra và metrics. Chỉ khi trả \texttt{BFS\_OK}, kết quả khoảng cách và số luồng mới được sử dụng. Serial báo một luồng; hai bản OpenMP đo team bằng \texttt{omp\_get\_num\_threads()} trong \texttt{single} của chính vùng BFS. Trường số luồng được đặt 0 trước kiểm tra đối số nếu có con trỏ metrics, và giữ 0 khi lỗi.
-
-\subsection{BFS tuần tự (Serial)}
-Serial cấp phát hàng đợi mảng dài $n$ với hai chỉ số đầu và cuối. Nó dùng $d[v]=-1$ làm dấu chưa thăm. Khi lấy $u$ ở đầu hàng, nó xét lần lượt đoạn láng giềng trong CSR, ghi khoảng cách cho mỗi đỉnh mới và thêm đỉnh đó vào cuối hàng. Ghi khoảng cách trước khi đưa vào hàng đợi bảo đảm mỗi đỉnh được thêm nhiều nhất một lần. Hàng đợi dùng $O(n)$ bộ nhớ phụ, với thời gian như Mục~\ref{sec:bfs-theory}.
-
-\begin{quote}
-\small
-\begin{tabbing}
-\hspace{0.65cm}\=\hspace{0.65cm}\=\hspace{0.65cm}\=\hspace{0.65cm}\=\kill
-\textbf{Thuật toán 2.1} BFS tuần tự\\
-\> $d[v]\gets-1$ với mọi $v$; $d[s]\gets0$; đưa $s$ vào hàng đợi $Q$\\
-\> \textbf{while} $Q$ còn phần tử \textbf{do}\\
-\> \> lấy $u$ ở đầu $Q$\\
-\> \> \textbf{for} mỗi cung $(u,v)$ trong CSR \textbf{do}\\
-\> \> \> \textbf{if} $d[v]=-1$ \textbf{then}\\
-\> \> \> \> $d[v]\gets d[u]+1$; thêm $v$ vào cuối $Q$\\
-\end{tabbing}
-\end{quote}
-
-\subsection{BFS song song OpenMP Basic}
-Basic tạo một team cho toàn bộ lời gọi BFS. Mỗi luồng xử lý một phần frontier hiện tại. Hai mảng frontier có sức chứa $n$ và được hoán đổi ở cuối mức. Mảng nguyên tử \texttt{visited} lưu riêng trạng thái giành quyền phát hiện đỉnh. Luồng đầu tiên thấy giá trị cũ là 0 trong phép \texttt{atomic\_exchange} ghi khoảng cách và lấy vị trí duy nhất ở frontier mới từ bộ đếm nguyên tử dùng chung. Phần mã trong \texttt{single} hoán đổi hai mảng sau khi vòng quét kết thúc.
-
-\begin{quote}
-\small
-\begin{tabbing}
-\hspace{0.6cm}\=\hspace{0.7cm}\=\hspace{0.7cm}\=\hspace{0.7cm}\=\hspace{0.7cm}\=\kill
-\textbf{Thuật toán 2.2} BFS song song Basic\\
-\> $d[v] \gets -1$ với mọi $v$; $d[s] \gets 0$\\
-\> visited[$v$] $\gets 0$ với mọi $v$; visited[$s$] $\gets 1$\\
-\> $F \gets \{s\}$\\
-\> \textbf{while} $F \neq \emptyset$ \textbf{do}\\
-\> \> $F' \gets \emptyset$; $c \gets 0$\\
-\> \> \textbf{parallel for} $u \in F$ với schedule đã chọn\\
-\> \> \> \textbf{for} mỗi cung $(u,v)$ trong CSR \textbf{do}\\
-\> \> \> \> \textbf{if} atomic\_exchange(visited[$v$], 1) $= 0$ \textbf{then}\\
-\> \> \> \> \> $d[v] \gets d[u]+1$\\
-\> \> \> \> \> $i \gets$ atomic\_fetch\_add($c$, 1)\\
-\> \> \> \> \> $F'[i] \gets v$\\
-\> \> barrier\\
-\> \> \textbf{single}: hoán đổi frontier; barrier\\
-\end{tabbing}
-\end{quote}
-
-Basic dùng $O(n)$ bộ nhớ phụ cho hai frontier và mảng đánh dấu. Tính theo các thao tác trên dữ liệu, có một phép trao đổi nguyên tử trên mỗi cung được xét và một lần tăng bộ đếm cho mỗi đỉnh mới. Chi phí chờ và điều phối của team phụ thuộc kích thước và phân bố công việc của từng mức.
-
-\subsection{BFS song song OpenMP Optimized}
-Optimized giữ cùng cách quét cung từ frontier và cùng thao tác giành quyền. Mỗi luồng gom đỉnh mới vào bộ đệm riêng $L_t$. Sau vòng quét, \texttt{single} cộng tiền tố số đỉnh của từng luồng để xác định đoạn ghi. Mỗi luồng sao chép đỉnh vào đoạn của mình; cả team đợi sao chép xong rồi một luồng hoán đổi frontier. Hình~\ref{fig:frontier-merge} minh họa thứ tự ghép.
-
-\begin{quote}
-\small
-\begin{tabbing}
-\hspace{0.6cm}\=\hspace{0.7cm}\=\hspace{0.7cm}\=\hspace{0.7cm}\=\hspace{0.7cm}\=\kill
-\textbf{Thuật toán 2.3} BFS song song Optimized\\
-\> $d[v] \gets -1$ với mọi $v$; $d[s] \gets 0$; $F \gets \{s\}$\\
-\> visited[$v$] $\gets 0$ với mọi $v$; visited[$s$] $\gets 1$\\
-\> \textbf{while} $F \neq \emptyset$ \textbf{do}\\
-\> \> mỗi luồng $t$: $L_t \gets \emptyset$\\
-\> \> \textbf{parallel for} $u \in F$ với schedule đã chọn\\
-\> \> \> \textbf{for} mỗi cung $(u,v)$ trong CSR \textbf{do}\\
-\> \> \> \> \textbf{if} atomic\_exchange(visited[$v$], 1) $= 0$ \textbf{then}\\
-\> \> \> \> \> $d[v] \gets d[u]+1$; thêm $v$ vào $L_t$\\
-\> \> barrier\\
-\> \> \textbf{single}: offset[$t$] $\gets \sum_{j<t}|L_j|$;\quad
-      $c \gets \sum_j |L_j|$\\
-\> \> barrier\\
-\> \> mỗi luồng $t$: sao chép $L_t$ vào $F'$ tại offset[$t$]\\
-\> \> barrier; \textbf{single}: hoán đổi frontier; barrier\\
-\end{tabbing}
-\end{quote}
+Lập luận quy nạp dựa trên đường đi ngắn nhất. Giả sử đã gán đúng khoảng cách đến hết tầng $k$. Một cung từ $u\in F_k$ đến đỉnh $v$ chưa được tìm thấy tạo ra đường đi dài $k+1$ tới $v$. Nếu $v$ có đường đi ngắn hơn, nó đã xuất hiện ở một trong các tầng trước đó, trái với giả thiết. Ngược lại, trên một đường đi ngắn nhất dài $k+1$ đến $v$, đỉnh đi trước $v$ phải ở tầng $k$. Khi xét cung cuối, BFS sẽ tìm thấy $v$ hoặc $v$ đã được phát hiện trong cùng tầng. Hai chiều của lập luận cho thấy quá trình mở rộng tạo đúng $F_{k+1}$.
 
 \begin{figure}[htbp]
 \centering
-\setlength{\unitlength}{1cm}
-\begin{picture}(13.4,5.6)
-  \put(0.0,4.5){\framebox(2.8,0.8){\small Luồng 0}}
-  \put(3.4,4.5){\framebox(2.8,0.8){\small Luồng 1}}
-  \put(6.8,4.5){\framebox(2.8,0.8){\small Luồng 2}}
-  \put(10.2,4.5){\framebox(2.8,0.8){\small Luồng 3}}
-  \put(1.4,4.4){\vector(0,-1){0.5}}
-  \put(4.8,4.4){\vector(0,-1){0.5}}
-  \put(8.2,4.4){\vector(0,-1){0.5}}
-  \put(11.6,4.4){\vector(0,-1){0.5}}
-  \put(0.0,3.0){\framebox(2.8,0.8){\small Bộ đệm $L_0$}}
-  \put(3.4,3.0){\framebox(2.8,0.8){\small Bộ đệm $L_1$}}
-  \put(6.8,3.0){\framebox(2.8,0.8){\small Bộ đệm $L_2$}}
-  \put(10.2,3.0){\framebox(2.8,0.8){\small Bộ đệm $L_3$}}
-  \put(1.4,2.9){\vector(0,-1){0.6}}
-  \put(4.8,2.9){\vector(0,-1){0.6}}
-  \put(8.2,2.9){\vector(0,-1){0.6}}
-  \put(11.6,2.9){\vector(0,-1){0.6}}
-  \put(0.0,1.3){\framebox(13.0,0.9){\small
-    Frontier mức kế tiếp: ghép $L_0,L_1,L_2,L_3$ theo offset tiền tố}}
-  \put(0.0,0.4){\small Barrier cuối mức; hoán đổi \texttt{current} và
-    \texttt{next}}
-\end{picture}
-\caption{Sơ đồ thu thập frontier của Optimized. Mỗi luồng ghi vào bộ đệm
-riêng, sau đó các bộ đệm được ghép lại theo thứ tự offset đã tính ở vùng
-\texttt{single}.}
-\label{fig:frontier-merge}
+\includegraphics[width=\textwidth]{figures/bfs-example.pdf}
+\caption[Ví dụ BFS sáu đỉnh]{BFS từ đỉnh $0$ trên đồ thị có hướng sáu đỉnh. Các cột biểu thị các tầng từ $0$ đến $2$ và các đỉnh ngoài phần tới được từ nguồn.}
+\label{fig:bfs-example}
 \end{figure}
-
-Bộ đệm tăng dung lượng theo cấp số nhân khi cần và được tái sử dụng qua các mức. Cộng tiền tố tốn $O(p)$ mỗi mức với $p$ luồng thực tế, và mỗi đỉnh mới được sao chép một lần vào frontier kế tiếp. Optimized cần thêm bộ đệm và mảng quản lý theo luồng. Phần dung lượng của các bộ đệm phụ thuộc đỉnh mới mà từng luồng từng thu được. Cả hai bản kiểm tra sức chứa frontier và trả lỗi nếu không bảo đảm đủ chỗ; Optimized cũng trả lỗi khi cấp phát bộ đệm thất bại.
-
-Tên Optimized thể hiện mục tiêu giảm tranh chấp tại bộ đếm chung. Cả hai bản của nhóm đều mở rộng từ frontier theo hướng \emph{top-down}. Phương pháp \emph{direction-optimizing} của Beamer và cộng sự chuyển giữa top-down và bottom-up~\cite{beamer2012}; sự chuyển hướng này nằm ngoài thiết kế đã triển khai.
 
 \begin{table}[htbp]
 \centering
-\small
-\begin{tabular}{@{}p{0.22\textwidth}p{0.34\textwidth}p{0.34\textwidth}@{}}
+\caption[Khoảng cách trong ví dụ BFS]{Khoảng cách và vị trí của sáu đỉnh trong Hình~\ref{fig:bfs-example}}
+\label{tab:bfs-example}
+\begin{tabular}{@{}lrrrrrr@{}}
 \toprule
-Tiêu chí & Basic & Optimized \\
+Đỉnh $v$ & 0 & 1 & 2 & 3 & 4 & 5 \\
 \midrule
-Thu thập frontier & Một biến đếm nguyên tử dùng chung &
-Bộ đệm riêng từng luồng, ghép bằng offset \\
-Tranh chấp & Mỗi đỉnh mới tranh chấp bộ đếm chung &
-Giữ nguyên phép trao đổi trên \texttt{visited} \\
-Bộ nhớ phụ & Hai mảng frontier và mảng \texttt{visited} &
-Thêm bộ đệm cục bộ có thể tăng theo số luồng \\
-Chi phí mỗi mức & Barrier và tranh chấp bộ đếm &
-Cộng tiền tố $O(p)$ và sao chép cục bộ \\
-Điểm mạnh & Đơn giản, ít bộ nhớ, dễ giải thích &
-Giảm điểm nóng khi frontier rộng \\
-Điểm yếu & Có thể tranh chấp bộ đếm chung &
-Tốn bộ nhớ, thêm bước ghép, có thể chậm ở frontier nhỏ \\
+Khoảng cách $d[v]$ & 0 & 1 & 1 & 2 & $-1$ & $-1$ \\
+Tập chứa đỉnh & $F_0$ & $F_1$ & $F_1$ & $F_2$ & \multicolumn{2}{c}{Ngoài phần tới được} \\
 \bottomrule
 \end{tabular}
-\caption{Các lựa chọn thiết kế trong Basic và Optimized.}
-\label{tab:basic-vs-optimized}
 \end{table}
 
-\section{Phân tích tính đúng đắn và chi phí song song}
-\label{sec:parallel-cost}
-Cả hai bản song song duy trì bất biến mức ở Mục~\ref{sec:bfs-theory}. Khi nhiều cung tới cùng đỉnh chưa thăm, các phép trao đổi nguyên tử có thứ tự sửa đổi trên từng ô \texttt{visited}. Chỉ phép đầu tiên thấy giá trị 0. Luồng thắng ghi $d[v]=d[u]+1$ và đưa $v$ vào frontier kế tiếp. Trong Basic, các giá trị lấy từ bộ đếm là duy nhất. Trong Optimized, các đoạn xác định bởi tổng tiền tố không giao nhau. Vì vậy mỗi đỉnh mới được thêm đúng một lần trong lời gọi thành công.
+Ở Hình~\ref{fig:bfs-example}, cả hai đỉnh $1$ và $2$ ở tầng $1$ đều có cung đến đỉnh $3$. Đỉnh $3$ chỉ xuất hiện một lần ở tầng $2$. Cả hai cung đều cho khoảng cách bằng $2$, nên thứ tự xử lý các đỉnh trong cùng tầng có thể thay đổi mà không làm đổi kết quả. Hai đỉnh cô lập $4$ và $5$ giữ giá trị $-1$ như trong Bảng~\ref{tab:bfs-example}.
 
-Các thao tác giành quyền dùng thứ tự \texttt{relaxed}. Barrier ở cuối vòng \texttt{for} đồng bộ các ghi khoảng cách và dữ liệu thu thập. Optimized còn đồng bộ sau khi \texttt{single} tính offset và sau khi các luồng sao chép. Barrier ngầm sau \texttt{single} hoán đổi giúp mọi luồng nhìn thấy frontier mới trước khi bắt đầu mức sau. Việc đọc khoảng cách ở mức kế tiếp dựa vào các điểm đồng bộ này; mỗi phần tử chỉ có một luồng ghi trong quá trình phát hiện. Đây là lập luận cho các truy cập trên đường thực thi thành công, được bổ trợ bằng kiểm thử ở Mục~\ref{sec:datasets}.
+\section{Biểu diễn CSR}
+Dạng nén theo hàng (Compressed Sparse Row, CSR) lưu các đỉnh kề đi ra của mỗi đỉnh trong một đoạn liên tiếp \cite{barrett1994}. Nhóm dùng hai mảng:
+\begin{itemize}
+  \item \texttt{row\_offsets} có $n+1$ phần tử. Đoạn ứng với đỉnh $u$ bắt đầu tại \texttt{row\_offsets[u]} và kết thúc ngay trước \texttt{row\_offsets[u+1]}. Phần tử cuối bằng $m_{\mathrm{CSR}}$ và xác định điểm kết thúc của mảng cung.
+  \item \texttt{col\_indices} có $m_{\mathrm{CSR}}$ phần tử. Mỗi phần tử là nhãn của một đỉnh đích.
+\end{itemize}
+Hai chỉ số bắt đầu liên tiếp bằng nhau khi đỉnh tương ứng không có cung đi ra. Với đồ thị không trọng số, CSR dùng cho BFS không cần mảng giá trị. Khi đồ thị đã được tạo, cả ba phiên bản chỉ đọc các mảng này. CSR giúp các phần tử liền kề của một hàng nằm sát nhau, còn thứ tự truy cập các hàng phụ thuộc vào thứ tự các đỉnh trong tập đỉnh biên.
 
-Gọi $L$ là số mức thực sự được duyệt từ nguồn. Phần duyệt CSR và khởi tạo vẫn có khối lượng $O(n+m_r)$, còn phần cộng tiền tố đưa tổng khối lượng thao tác trên dữ liệu của Optimized lên $O(n+m_r+pL)$. Các bậc này không biểu diễn thời gian thực: còn chi phí tạo team, phân việc, đồng bộ, truy cập bộ nhớ và chi phí nguyên tử. Bỏ bộ đếm chung giảm một điểm cập nhật chia sẻ, đồng thời thêm ghép frontier. Với frontier hẹp hoặc tải dồn vào một đỉnh, thêm luồng có thể tăng thời gian chờ mà ít tăng công việc hữu ích đồng thời. Các cơ chế này giải thích vì sao cần đo trên nhiều cấu hình; phép đo tổng ở Chương 3 chỉ cho phép đánh giá thời gian toàn lời gọi.
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=.67\textwidth]{figures/csr-example.pdf}
+\caption[Hai mảng CSR cho ba đỉnh]{Hai mảng CSR của đồ thị ba đỉnh với các cung $0\to1$, $0\to2$ và $1\to2$. Chỉ số mảng bắt đầu tại $0$.}
+\label{fig:csr}
+\end{figure}
+
+Trong Hình~\ref{fig:csr}, đỉnh $0$ dùng đoạn $[0,2)$ của \texttt{col\_indices}, còn đỉnh $1$ dùng đoạn $[2,3)$. Hàng của đỉnh $2$ rỗng vì hai chỉ số giới hạn đều bằng $3$. Cạnh vô hướng giữa hai đỉnh khác nhau xuất hiện trong cả hai hàng tương ứng.
+
+\section{OpenMP và các chính sách lập lịch}
+OpenMP tạo nhóm luồng thực thi (thread team) trong vùng \texttt{parallel}, sau đó phân chia các vòng lặp bằng \texttt{omp for} \cite{trobec2018,openmp52}. Trong hai phiên bản của nhóm, một vùng song song phục vụ toàn bộ quá trình duyệt theo tầng. Công việc được chia theo chỉ số đỉnh trong frontier. Các đỉnh có thể có bậc ra khác nhau, nên hai luồng nhận cùng số đỉnh vẫn có thể phải xét số cung rất khác nhau.
+
+Chính sách lập lịch (schedule) quyết định cách giao các lượt lặp. Với \texttt{static}, việc phân đoạn được xác định trước. Với \texttt{dynamic}, luồng nhận thêm đoạn khi hoàn thành đoạn trước. Với \texttt{guided}, kích thước đoạn giảm dần khi số lượt lặp chưa được cấp giảm. Hai chính sách cấp phát theo nhu cầu có thể hữu ích khi bậc ra chênh lệch, nhưng cần điều phối khi giao đoạn \cite{openmp52}. Mã hỗ trợ cả ba chính sách. Dữ liệu ở Chương~\ref{chap:experiment} dùng \texttt{static}.
+
+Rào đồng bộ (barrier) buộc các luồng trong nhóm hoàn thành một pha trước khi chuyển sang pha phụ thuộc. Chỉ thị \texttt{omp for} và \texttt{single} trong hai cài đặt không có \texttt{nowait}, nên đều có rào ngầm ở cuối. Một vùng \texttt{single} cho đúng một luồng thực hiện công việc chung, chẳng hạn đổi hai tập đỉnh biên. Chỉ thị \texttt{omp barrier} tạo rào tường minh ở vị trí xuất hiện trong mã \cite{openmp52}.
+
+\section{Chỉ số đánh giá hiệu năng}
+\label{sec:metrics}
+\subsection{Hệ số tăng tốc và hiệu suất}
+Gọi $T_{\mathrm{Serial}}$ và $T_{\mathrm{OMP},p}$ lần lượt là trung vị thời gian của Serial và của một phiên bản OpenMP với $p$ luồng thực tế trên cùng đồ thị. Hai đại lượng báo cáo là
+\[
+ S_p=\frac{T_{\mathrm{Serial}}}{T_{\mathrm{OMP},p}},
+ \qquad E_p=\frac{S_p}{p}.
+\]
+OpenMP có trung vị thấp hơn Serial khi $S_p>1$. Khi $S_p<1$, nghịch đảo $1/S_p$ cho biết OpenMP mất bao nhiêu lần thời gian của Serial. Bảng kết quả biểu diễn $E_8$ theo phần trăm. Đại lượng này chuẩn hóa tỷ số theo số luồng, nên không trực tiếp cho biết tỷ lệ CPU bận.
+
+Khả năng mở rộng (scaling) cần so chính một cài đặt OpenMP ở nhiều số luồng trên cùng đầu vào. Chỉ số nội bộ $S_{\text{nội},p}=T_{\mathrm{OMP},1}/T_{\mathrm{OMP},p}$ giữ nguyên thuật toán. Chỉ số $S_p$ dùng Serial làm mốc để trả lời câu hỏi lựa chọn phiên bản. Thực nghiệm về khả năng mở rộng đo cả hai mốc trong cùng điều kiện; hiệu suất $E_p$ tính theo mốc Serial và đổi sang phần trăm bằng cách nhân $100$.
+
+\subsection{Trung vị và tứ phân vị}
+Với $N$ mẫu đã sắp tăng dần, đánh chỉ số từ $0$, vị trí của phân vị tại $q$ là $h=(N-1)q$. Nếu $i=\lfloor h\rfloor$ và $j=\lceil h\rceil$, giá trị phân vị là $x_i+(h-i)(x_j-x_i)$. Nhóm dùng $q=\num{0.25},\num{0.5},\num{0.75}$ để tính $Q_1$, trung vị và $Q_3$. Khoảng $[Q_1;Q_3]$ mô tả nửa giữa của phân bố theo các phân vị nội suy, còn độ rộng khoảng tứ phân vị (IQR) là $Q_3-Q_1$. Các đoạn sai số trong hình biểu thị khoảng này.
+
+Khi thời gian Serial có độ phân tán lớn, nhóm thay tử số của $S_8$ lần lượt bằng $Q_1$ và $Q_3$ của Serial, giữ nguyên trung vị OpenMP. Phân tích này cho biết hệ số thay đổi thế nào khi dùng các phân vị khác nhau của thời gian Serial. Các tỷ số thu được mô tả độ nhạy theo mốc và không có diễn giải xác suất như khoảng tin cậy.
+
+\subsection{Mô hình chi phí theo tầng}
+Xấp xỉ $T_{\mathrm{OMP},p}\approx W/p+L\,t_{\text{tầng}}$ tách phần thời gian hữu ích trong điều kiện chia đều và chi phí phụ trội (overhead) lặp lại qua $L$ tầng. $W$ quy đổi lượng việc song song thành thời gian trên một luồng lý tưởng. $t_{\text{tầng}}$ biểu diễn một chi phí trung bình hiệu dụng, gộp điều phối, đồng bộ và thao tác chuẩn bị. Mô hình giúp hình thành giả thuyết cho đầu vào có nhiều tầng hẹp. Thời gian khởi tạo, chênh lệch lượng việc giữa các luồng và truy cập bộ nhớ có thể khiến xấp xỉ sai lệch. Tỷ số thời gian tổng chia cho số tầng vẫn chứa các thành phần này.
+
+\section{Thiết kế và triển khai ba phiên bản}
+\label{sec:implementations}
+\subsection{Serial}
+Serial dùng mảng hàng đợi FIFO với hai chỉ số đọc và ghi. Hàm khởi tạo toàn bộ $d$ bằng $-1$ và gán $d[s]=0$. Khi lấy đỉnh $u$ ở đầu hàng, hàm xét các cung đi ra và xếp vào cuối hàng mỗi đỉnh $v$ còn có $d[v]=-1$. Gán khoảng cách trước khi xếp hàng giúp mỗi đỉnh chỉ vào hàng đợi một lần. Thuật toán~\ref{alg:serial} mô tả trường hợp hàm hoàn tất phép duyệt.
+
+\begin{algorithm}[htbp]
+\caption{BFS tuần tự (Serial)}
+\label{alg:serial}
+\begin{algorithmic}[1]
+\State Gán tất cả $d[v]\gets-1$, sau đó $d[s]\gets0$
+\State Tạo hàng đợi FIFO $Q$ chứa $s$
+\While{$Q$ còn phần tử}
+  \State Lấy $u$ ở đầu $Q$
+  \For{mỗi cung $(u,v)$ từ CSR}
+    \If{$d[v]=-1$}
+      \State $d[v]\gets d[u]+1$ và đưa $v$ vào cuối $Q$
+    \EndIf
+  \EndFor
+\EndWhile
+\State \Return $d$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Basic: bộ đếm nguyên tử dùng chung}
+Hai bản OpenMP có hai mảng $F$ và $F'$ đủ sức chứa các đỉnh của một tầng. Ở Basic, một luồng đặt bộ đếm $c$ về $0$ trước khi cả nhóm mở rộng $F$. Khi thao tác nguyên tử trả về cờ cũ bằng $0$, luồng phát hiện $v$ lần đầu ghi $d[v]$ rồi gọi \texttt{atomic\_fetch\_add\_explicit} trên $c$. Giá trị trả về là chỉ số riêng để ghi $v$ vào $F'$. Cuối tầng, một luồng đọc số phần tử đã ghi và hoán đổi hai mảng. Thuật toán~\ref{alg:basic} thể hiện ba rào ngầm trong mỗi tầng được xử lý đầy đủ.
+
+Nếu hai luồng cùng gặp đỉnh $3$ ở Hình~\ref{fig:bfs-example}, việc cùng đọc và ghi một cờ thường mà thiếu đồng bộ tạo ra tranh chấp dữ liệu (data race). Tình trạng tương tự xảy ra khi hai luồng cập nhật một bộ đếm thường và dùng chung chỉ số ghi. Đoạn rút gọn sau dựa trên \path{src/bfs_parallel_basic.c}, với bước truy cập hàng CSR và kiểm tra biên được lược bỏ. Đoạn này dùng thao tác nguyên tử C11 từ \texttt{<stdatomic.h>}. OpenMP phân việc và đồng bộ giữa các pha.
+\begin{quote}\small\singlespacing
+\begin{verbatim}
+if (atomic_exchange_explicit(&visited[v], 1u,
+                             memory_order_relaxed) == 0u) {
+    distance[v] = distance[u] + 1;
+    size_t j = atomic_fetch_add_explicit(next_size, 1u,
+                                          memory_order_relaxed);
+    next[j] = v;
+}
+\end{verbatim}
+\end{quote}
+
+\begin{algorithm}[htbp]
+\caption{BFS OpenMP với bộ đếm chung (Basic)}
+\label{alg:basic}
+\begin{algorithmic}[1]
+\State Mở một vùng \texttt{parallel}. Khởi tạo $d$ và \texttt{visited} bằng \texttt{omp for}
+\State \texttt{single}: đặt nguồn vào $F$, đánh dấu nguồn và gán $d[s]=0$
+\While{$F$ còn phần tử}
+  \State \texttt{single}: đặt $c\gets0$ \Comment{Rào ngầm B1}
+  \State \texttt{omp for}: chia các đỉnh $u\in F$ cho các luồng
+  \For{mỗi cung $(u,v)$ của đỉnh $u$ đã được giao}
+    \If{\Call{ExchangeRelaxed}{$\texttt{visited}[v],1$}$=0$}
+      \State $d[v]\gets d[u]+1$
+      \State $j\gets\Call{FetchAddRelaxed}{c,1}$ rồi ghi $F'[j]\gets v$
+    \EndIf
+  \EndFor
+  \State Đóng \texttt{omp for} \Comment{Rào ngầm B2}
+  \State \texttt{single}: đổi vai trò $F,F'$ và đặt kích thước $|F|\gets c$ \Comment{Rào ngầm B3}
+\EndWhile
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Optimized: ghép các bộ đệm riêng}
+Ở Optimized, luồng $t$ ghi đỉnh mới vào bộ đệm riêng theo luồng (thread-local buffer) $L_t$ và đặt lại số phần tử khi bắt đầu tầng. Bộ đệm có thể tăng dung lượng và được tái sử dụng ở tầng sau. Khi vòng lặp duyệt kết thúc, một luồng tính chỉ số bắt đầu của từng đoạn ghi
+\[
+ o_0=0,\qquad o_t=\sum_{j=0}^{t-1}|L_j|,\qquad |F'|=o_p.
+\]
+Sau khi các chỉ số bắt đầu đã được xác định, mỗi luồng chép bộ đệm của mình vào đoạn $[o_t,o_{t+1})$ của $F'$. Một rào tường minh bảo đảm mọi đoạn đã được chép trước khi hoán đổi tập đỉnh biên. Thuật toán~\ref{alg:opt} sử dụng năm rào đồng bộ trong mỗi tầng được xử lý hoàn chỉnh.
+
+\begin{algorithm}[htbp]
+\caption{BFS OpenMP với bộ đệm theo luồng (Optimized)}
+\label{alg:opt}
+\begin{algorithmic}[1]
+\State Mở một vùng \texttt{parallel}; chuẩn bị các bộ đệm và khởi tạo như Basic
+\While{$F$ còn phần tử}
+  \State Mỗi luồng $t$ đặt số phần tử của $L_t$ về $0$
+  \State \texttt{single}: đặt lại cờ lỗi dùng chung \Comment{Rào ngầm O1}
+  \State \texttt{omp for}: chia các đỉnh $u\in F$ cho các luồng
+  \For{mỗi cung $(u,v)$ của đỉnh $u$ đã được giao}
+    \If{\Call{ExchangeRelaxed}{$\texttt{visited}[v],1$}$=0$}
+      \State $d[v]\gets d[u]+1$ rồi thêm $v$ vào $L_t$
+    \EndIf
+  \EndFor
+  \State Đóng \texttt{omp for}, kiểm tra cờ lỗi \Comment{Rào ngầm O2}
+  \State \texttt{single}: tính tổng tiền tố $o_0,\dots,o_p$ \Comment{Rào ngầm O3}
+  \State Mỗi luồng $t$ chép $L_t$ vào $F'[o_t:o_{t+1})$
+  \State \texttt{omp barrier} \Comment{Rào tường minh O4}
+  \State \texttt{single}: đổi vai trò $F,F'$ và đặt $|F|\gets o_p$ \Comment{Rào ngầm O5}
+\EndWhile
+\end{algorithmic}
+\end{algorithm}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/frontier-design.pdf}
+\caption[Một tầng của Basic và Optimized]{Các pha của một tầng thành công với bốn luồng. B1--B3 và O1--O5 là các rào đồng bộ. O4 là rào tường minh, các rào còn lại đều ngầm.}
+\label{fig:design}
+\end{figure}
+
+Hình~\ref{fig:design} tách các pha phải hoàn tất trước khi chuyển sang pha kế tiếp. Basic cấp chỉ số ghi ngay khi phát hiện đỉnh mới. Optimized ghép các bộ đệm sau khi xác định số phần tử của từng luồng, do đó cần thêm hai rào đồng bộ. Bảng~\ref{tab:design} tóm tắt các thao tác làm nên sự khác biệt.
+
+\begin{table}[htbp]
+\centering
+\caption[So sánh thiết kế OpenMP]{So sánh các thao tác khi xử lý một tầng}
+\label{tab:design}
+\begin{tabularx}{\textwidth}{@{}p{.27\textwidth}XX@{}}
+\toprule
+Thao tác & Basic & Optimized \\
+\midrule
+Xác nhận đỉnh mới & Cập nhật cờ nguyên tử & Cập nhật cờ nguyên tử \\
+Ghi đỉnh mới & Ghi trực tiếp vào $F'$ & Ghi vào bộ đệm $L_t$ \\
+Cấp vị trí ghi & Tăng bộ đếm chung & Tính tổng tiền tố \\
+Hoàn tất $F'$ & Công bố kích thước & Chép các đoạn rồi công bố kích thước \\
+Rào mỗi tầng & 3 rào ngầm & 4 rào ngầm, 1 rào tường minh \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Phân tích tính đúng đắn và chi phí}
+\subsection{Bất biến và thứ tự bộ nhớ}
+Tính nguyên tử của phép \texttt{atomic\_exchange\_explicit} bảo đảm chỉ một luồng nhận giá trị cờ cũ bằng $0$ và ghi $d[v]$. Thứ tự bộ nhớ \texttt{memory\_order\_relaxed} đủ cho việc xác nhận đỉnh mới vì sự đồng bộ giữa các pha được thực hiện bằng các rào OpenMP. Các luồng còn lại bỏ qua $v$ mà không đọc $d[v]$ trong tầng đó. Basic cấp chỉ số riêng bằng phép tăng nguyên tử. Optimized dùng các đoạn riêng xác định bằng tổng tiền tố.
+
+Rào OpenMP bảo đảm việc ghi $d$ và tập đỉnh biên hoàn tất trước khi các luồng đọc dữ liệu ở pha sau. Hai cách tập hợp sinh cùng tập $F'$ theo lập luận ở Mục~\ref{sec:layers}. Bất biến về khoảng cách của các đỉnh trong $F$ vì thế được duy trì đến khi không còn tầng mới.
+
+\subsection{Công việc và bộ nhớ}
+Gọi $n_R$ và $m_R$ là số đỉnh tới được và số cung đi ra từ các đỉnh đó. Cả ba bản đều khởi tạo mảng khoảng cách kích thước $n$, xét mỗi đỉnh tới được một lần và duyệt đúng các cung đi ra từ chúng. Serial có công việc $O(n+m_R)$ và cần $O(n)$ bộ nhớ phụ. Basic cũng có công việc duyệt $O(n+m_R)$, với một phép đổi cờ trên mỗi cung được xét và một lần tăng bộ đếm trên mỗi đỉnh mới. Đếm thêm việc điều phối của $p$ luồng qua $L$ tầng cho một cận công việc theo mô hình $O(n+m_R+pL)$. Cận này không dự báo trực tiếp thời gian chờ tại rào hay khi nhiều luồng cùng truy cập biến nguyên tử.
+
+Optimized thêm $O(pL)$ công việc tính tổng tiền tố và chép $n_R-1$ phần tử. Tăng dung lượng theo cấp số nhân cho chi phí thêm đỉnh khấu hao hằng số. Mỗi bộ đệm giữ dung lượng theo lần sử dụng lớn nhất của luồng. Tổng các cực đại không vượt $n_R-1$ vì mỗi đỉnh mới chỉ được ghi một lần. Hai mảng đỉnh biên, mảng đánh dấu, bộ đệm và bảng chỉ số dùng tổng cộng $O(n+p)$ bộ nhớ phụ.
+

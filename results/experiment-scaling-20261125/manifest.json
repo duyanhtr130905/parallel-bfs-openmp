@@ -1,0 +1,131 @@
+{
+  "baseline_commit": "11b86b53cfdbd14e72eab51ab13f5b19b70ebc43",
+  "started_utc": "2026-11-25T02:37:53.946771+00:00",
+  "host": {
+    "cpu": "Intel64 Family 6 Model 151 Stepping 2, GenuineIntel",
+    "os": "Windows-11-10.0.26300-SP0",
+    "physical_cores": 8,
+    "logical_cores": 12,
+    "os_visible_ram_bytes": 25463480320,
+    "python": "3.13.2",
+    "qpc_hz": 10000000,
+    "timer": "QPC",
+    "snapshot_sources": "psutil cpu_percent, virtual_memory, sensors_battery"
+  },
+  "compiler": "gcc (Rev6, Built by MSYS2 project) 16.2.0",
+  "command": [
+    "gcc",
+    "-O2",
+    "-Wall",
+    "-Wextra",
+    "-Wpedantic",
+    "-Werror",
+    "-std=c11",
+    "-fopenmp",
+    "-Iinclude",
+    "-Isrc",
+    "scripts/benchmark_scaling.c",
+    "src/graph.c",
+    "src/bfs_serial.c",
+    "src/bfs_parallel_basic.c",
+    "src/bfs_parallel_optimized.c",
+    "-o",
+    "benchmark.exe"
+  ],
+  "plan_sha256": "84ce6b40dce49d2c3d4f8dfea0b14cc02d22736e4479de5a68addb3c19948a14",
+  "reference_manifest_sha256": "ce28919d55d56db9be71d13783716d9e60e9a298b2d7af3f3f355f86345df393",
+  "source_hashes": {
+    "scripts/benchmark_scaling.c": "cee668206ff7f48f9a5d563ae057164821b4cd027afc6a689f33339ce13b5713",
+    "scripts/run_scaling.py": "34bdb14eeba32414cd9b1003f1f55ef8903e589961bd80dd49463cc8165146d8",
+    "scripts/run_supplement.py": "d1a4ab3f0740f1654f95faee15fa14a80bf4ae13ac9193e93735334e65574b2b",
+    "src/wall_timer.h": "811275f6f7f680fa2aca3dbe8fa44f704efde4f5137af5edd356a4cfa96616ef",
+    "src/graph.c": "e8bef40fcf0d22f8ba4fe910a34ed06edd079df1adc06fba65ad56c27ee30504",
+    "src/bfs_serial.c": "d4ec4a978ffa02599827d1e66f8702e491427924275c163fd577f4005b7386f7",
+    "src/bfs_parallel_basic.c": "4a6e2bca9f6012e9cad6d5fed6b0bd1b39f912fad6e709604c62dcb35c51dbdb",
+    "src/bfs_parallel_optimized.c": "c5aab3e46a789faf4487c9c82ee85b43fe0736f10f25c7393fa3d9d786ee275d",
+    "include/bfs.h": "66e439c23ca66b8aba6662c7eca4ca10b133b7a6ffb6ce59302c30e5ac3a7d86",
+    "include/status.h": "277fa6b6eb1d7a65aa95f9f71e126c6279552514ce5dd365cab053d18c22212b",
+    "include/graph.h": "07477f3d87a54d207f4d8ead9278e7a20dd13568a3280bba01916626adf21063"
+  },
+  "before": [
+    {
+      "utc": "2026-11-25T02:37:54.163285+00:00",
+      "cpu_percent": 14.5,
+      "available_bytes": 13404745728,
+      "ac": true
+    }
+  ],
+  "graphs": {
+    "path513": {
+      "before": [
+        {
+          "utc": "2026-11-25T02:37:56.645008+00:00",
+          "cpu_percent": 14.9,
+          "available_bytes": 13405671424,
+          "ac": true
+        }
+      ],
+      "edge_sha256": "e38f8ac2b7e07017676b6a1417ecc4f1b10551d6eacbaca04032f6c880bb2cb7",
+      "input_edges": 512,
+      "csv_sha256": "4c5ab0d62abc34d18cda43386b4829ca13f47e31f82783384b4c8c42da4b8c17",
+      "profile_sha256": "4adfd3b186cbbf50a706f699ad2036ff3af58d9ac1d6f5cff17603851f486d12",
+      "after": {
+        "utc": "2026-11-25T02:38:09.067794+00:00",
+        "cpu_percent": 9.3,
+        "available_bytes": 13397307392,
+        "ac": true
+      }
+    },
+    "ring-random": {
+      "before": [
+        {
+          "utc": "2026-11-25T02:38:12.876467+00:00",
+          "cpu_percent": 5.3,
+          "available_bytes": 13368041472,
+          "ac": true
+        }
+      ],
+      "edge_sha256": "1ad19d95f1c37f3d2fdae934d7406baba851f292f2a76ce1d2467de544a8a1fb",
+      "input_edges": 2450000,
+      "csv_sha256": "fe53250036235eb68174267b018d98b16ec1acec03273e89642a782704dfa6dc",
+      "profile_sha256": "4b503c77d3319372d101d888f367406927e118f2b141ae550e05df353645cd1f",
+      "after": {
+        "utc": "2026-11-25T02:38:18.251648+00:00",
+        "cpu_percent": 6.3,
+        "available_bytes": 13398769664,
+        "ac": true
+      }
+    },
+    "layered-permuted": {
+      "before": [
+        {
+          "utc": "2026-11-25T02:38:24.004576+00:00",
+          "cpu_percent": 10.1,
+          "available_bytes": 13323694080,
+          "ac": true
+        }
+      ],
+      "edge_sha256": "7856d14ed9aa98e9359e793d1e05caedf8ee47e0da714a2f6a5e83c359072b90",
+      "input_edges": 7929856,
+      "csv_sha256": "f6a7184024ea5c8570b686c9ae3c76a9d55eeb3abd08e1c1917370a8d076ae2e",
+      "profile_sha256": "0f1c11b51205c09627675b8041e05fcbc49f764809faf74ee0b47308c153d516",
+      "after": {
+        "utc": "2026-11-25T02:38:41.545226+00:00",
+        "cpu_percent": 12.0,
+        "available_bytes": 13341798400,
+        "ac": true
+      }
+    }
+  },
+  "complete": true,
+  "libgomp_sha256": "ccaf59dc8cff15ace88ab47acd68a5b014167cad8f960e7683466a4c821e41c4",
+  "power_plan": "Balanced",
+  "binary_sha256": "6a6b9e69acddb13dcee3546e15d0703537df87fb6cddaec9922d192e33ba18fe",
+  "finished_utc": "2026-11-25T02:38:42.548176+00:00",
+  "after": {
+    "utc": "2026-11-25T02:38:42.548211+00:00",
+    "cpu_percent": 10.7,
+    "available_bytes": 13350510592,
+    "ac": true
+  }
+}

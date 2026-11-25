@@ -1,0 +1,20 @@
+\begin{tikzpicture}[x=.9cm,y=.82cm,>=Stealth,
+  cell/.style={draw,minimum width=.9cm,minimum height=.74cm,inner sep=0pt},
+  font=\small]
+\node[anchor=east] at (-.6,1.2) {\texttt{row\_offsets}};
+\node[anchor=east] at (-.6,-.4) {\texttt{col\_indices}};
+\foreach \i/\v in {0/0,1/2,2/3,3/3}{
+ \node[cell,fill=blue!8] at (\i,1.2) {$\v$};
+ \node at (\i,2) {$\i$};
+}
+\foreach \i/\v in {0/1,1/2,2/2}{
+ \node[cell,fill=orange!12] at (\i,-.4) {$\v$};
+ \node at (\i,.36) {$\i$};
+}
+\draw (-.48,-1) -- (1.48,-1);
+\draw (1.52,-1) -- (2.48,-1);
+\node at (.5,-1.42) {Hàng $0$};
+\node at (2,-1.42) {Hàng $1$};
+\node[align=left,anchor=west] at (3.65,-.4) {Hàng $2$ rỗng};
+\end{tikzpicture}
+

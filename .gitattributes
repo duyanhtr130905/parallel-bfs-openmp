@@ -1,0 +1,8 @@
+# These measurements and their manifests are verified by byte-level SHA-256.
+results/experiment-20261125/*.csv -text
+results/experiment-20261125/*.profile -text
+results/experiment-20261125/*.json -text
+results/experiment-20261125/compile-attempt/*.json -text
+results/experiment-scaling-20261125/*.csv -text
+results/experiment-scaling-20261125/*.profile -text
+results/experiment-scaling-20261125/*.json -text

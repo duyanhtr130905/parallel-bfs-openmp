@@ -5,7 +5,57 @@
 \usepackage{setspace}
 \usepackage{amsmath,amssymb}
 \usepackage{graphicx,booktabs,array}
+\usepackage{tabularx,siunitx,float,algpseudocode,caption,etoolbox}
 \usepackage{titlesec}
+\captionsetup{font=small,labelfont=bf}
+\captionsetup[table]{position=above}
+\captionsetup[figure]{position=below}
+\sisetup{output-decimal-marker={,},group-separator={\,},group-minimum-digits=4,group-digits=integer,
+  exponent-product=\cdot,detect-weight=true,table-number-alignment=center,
+  }
+\floatstyle{ruled}
+\newfloat{algorithm}{tbp}{loa}[chapter]
+\floatname{algorithm}{Thuật toán}
+\AtBeginEnvironment{algorithm}{\small\singlespacing}
+\AtBeginEnvironment{table}{\singlespacing}
+\renewcommand\textproc{\texttt}
+\algrenewcommand\algorithmicwhile{\textbf{trong khi}}
+\algrenewcommand\algorithmicfor{\textbf{với}}
+\algrenewcommand\algorithmicif{\textbf{nếu}}
+\algrenewcommand\algorithmicdo{\textbf{thực hiện}}
+\algrenewcommand\algorithmicthen{\textbf{thì}}
+\algrenewcommand\algorithmicend{\textbf{kết thúc}}
+\algrenewcommand\algorithmicreturn{\textbf{trả về}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\frontsection}[1]{\chapter*{#1}\phantomsection\addcontentsline{toc}{chapter}{#1}}
+\makeatletter
+\newcommand{\listmedia}{%
+  \frontsection{\listfigurename}%
+  \begingroup\small\singlespacing
+  \@starttoc{lof}%
+  \section*{\listtablename}%
+  \phantomsection\addcontentsline{toc}{chapter}{\listtablename}%
+  \@starttoc{lot}%
+  \endgroup
+}
+\makeatother
+\newcommand{\experimentfig}[5]{%
+  \begin{figure}[!htbp]\centering
+  \includegraphics[width=\textwidth]{figures/#1.pdf}%
+  \caption[#2]{#3}\label{#4}%
+  \smallskip
+  \begin{minipage}{\textwidth}\small
+    #5
+  \end{minipage}%
+  \end{figure}%
+}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{5}
+\renewcommand{\topfraction}{.9}
+\renewcommand{\bottomfraction}{.75}
+\renewcommand{\textfraction}{.07}
+\renewcommand{\floatpagefraction}{.65}
 \titleformat{\chapter}[block]{\bfseries\centering\fontsize{18}{22}\selectfont}{Chương \thechapter.}{1em}{}
 \titlespacing*{\chapter}{0pt}{0pt}{1em}
 \titleformat{\section}{\bfseries\fontsize{16}{20}\selectfont}{\thesection}{1em}{}
@@ -28,3 +78,4 @@
 \renewcommand{\chaptername}{Chương}
 \renewcommand{\figurename}{Hình}
 \renewcommand{\tablename}{Bảng}
+

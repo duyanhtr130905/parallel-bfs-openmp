@@ -1,0 +1,20 @@
+\begin{tikzpicture}[>=Stealth,
+  box/.style={draw,rounded corners=2pt,align=center,text width=6cm,
+              minimum height=8mm,inner sep=3pt,font=\footnotesize},
+  basic/.style={box,fill=blue!9}, opt/.style={box,fill=orange!12},
+  gate/.style={font=\footnotesize,anchor=west,fill=white,inner sep=1pt}]
+\node[basic] (b0) at (0,0) {\textbf{Basic} | \texttt{single} đặt $c=0$};
+\node[basic] (b1) at (0,-1.55) {Luồng $0,1,2,3$ duyệt phần được giao.\\Luồng thắng gọi \texttt{atomic\_fetch\_add}\\để lấy một chỉ số ghi vào $F'$.};
+\node[basic] (b2) at (0,-3.25) {\texttt{single} đổi $F,F'$ và công bố kích thước.};
+\node[basic] (b3) at (0,-4.55) {Bắt đầu xét tầng kế tiếp.};
+\node[opt] (o0) at (7.40,0) {\textbf{Optimized} | đặt lại bộ đếm riêng và cờ lỗi};
+\node[opt] (o1) at (7.40,-1.55) {Luồng $t$ duyệt phần được giao, ghi vào $L_t$.\\Ví dụ $(|L_0|,|L_1|,|L_2|,|L_3|)=(2,1,0,2)$.};
+\node[opt] (o2) at (7.40,-3.25) {\texttt{single} tính tổng tiền tố.\\Độ dời là $(0,2,3,3,5)$.};
+\node[opt] (o3) at (7.40,-4.82) {Bốn luồng chép vào các đoạn $[0,2)$,\\$[2,3)$, đoạn rỗng và $[3,5)$ của $F'$.};
+\node[opt] (o4) at (7.40,-6.33) {\texttt{single} đổi $F,F'$ và công bố kích thước.};
+\node[opt] (o5) at (7.40,-7.63) {Bắt đầu xét tầng kế tiếp.};
+\foreach \a/\b/\l in {b0/b1/B1,b1/b2/B2,b2/b3/B3,o0/o1/O1,o1/o2/O2,o2/o3/O3,o3/o4/O4,o4/o5/O5}{
+ \draw[->] (\a) -- node[gate,midway,right=2pt] {\l} (\b);
+}
+\end{tikzpicture}
+

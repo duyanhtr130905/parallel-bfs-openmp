@@ -2,13 +2,14 @@
 
 | Yêu cầu | Nguồn triển khai/kiểm chứng | Trạng thái |
 |---|---|---|
-| C11/OpenMP, Windows | Makefile, openmp_probe.c, ENVIRONMENT | Khung + khảo sát |
+| C11/OpenMP trên Linux và Windows | Makefile, tests/openmp_probe.c, GitHub Actions | Có build/test và probe |
 | API thống nhất, n tường minh | CONTRACT, include/*.h | Chốt v1 |
-| CLI rõ lỗi module | src/main.c, tests/test_cli.py | Scaffold |
-| Timing/JSONL không bịa | CONTRACT, EXPERIMENT_PROTOCOL | Chỉ contract |
-| Sáu chương tiếng Việt | report/main.tex, chapters | Khung |
+| CLI phân biệt lỗi và kết quả | src/main.c, tests/test_cli.py, tests/test_cli_failures.py | Đã triển khai và kiểm thử |
+| Đo wall-clock và kiểm chứng kết quả | scripts/benchmark_six_graphs.c, scripts/benchmark_supplement.c, results/ | Hai phiên đo có dữ liệu raw |
+| Ba chương tiếng Việt | report/main.tex, report/chapters/, report/refs.bib | Có PDF bàn giao và quy trình tái tạo |
 | Workflow ba vai trò/review | CONTRIBUTING, DELIVERY_PLAN | Tài liệu |
-| Thuật toán/hiệu năng | Chưa có | Ngoài bootstrap |
+| Thuật toán/hiệu năng | src/, tests/test_integration.c, báo cáo Chương 3 | Ba hiện thực và hai phiên đo |
+| Khảo sát 1/2/4/8/12 luồng | scripts/benchmark_scaling.c, results/experiment-scaling-20261125/, tests/test_review_artifacts.py | Phiên riêng, có kiểm đúng khoảng cách và số luồng |
 
 ## Phân công cuối cùng — chủ dự án chọn 05/11/2026
 
