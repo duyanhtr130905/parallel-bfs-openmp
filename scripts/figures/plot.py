@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "analysis"))
 from summarize import ALGORITHMS, GRAPHS, ROOT, load, widths
 
 OUT = ROOT / "report/figures"
-COLORS = ["#666666", "#0072B2", "#D55E00"]
+COLORS = ["#555555", "#0072B2", "#D55E00"]
 HATCHES = ["...", "///", "xx"]
 MARKERS = ["o", "s", "^", "D", "v", "P"]
 
@@ -29,16 +29,8 @@ def axis_number(value, _position):
     return vi(value)
 
 
-def speed_label(value):
-    if value >= 0.01:
-        digits = 3 if value < 0.1 else 2
-        return f"{value:.{digits}f}".replace(".", ",")
-    mantissa, exponent = f"{value:.1e}".split("e")
-    return rf"$ {mantissa.replace('.', '{,}')} \cdot 10^{{{int(exponent)}}}$"
-
-
 def finish(fig, name):
-    fig.savefig(OUT / f"{name}.pdf", bbox_inches="tight", pad_inches=0.08)
+    fig.savefig(OUT / f"{name}.pdf", bbox_inches="tight", pad_inches=0.08, metadata={"CreationDate": None})
     plt.close(fig)
 
 
@@ -53,22 +45,15 @@ def grouped_bars(stats, names, speedup=False):
         x = np.arange(len(names)) + shifts[i]
         if speedup:
             ratio = np.array([float(stats[g, "serial"][1]) for g in GRAPHS]) / median
-            floor = 1e-5
-            ax.bar(x, ratio - floor, bottom=floor, width=.35, label=label,
-                   color=COLORS[i], hatch=HATCHES[i], edgecolor="black", linewidth=.5)
-            for px, py in zip(x, ratio):
-                ax.annotate(speed_label(py), (px, py), ha="center", va="bottom",
-                            xytext=(0, 3), textcoords="offset points", rotation=90, fontsize=8.5)
+            ax.scatter(x, ratio, marker=MARKERS[i], color=COLORS[i], label=label)
         else:
-            floor = 0.007
-            ax.bar(x, median - floor, bottom=floor, width=.23, label=label,
-                   color=COLORS[i], hatch=HATCHES[i], edgecolor="black", linewidth=.5,
-                   yerr=[median - points[:, 0], points[:, 2] - median],
-                   error_kw={"capsize": 2, "elinewidth": .9})
+            ax.errorbar(x, median, yerr=[median - points[:, 0], points[:, 2] - median],
+                        marker=MARKERS[i], linestyle="none", color=COLORS[i],
+                        capsize=3, label=label)
     ax.set_yscale("log")
     ax.set_xticks(range(len(names)), names)
     ax.set_ylabel("Hệ số tăng tốc $S_8$" if speedup else "Thời gian (ms)")
-    ax.set_ylim((1e-5, 30) if speedup else (.007, 5500))
+    ax.margins(y=.12)
     if speedup:
         ax.axhline(1, ls="--", color="black", lw=.9, label="$S_8=1$")
     ax.yaxis.set_major_formatter(FuncFormatter(axis_number))
@@ -137,7 +122,7 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True)
     plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": 9.5, "pdf.fonttype": 42})
     metadata, samples, stats = load()
-    names = ["Chu\ntrình", "Thang", "Lưới", "Cây 3\nnhỏ", "Cây 2\nlớn", "Cây 4\nlớn"]
+    names = ["Chu\ntrình", "Thang", "Lưới", "Cây bậc\nba nhỏ", "Cây nhị\nphân lớn", "Cây bậc\nbốn lớn"]
     grouped_bars(stats, names)
     grouped_bars(stats, names, speedup=True)
     layer_figure(metadata)

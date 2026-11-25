@@ -2,9 +2,9 @@
 \label{chap:intro}
 
 \section{Bối cảnh và động lực}
-Khi một bài toán chỉ quan tâm đến số bước di chuyển, một mạng các điểm kết nối có thể biểu diễn bằng đồ thị không trọng số. Trên mạng liên kết xã hội, mỗi bước có thể là một quan hệ kết nối. Trong mô hình định tuyến theo số chặng, mỗi bước đi qua một liên kết. Duyệt theo chiều rộng (breadth-first search, BFS) xử lý bài toán khoảng cách theo số bước bằng cách lần lượt mở rộng các đỉnh ở cùng khoảng cách từ nguồn \cite{clrs2022,beamer2013}.
+BFS trả lời câu hỏi một đỉnh cách nguồn bao nhiêu bước. Khi mạng liên kết được biểu diễn bằng đồ thị không trọng số, mỗi bước có thể tương ứng với một chặng định tuyến hoặc một liên kết giữa hai đối tượng. Trên đồ thị lớn, lượng cung phải xét có thể vượt xa số đỉnh ở tầng đầu tiên \cite{clrs2022}.
 
-BFS có thể chia việc duyệt các đỉnh cùng tầng cho nhiều luồng. Lượng việc có thể chia thay đổi trong suốt lời gọi: một tầng có thể chỉ chứa một đỉnh, trong khi tầng khác chứa nhiều đỉnh và nhiều cung đi ra. Nhóm chọn khảo sát sự thay đổi đó trên các cấu trúc có thể mô tả chính xác bằng quy tắc sinh đồ thị. Cách tiếp cận này giúp diễn giải thời gian thực thi dựa trên cấu trúc đầu vào và các thao tác thực tế trong chương trình.
+Các đỉnh cùng tầng có thể được xét đồng thời, nhưng hai luồng có thể gặp cùng một đỉnh mới hoặc nhận số cung phải xử lý rất khác nhau. Nhóm dùng OpenMP để khảo sát hai vấn đề đó trên CPU đa lõi có bộ nhớ chia sẻ. Các phiên bản dùng chung CSR và chỉ khác cách tổ chức duyệt, từ đó tập trung phép so sánh vào việc chia công việc, phát hiện đỉnh và chuẩn bị tầng kế tiếp.
 
 \section{Các nghiên cứu liên quan}
 \subsection{Đổi hướng duyệt}
@@ -21,7 +21,7 @@ Cả ba phiên bản trong đề tài duyệt theo hướng top-down và trả c
 
 \section{Phát biểu bài toán}
 \subsection{Đầu vào}
-Cho đồ thị không trọng số và đỉnh nguồn $s\in V$. Nhãn đỉnh thuộc $\{0,\ldots,n-1\}$, với $n=|V|$. CSR biểu diễn mỗi cung có hướng bằng một mục và mỗi cạnh vô hướng bằng hai cung ngược chiều. Khuyên tại một đỉnh chiếm một mục. Trong phần phân tích thuật toán, $m$ là số cung được lưu trong CSR, còn các bảng dữ liệu ghi riêng số cạnh đầu vào khi có đồ thị vô hướng. Độ dài đường đi bằng số cung đi qua.
+Cho đồ thị không trọng số $G=(V,E)$ và nguồn $s\in V$. Tập $V$ có $n$ đỉnh với nhãn từ $0$ đến $n-1$; $E$ chứa $m_{\mathrm{in}}$ liên kết đầu vào. CSR lưu $m_{\mathrm{CSR}}$ cung: một mục cho mỗi cung có hướng hoặc khuyên, hai mục ngược chiều cho mỗi cạnh vô hướng nối hai đỉnh khác nhau. Đường đi tuân theo hướng của các cung và có độ dài bằng số cung đi qua.
 
 \subsection{Đầu ra}
 Với mỗi $v\in V$, đặt
@@ -33,10 +33,10 @@ d[v]=
 -1, & \text{nếu }v\text{ không đi tới được từ }s.
 \end{cases}
 \]
-Đường đi rỗng tại nguồn cho $d[s]=0$. Mảng $d$ là đầu ra dùng để kiểm chứng cả ba chương trình. Khi nhiều đường đi cùng đạt độ dài ngắn nhất, chúng cho cùng một giá trị $d[v]$. Vì vậy, thứ tự các đỉnh trong một tầng có thể thay đổi mà vẫn bảo toàn đầu ra.
+Đường đi rỗng tại nguồn cho $d[s]=0$. Nhóm đối chiếu từng phần tử của $d$ để kiểm chứng cả ba phiên bản. Khi nhiều đường đi cùng đạt độ dài ngắn nhất, chúng cho cùng một giá trị $d[v]$. Vì vậy, thứ tự các đỉnh trong một tầng có thể thay đổi mà vẫn bảo toàn đầu ra.
 
 \section{Mục tiêu và câu hỏi nghiên cứu}
-Nhóm cài đặt ba phiên bản C11 trên cùng CSR, kiểm tra khoảng cách tới mọi đỉnh sau mỗi lời gọi và so sánh thời gian của các lời gọi đã qua kiểm tra. Ba câu hỏi nghiên cứu định hướng cách trình bày kết quả.
+Nhóm kiểm tra toàn bộ mảng khoảng cách sau mỗi lời gọi và dùng các phép đo đã qua kiểm tra để trả lời ba câu hỏi.
 \begin{enumerate}
   \item Phiên bản nào có trung vị thời gian thấp nhất trên từng đồ thị và chênh lệch so với Serial là bao nhiêu?
   \item Việc dùng bộ đệm riêng thay bộ đếm chung đi kèm thay đổi thời gian như thế nào giữa các đầu vào?
@@ -45,15 +45,8 @@ Nhóm cài đặt ba phiên bản C11 trên cùng CSR, kiểm tra khoảng cách
 Câu hỏi thứ ba được trả lời bằng cách đối chiếu cấu trúc, thời gian tổng và mã thực thi. Mức đóng góp riêng của từng yếu tố cần thí nghiệm kiểm soát tương ứng.
 
 \section{Phạm vi và phương pháp}
-Nhóm khảo sát 12 đồ thị tổng hợp, mỗi đồ thị dùng nguồn $s=0$. Hai phiên đo dùng chung phương pháp tính khoảng cách và cùng số luồng cho từng phiên bản. Trung vị mô tả thời gian điển hình, còn khoảng giữa hai tứ phân vị thể hiện độ phân tán. Chương~\ref{chap:experiment} mô tả cách kiểm chứng toàn bộ mảng khoảng cách trong mỗi phiên.
+Nhóm khảo sát 12 đồ thị tổng hợp, mỗi đồ thị dùng nguồn $s=0$. Hai phiên so sánh dùng cùng cấu hình luồng. Phiên riêng khảo sát 1, 2, 4, 8 và 12 luồng trên ba đầu vào đã xác định. Trung vị mô tả thời gian điển hình, còn khoảng giữa hai tứ phân vị thể hiện độ phân tán. Chương~\ref{chap:experiment} mô tả cách kiểm chứng toàn bộ mảng khoảng cách trong mỗi phiên.
 
-\section{Đóng góp chính}
-\begin{enumerate}
-  \item Hiện thực ba cách tổ chức BFS trên cùng CSR và chỉ ra bất biến bảo đảm các bản song song trả về khoảng cách đúng.
-  \item Xây dựng hai bộ đồ thị có độ sâu, bề rộng và mẫu kết nối khác nhau. Đối chiếu khoảng cách bằng công thức của đồ thị hoặc bằng BFS tham chiếu độc lập.
-  \item Đối chiếu thời gian, hệ số tăng tốc và độ phân tán của các phiên bản. Phân tích độ nhạy trên hai cây lớn cho thấy kết luận về độ lớn của hệ số tăng tốc phụ thuộc vào phân bố mẫu Serial.
-\end{enumerate}
-
-\section{Bố cục báo cáo}
-Chương~\ref{chap:design} trình bày BFS, CSR, OpenMP, các đại lượng đánh giá và ba thiết kế. Chương~\ref{chap:experiment} mô tả môi trường, dữ liệu, phép đo và kết quả đối chiếu theo cấu trúc đồ thị. Phụ lục~\ref{app:reproduce} cung cấp lệnh tái lập. Phụ lục~\ref{app:quartiles} liệt kê thống kê của từng cấu hình.
+\section{Đóng góp và bố cục}
+Nhóm triển khai ba cách tổ chức BFS, xây dựng hai bộ đồ thị có thể tái tạo và đánh giá hiệu năng theo cấu trúc đầu vào và số luồng. Chương~\ref{chap:design} trình bày bất biến và thiết kế. Chương~\ref{chap:experiment} phân tích thời gian, độ phân tán và độ nhạy theo mốc Serial. Các phụ lục lưu lệnh tái lập và thống kê chi tiết.
 

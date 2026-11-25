@@ -56,16 +56,25 @@ Cùng ba phiên bản và cấu hình 1/8 luồng, lịch tĩnh, nguồn 0. Mỗ
 
 Xem [dữ liệu, manifest và lệnh tái lập](results/experiment-20261125/README.md).
 
+## Khảo sát theo số luồng
+
+Trong bộ 12 đồ thị cố định, Serial có trung vị thấp nhất ở 7 đồ thị và
+Optimized ở 5 đồ thị. Phiên khảo sát luồng riêng đo 1, 2, 4, 8 và 12 luồng
+trên ba đầu vào. Optimized đạt trung vị tốt nhất tại 12 luồng trên vòng
+có cung ngẫu nhiên và phân tầng hoán vị, lần lượt khoảng 1,02× và 1,61×
+so với Serial cùng phiên. Trên đường đi, tăng số luồng làm hai bản OpenMP
+chậm hơn. [Kế hoạch, raw và lệnh kiểm thử](results/experiment-scaling-20261125/)
+
 ## Báo cáo
 
 Mã LaTeX ở [report/](report/). Chạy `make report` với XeLaTeX và BibTeX để tạo `report/main.pdf`. Báo cáo có ba chương. Xem thêm [giao diện lập trình](docs/CONTRACT.md) và [thiết kế](docs/ARCHITECTURE.md).
 
 [Bản PDF bàn giao](report/published/main.pdf) và [nhật ký biên tập](CHANGELOG_BAOCAO.md).
-Dùng `make tables figures supplement-artifacts report` để tái tạo từ dữ liệu đã lưu. Cần Python 3.11+, Matplotlib, psutil, XeLaTeX và BibTeX. Trong UCRT64, dùng `mingw32-make` thay cho `make`.
+Dùng `make tables figures supplement-artifacts review-artifacts report` để tái tạo từ dữ liệu đã lưu. Cần Python 3.11+, Matplotlib, psutil, XeLaTeX và BibTeX. Trong UCRT64, dùng `mingw32-make` thay cho `make`.
 
 ## Kịch bản khảo sát đồ thị SNAP
 
-Kịch bản này dùng CLI trong tiến trình mới cho mỗi mẫu. Hai phiên trong báo cáo đo nhiều lần trên một CSR trong cùng tiến trình. Chưa có số liệu SNAP hoặc scaling trong báo cáo.
+Kịch bản này dùng CLI trong tiến trình mới cho mỗi mẫu. Các phiên trong báo cáo đo nhiều lần trên một CSR trong cùng tiến trình. SNAP vẫn là hướng phát triển.
 
 Xem kế hoạch mà chưa gọi BFS:
 

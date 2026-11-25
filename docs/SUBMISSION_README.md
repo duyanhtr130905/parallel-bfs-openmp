@@ -6,9 +6,10 @@ Phiên [24/11](../results/experiment-20261124/) và phiên [25/11](../results/ex
 có hồ sơ riêng. Dữ liệu ngày 12/11 và bộ bàn giao cũ được trình bày trong
 [hồ sơ lịch sử](FINAL_HANDOFF_20261114.md).
 
-Tái tạo báo cáo từ dữ liệu đã lưu bằng `make tables figures supplement-artifacts report`
+Tái tạo báo cáo từ dữ liệu đã lưu bằng `make tables figures supplement-artifacts review-artifacts report`
 với Python 3.11+, Matplotlib, psutil, XeLaTeX và BibTeX. Trên Windows UCRT64 dùng
-`mingw32-make`. Chạy `make test-supplement` để kiểm trình đo và bộ phân tích bổ sung.
+`mingw32-make`. Chạy `make test-supplement test-review` để kiểm trình đo và bộ phân tích.
+Phiên [khảo sát số luồng](../results/experiment-scaling-20261125/) dùng mốc Serial riêng.
 
 ## Ghi chú từ bộ bàn giao trước ngày 24/11
 

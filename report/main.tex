@@ -14,11 +14,11 @@ Nhóm sinh viên thực hiện
 \end{flushright}
 
 \frontsection{Tóm tắt}
-Duyệt đồ thị theo chiều rộng (BFS) xác định khoảng cách ngắn nhất từ một đỉnh nguồn trên đồ thị không trọng số. Việc xử lý nhiều đỉnh cùng tầng bằng OpenMP có thể rút ngắn thời gian duyệt, nhưng mỗi tầng cũng phát sinh công việc điều phối. Báo cáo khảo sát sự đánh đổi này qua ba phiên bản trên cùng biểu diễn CSR: Serial dùng hàng đợi, Basic ghi đỉnh mới qua một bộ đếm chung và Optimized tập hợp đỉnh mới trong bộ đệm riêng của từng luồng.
+Duyệt đồ thị theo chiều rộng (Breadth-First Search, BFS) tìm khoảng cách ngắn nhất từ một đỉnh nguồn trên đồ thị không trọng số. Nhóm cài đặt ba phiên bản sử dụng cùng biểu diễn CSR trên CPU đa lõi: BFS tuần tự (Serial), OpenMP Basic dùng bộ đếm nguyên tử chung và OpenMP Optimized dùng bộ đệm riêng theo luồng kết hợp tổng tiền tố. Mỗi lời gọi được kiểm tra bằng toàn bộ mảng khoảng cách.
 
-Nhóm thực hiện hai phiên đo trên tổng cộng 12 đồ thị tổng hợp có hướng và vô hướng. Mỗi phiên bản có 12 mẫu chính thức trên mỗi đồ thị. Trong phiên ngày 24/11, Serial có trung vị thấp nhất ở bốn đồ thị và Optimized dẫn đầu ở hai cây lớn. Phiên bổ sung ngày 25/11 ghi nhận Serial dẫn đầu trên đường đi, sao và lưới tách rời. Optimized dẫn đầu trên đồ thị vòng có cung ngẫu nhiên và hai đồ thị phân tầng, với hệ số tăng tốc từ \num{1.17} đến \num{2.12}.
+Trên 12 đồ thị tổng hợp, Serial có trung vị thấp nhất ở 7 đồ thị. Optimized đứng đầu ở 5 đồ thị còn lại, với hệ số tăng tốc từ \num{1.17} đến \num{2.35} ở cấu hình tám luồng, lịch tĩnh. Mức \num{2.35} trên cây nhị phân lớn nhạy với mốc thời gian Serial. Đồ thị sao cho thấy một tầng có nhiều đỉnh vẫn có thể ít việc để chia nếu các cung cần xét tập trung ở tầng nguồn.
 
-Kết quả trên đồ thị sao cho thấy tầng rộng vẫn có thể đi kèm phân việc mất cân đối: riêng đỉnh nguồn đã chứa toàn bộ cung cần xét. Các phép đo dùng cùng laptop, tám luồng OpenMP và lịch tĩnh. Kết luận giới hạn ở cấu hình và các đầu vào đã khảo sát.
+Trong phép đo theo số luồng riêng, Optimized đạt trung vị tốt nhất với 12 luồng trên vòng có cung ngẫu nhiên và đồ thị phân tầng hoán vị. Trên đường đi, tăng số luồng làm cả hai bản OpenMP chậm hơn. Kết quả gắn với bộ đồ thị, môi trường và cấu hình đã khảo sát.
 
 \begingroup\fontsize{11}{13}\selectfont\singlespacing\tableofcontents\endgroup
 \listmedia
@@ -49,7 +49,9 @@ RAM & Bộ nhớ truy cập ngẫu nhiên (Random Access Memory) \\
 \cleardoublepage
 \phantomsection
 \addcontentsline{toc}{chapter}{Tài liệu tham khảo}
-{\fontsize{11}{12.5}\selectfont\singlespacing\raggedright\bibliography{refs}}
+{\fontsize{10.5}{11.5}\selectfont\singlespacing\raggedright\interlinepenalty=10000
+\apptocmd{\thebibliography}{\setlength{\itemsep}{1.5pt}\setlength{\parsep}{0pt}}{}{}
+\bibliography{refs}}
 \appendix
 \titleformat{\chapter}[block]{\bfseries\centering\fontsize{16}{20}\selectfont}{Phụ lục \thechapter.}{1em}{}
 \renewcommand{\chaptername}{Phụ lục}

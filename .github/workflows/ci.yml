@@ -29,10 +29,10 @@ jobs:
         run: |
           python3 -m venv build/plot-venv
           build/plot-venv/bin/python -m pip install matplotlib psutil
-          make PYTHON=build/plot-venv/bin/python test-plots test-supplement
+          make PYTHON=build/plot-venv/bin/python test-plots test-supplement test-review
       - name: Verify regenerated report tables from committed samples
         run: |
-          make PYTHON=build/plot-venv/bin/python tables supplement-artifacts
+          make PYTHON=build/plot-venv/bin/python tables supplement-artifacts review-artifacts
           git diff --exit-code -- report/generated/
 
   windows:

@@ -1,0 +1,99 @@
+{
+  "utc": "2026-11-25T02:37:53.946136+00:00",
+  "graphs": [
+    {
+      "id": "path513",
+      "kind": "path",
+      "n": 513,
+      "direction": "directed"
+    },
+    {
+      "id": "ring-random",
+      "kind": "random",
+      "n": 350000,
+      "direction": "directed",
+      "degree": 6,
+      "seed": 34178
+    },
+    {
+      "id": "layered-permuted",
+      "kind": "layered",
+      "n": 1048577,
+      "direction": "directed",
+      "width": 65536,
+      "degree": 8,
+      "seed": 46029,
+      "overlap": false
+    }
+  ],
+  "configurations": [
+    [
+      "serial",
+      1
+    ],
+    [
+      "omp-basic",
+      1
+    ],
+    [
+      "omp-basic",
+      2
+    ],
+    [
+      "omp-basic",
+      4
+    ],
+    [
+      "omp-basic",
+      8
+    ],
+    [
+      "omp-basic",
+      12
+    ],
+    [
+      "omp-opt",
+      1
+    ],
+    [
+      "omp-opt",
+      2
+    ],
+    [
+      "omp-opt",
+      4
+    ],
+    [
+      "omp-opt",
+      8
+    ],
+    [
+      "omp-opt",
+      12
+    ]
+  ],
+  "source": 0,
+  "schedule": "static",
+  "warmups": 2,
+  "samples": 12,
+  "order": "Cyclic rotation: index=(slot+round+2) mod 11",
+  "omp": {
+    "OMP_DYNAMIC": "FALSE",
+    "OMP_PROC_BIND": null,
+    "OMP_PLACES": null,
+    "OMP_WAIT_POLICY": null,
+    "GOMP_CPU_AFFINITY": null,
+    "OMP_NUM_THREADS": null,
+    "OMP_THREAD_LIMIT": null,
+    "OMP_SCHEDULE": null,
+    "GOMP_SPINCOUNT": null,
+    "OMP_MAX_ACTIVE_LEVELS": null,
+    "OMP_STACKSIZE": null
+  },
+  "affinity": "runtime and OS defaults",
+  "timeout_seconds_per_graph": 240,
+  "minimum_available_bytes": 2147483648,
+  "cpu_ceiling_percent": 65,
+  "safety": "Abort on RAM/battery failure or three consecutive 1-second snapshots above CPU ceiling",
+  "exclusion": "Abort on invalid time, status, full distance, team size, timeout or input mismatch. No exclusions."
+}

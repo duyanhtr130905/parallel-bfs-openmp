@@ -1,10 +1,6 @@
-\section{Thực nghiệm bổ sung ngày 25/11/2026}
-\label{sec:supplement}
+Phiên 25/11 khảo sát đường đi sâu, sao có một đỉnh bậc ra lớn và hai lưới vô hướng tách rời. Ba đầu vào còn lại cung cấp nhiều công việc hơn cho các tầng rộng. \texttt{ring-random} ghép một vòng có hướng với sáu cung ngẫu nhiên phân biệt đi ra từ mỗi đỉnh. Hai đồ thị phân tầng xáo nhãn đỉnh. \texttt{layered-overlap} tập trung nhiều cung vào một nhóm nhỏ đỉnh ở tầng kế tiếp, còn \texttt{layered-permuted} dùng các phép dịch vòng để phân bố cung đều hơn. Quy tắc, kích thước và hạt giống được chốt trước khi đo. Kế hoạch gốc có cân nhắc đồ thị SNAP, nhưng phiên đo không tải được dữ liệu trong môi trường hiện tại. Các nghiên cứu chuẩn hóa benchmark như GAP cung cấp tiền lệ cho việc công bố cả quy tắc đầu vào và phương pháp đánh giá \cite{gap2015}.
 
-\subsection{Đầu vào và cách đo}
-Đợt này khảo sát đường đi sâu, sao có một đỉnh bậc ra lớn và hai lưới vô hướng tách rời. Ba đầu vào còn lại cung cấp nhiều công việc hơn cho các tầng rộng. \texttt{ring-random} ghép một vòng có hướng với sáu cung ngẫu nhiên phân biệt đi ra từ mỗi đỉnh. Hai đồ thị phân tầng xáo nhãn đỉnh. \texttt{layered-overlap} tập trung nhiều cung vào một nhóm nhỏ đỉnh ở tầng kế tiếp, còn \texttt{layered-permuted} dùng các phép dịch vòng để phân bố cung đều hơn. Quy tắc, kích thước và hạt giống được chốt trước khi đo. Kế hoạch gốc có cân nhắc đồ thị SNAP, nhưng phiên đo không tải được dữ liệu trong môi trường hiện tại. Các nghiên cứu chuẩn hóa benchmark như GAP cung cấp tiền lệ cho việc công bố cả quy tắc đầu vào và phương pháp đánh giá \cite{gap2015}.
-
-Bảng~\ref{tab:supplement-graphs} dùng $m$ cho số liên kết đầu vào. Hai lưới rời có \num{65024} cạnh và \num{130048} cung trong CSR. Đỉnh nguồn thuộc một thành phần liên thông, nên BFS đi tới \num{16384} đỉnh và xét \num{65024} cung. Trên đồ thị có hướng, mỗi liên kết trong tệp đầu vào là một cung.
+Bảng~\ref{tab:supplement-graphs} dùng $m_{\mathrm{in}}$ cho số liên kết đầu vào. Hai lưới rời có \num{65024} cạnh và \num{130048} cung trong CSR. Từ nguồn, BFS tới \num{16384} đỉnh và xét \num{65024} cung. Trên đồ thị có hướng, mỗi liên kết đầu vào là một cung. Hạt giống của vòng có cung ngẫu nhiên, phân tầng hội tụ và phân tầng hoán vị lần lượt là \num{34178}, \num{39014} và \num{46029}.
 
 \begin{table}[!htbp]
 \centering\footnotesize
@@ -14,47 +10,8 @@ Bảng~\ref{tab:supplement-graphs} dùng $m$ cho số liên kết đầu vào. H
 \begin{tabular}{@{}ll S[table-format=7.0] S[table-format=7.0] S[table-format=7.0]
 S[table-format=3.0] S[table-format=6.0]@{}}
 \toprule
-Đồ thị & Hướng & {$n$} & {$m$} & {Tới được} & {Tầng} & {Tầng rộng nhất} \\
+Đồ thị & Hướng & {$n$} & {$m_{\mathrm{in}}$} & {Tới được} & {Tầng} & {Rộng nhất} \\
 \midrule
 \input{generated/supplement-graphs}
 \end{tabular}
 \end{table}
-
-Mỗi tiến trình dựng CSR một lần cho một đồ thị và dùng chung CSR cho ba phiên bản. Chương trình xoay lượt bắt đầu qua Serial, Basic và Optimized giữa các vòng. Mỗi cặp đồ thị--phiên bản có hai lượt khởi động và 12 lượt chính thức, tổng cộng 36 lượt khởi động và 216 lượt chính thức. Đồng hồ QPC có tần số \num{10000000} Hz. Khoảng đo bao quanh lời gọi BFS. Sau khi dừng đồng hồ, chương trình so từng phần tử khoảng cách với BFS tham chiếu chạy trên CSR và kiểm tra số luồng. Cả 252 lượt vượt qua hai kiểm tra. Cấu hình chính dùng một luồng cho Serial, tám luồng cho hai bản OpenMP và lịch \texttt{static}.
-
-\subsection{Kết quả và diễn giải}
-Bảng~\ref{tab:supplement-results} ghi trung vị từng phiên bản và hệ số của Optimized so với Serial. Hình~\ref{fig:supplement-performance} bổ sung khoảng từ $Q_1$ đến $Q_3$ và hệ số của cả hai bản OpenMP. Hình~\ref{fig:supplement-frontier} cho thấy các tầng rộng xuất hiện ở những thời điểm khác nhau trong quá trình duyệt.
-
-\begin{table}[!htbp]
-\centering\footnotesize
-\setlength{\tabcolsep}{3pt}
-\caption{Trung vị thời gian (ms), hệ số tăng tốc $S_8$ và hiệu suất $E_8$ của Optimized trong phiên 25/11}
-\label{tab:supplement-results}
-\begin{tabular}{@{}l *{3}{S[table-format=3.5]} S[table-format=1.5e-1]
-S[table-format=2.6] @{\hspace{6pt}}l@{}}
-\toprule
-Đồ thị & {Serial} & {Basic} & {Optimized} & {$S_8$} & {$E_8$ (\%)} & Nhanh nhất \\
-\midrule
-\input{generated/supplement-times}
-\end{tabular}
-\end{table}
-
-\begin{figure}[!htbp]
-\centering
-\includegraphics[width=.88\textwidth]{figures/supplement-performance.pdf}
-\caption[Thời gian, IQR và hệ số tăng tốc ngày 25/11]{Trung vị, khoảng $[Q_1,Q_3]$ và hệ số tăng tốc từ 12 mẫu chính thức trên mỗi cấu hình ngày 25/11. Hai trục đứng dùng thang logarit.}
-\label{fig:supplement-performance}
-\end{figure}
-
-\begin{figure}[!htbp]
-\centering
-\includegraphics[width=.88\textwidth]{figures/supplement-frontier.pdf}
-\caption[Bề rộng frontier trong phiên bổ sung]{Bề rộng frontier theo tầng từ nguồn $s=0$ trong phiên 25/11. Trục bề rộng dùng thang logarit.}
-\label{fig:supplement-frontier}
-\end{figure}
-
-Serial dẫn đầu ở đường đi, sao và hai lưới tách rời. Đường đi có 513 tầng, mỗi tầng đúng một đỉnh, nên việc mở rộng mỗi tầng gần như không chia được. Trong đồ thị sao, tầng rộng nhất có \num{262143} đỉnh lá nhưng không có cung đi ra. Toàn bộ công việc xét cung tập trung ở đỉnh nguồn, được giao cho một luồng trong vòng chia việc theo đỉnh. Ví dụ này cho thấy cần xét bậc ra cùng với bề rộng frontier.
-
-Optimized dẫn đầu trên ba đầu vào còn lại. Bản này tăng tốc khoảng \num{1.17} lần trên vòng có cung ngẫu nhiên, \num{1.38} lần trên đồ thị phân tầng hội tụ và \num{2.12} lần trên đồ thị phân tầng hoán vị. Basic cũng nhanh hơn Serial trên hai đồ thị phân tầng, nhưng chậm hơn Serial trên vòng có cung ngẫu nhiên. Các phép đo phù hợp với khả năng phân chia lượng cung lớn giữa nhiều luồng. Vì quy mô, số tầng và cách nối đỉnh cùng thay đổi giữa các đầu vào, số đo chưa định lượng được chi phí của ghi nguyên tử, hàng rào hoặc truy cập bộ nhớ.
-
-Manifest ghi thời điểm, tải CPU lấy mẫu, RAM trống, trạng thái nguồn và các biến OpenMP của phiên. Tải nền và nhiệt độ trong từng lời gọi chưa được theo dõi. Việc đo khả năng mở rộng theo số luồng và đo trên đồ thị thực được để lại cho các phiên riêng.

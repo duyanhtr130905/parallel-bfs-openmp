@@ -2,6 +2,10 @@
 
 ## Bản báo cáo ngày 25/11/2026
 
+- Nghiệm thu cuối tích hợp hai phiên so sánh trong Chương 3 và trình bày
+  36 cặp thống kê trong Phụ lục B. [Phiên khảo sát luồng riêng](../results/experiment-scaling-20261125/)
+  có 33 cấu hình, 66 lượt khởi động và 396 mẫu chính thức.
+
 - Bản ba chương được cập nhật trên [PR #13](https://github.com/duyanhtr130905/parallel-bfs-openmp/pull/13). Xem [PDF bàn giao](../report/published/main.pdf).
 - Hai phiên đo có 12 đồ thị tổng hợp, 72 lượt khởi động và 432 mẫu chính thức. CSV 24/11 được bảo toàn. Thư mục [phiên 25/11](../results/experiment-20261125/) lưu CSV, kế hoạch, cấu hình và kết quả kiểm chứng.
 - Hồ sơ tháng 11 bên dưới mô tả các mốc trước. [Hướng dẫn bàn giao hiện hành](SUBMISSION_README.md) ghi các lệnh tái lập.

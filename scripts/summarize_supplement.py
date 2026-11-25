@@ -12,6 +12,10 @@ from run_supplement import digest, edges
 
 ALGORITHMS = ("serial", "omp-basic", "omp-opt")
 LABELS = dict(zip(ALGORITHMS, ("Serial", "Basic", "Optimized")))
+NAMES = dict(zip(("path513", "star262k", "split-grid", "ring-random",
+                  "layered-overlap", "layered-permuted"),
+                 ("Đường đi", "Sao", "Hai lưới rời", "Vòng có cung ngẫu nhiên",
+                  "Phân tầng hội tụ", "Phân tầng hoán vị")))
 CSV_FIELDS = "round,slot,utc,algorithm,requested,actual,ms,bfs_status,validated".split(",")
 
 
@@ -103,7 +107,7 @@ def tables(results, generated):
     graphs = []
     times = []
     for row in results:
-        graph_id = row["id"]
+        graph_id = NAMES[row["id"]]
         direction = "Có hướng" if row["direction"] == "directed" else "Vô hướng"
         graphs.append(f"{graph_id} & {direction} & {row['n']} & {row['m']} & {row['reachable']} & "
                       f"{len(row['frontier'])} & {max(row['frontier'])} " + r"\\")
@@ -127,7 +131,7 @@ def plots(results, figures):
     axes[0].set_yscale("log")
     axes[1].set_yscale("log")
     axes[1].axhline(1, color="0.4", linestyle="--", linewidth=0.8)
-    for offset, (name, marker, shade) in enumerate(zip(ALGORITHMS, ("o", "s", "^"), ("0.10", "0.40", "0.65"))):
+    for offset, (name, marker, shade) in enumerate(zip(ALGORITHMS, ("o", "s", "^"), ("#555555", "#0072B2", "#D55E00"))):
         stats = [row["stats"][name] for row in results]
         x = [i + (offset - 1) * 0.18 for i in range(len(stats))]
         axes[0].errorbar(x, [s["median"] for s in stats],
@@ -138,7 +142,7 @@ def plots(results, figures):
             axes[1].scatter(x, [s["speedup"] for s in stats], color=shade, marker=marker)
     axes[0].set_ylabel("Thời gian (ms, thang log)")
     axes[1].set_ylabel("Hệ số tăng tốc (thang log)")
-    axes[1].set_xticks(range(len(results)), [row["id"] for row in results], rotation=19, ha="right")
+    axes[1].set_xticks(range(len(results)), [NAMES[row["id"]] for row in results], rotation=24, ha="right")
     axes[0].legend(ncols=3)
     for ax in axes:
         ax.yaxis.set_major_formatter(FuncFormatter(lambda value, _: f"{value:g}".replace(".", ",")))
@@ -149,7 +153,7 @@ def plots(results, figures):
     fig, axes = plt.subplots(2, 3, figsize=(7.0, 4.4), layout="constrained")
     for ax, row in zip(axes.flat, results):
         ax.plot(range(len(row["frontier"])), row["frontier"], color="0.2")
-        ax.set_title(row["id"])
+        ax.set_title(NAMES[row["id"]], fontsize=9)
         ax.set_yscale("log")
         ax.xaxis.set_major_locator(MaxNLocator(nbins=4, integer=True))
         ax.grid(axis="y", alpha=0.3)
@@ -161,7 +165,7 @@ def plots(results, figures):
 
 def structures(figures):
     import matplotlib.pyplot as plt
-    from matplotlib.collections import LineCollection
+    from matplotlib.patches import FancyArrowPatch
 
     ring = [(math.cos(i * math.tau / 8), math.sin(i * math.tau / 8)) for i in range(8)]
     grid = [(i % 4, -(i // 4)) for i in range(12)]
@@ -177,13 +181,13 @@ def structures(figures):
         ("Thang", ladder, [(i, i + 2) for i in range(6)] + [(i, i + 1) for i in range(0, 8, 2)]),
         ("Lưới", grid, [(i, i + 1) for i in range(12) if (i + 1) % 4] +
                        [(i, i + 4) for i in range(8)]),
-        ("Cây nhị phân", binary, [((i - 1) // 2, i) for i in range(1, len(binary))]),
-        ("Cây bậc ba", ternary, [((i - 1) // 3, i) for i in range(1, len(ternary))]),
-        ("Cây bậc bốn", quaternary, [((i - 1) // 4, i) for i in range(1, 21)]),
+        ("Cây nhị phân lớn", binary, [((i - 1) // 2, i) for i in range(1, len(binary))]),
+        ("Cây bậc ba nhỏ", ternary, [((i - 1) // 3, i) for i in range(1, len(ternary))]),
+        ("Cây bậc bốn lớn", quaternary, [((i - 1) // 4, i) for i in range(1, 21)]),
         ("Đường đi", [(i, 0) for i in range(8)], list(edges(dict(kind="path", n=8)))),
         ("Sao", [(0, 0), *ring], list(edges(dict(kind="star", n=9)))),
         ("Vòng và cung ngẫu nhiên", ring, list(edges(dict(kind="random", n=8, degree=1, seed=34178)))),
-        ("Hai lưới tách rời", grid + [(x + 5, y) for x, y in grid],
+        ("Hai lưới rời", grid + [(x + 5, y) for x, y in grid],
          list(edges(dict(kind="grid", n=24, width=4)))),
         ("Phân tầng hội tụ", wide_tiers, list(edges(dict(kind="layered", n=49, width=16,
                degree=2, seed=39014, overlap=True)))),
@@ -192,29 +196,36 @@ def structures(figures):
     ]
     # Layered generator permutes labels. Locate each vertex by its shuffled tier.
     import random
-    fig, axes = plt.subplots(4, 3, figsize=(7, 6.6), layout="constrained")
-    for index, (ax, (title, points, pairs)) in enumerate(zip(axes.flat, cases)):
-        if index >= 10:
-            labels = list(range(1, len(points)))
-            random.Random((39014, 46029)[index - 10]).shuffle(labels)
-            by_label = dict(zip([0, *labels], points))
-            points = [by_label[label] for label in range(len(labels) + 1)]
-        ax.add_collection(LineCollection([[points[a], points[b]] for a, b in pairs],
-                                         colors="0.5", linewidths=0.85))
-        ax.scatter(*zip(*points), color="0.18", s=12, zorder=3)
-        ax.scatter(*points[0], color="white", edgecolors="0.12", s=25, zorder=4)
-        ax.set_title(title, fontsize=10)
-        ax.set_aspect("equal")
-        ax.autoscale()
-        ax.axis("off")
-    fig.savefig(figures / "graph-structures.pdf", metadata={"CreationDate": None})
-    plt.close(fig)
+    for day, offset in ((24, 0), (25, 6)):
+        fig, axes = plt.subplots(3, 2, figsize=(7, 5.6), layout="constrained")
+        for index, (ax, (title, points, pairs)) in enumerate(zip(axes.flat, cases[offset:offset + 6]), offset):
+            if index >= 10:
+                labels = list(range(1, len(points)))
+                random.Random((39014, 46029)[index - 10]).shuffle(labels)
+                by_label = dict(zip([0, *labels], points))
+                points = [by_label[label] for label in range(len(labels) + 1)]
+            for i, (a, b) in enumerate(pairs):
+                show_arrow = index != 9 and (index < 10 or i % 7 == 0)
+                bend = 0.10 if index == 8 else 0
+                ax.add_patch(FancyArrowPatch(points[a], points[b],
+                             arrowstyle="-|>" if show_arrow else "-", mutation_scale=10,
+                             connectionstyle=f"arc3,rad={bend}", shrinkA=3, shrinkB=3,
+                             color="0.36", linewidth=.65 if index >= 10 else .85))
+            ax.scatter(*zip(*points), color="0.18", s=17, zorder=3)
+            ax.scatter(*points[0], color="white", edgecolors="0.12", s=34, zorder=4)
+            ax.set_title(title, fontsize=11)
+            ax.set_aspect("equal")
+            ax.margins(.13)
+            ax.axis("off")
+        fig.savefig(figures / f"graph-structures-{day}.pdf", metadata={"CreationDate": None})
+        plt.close(fig)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("session", type=Path)
     parser.add_argument("--report", type=Path, default=Path("report"))
+    parser.add_argument("--summary", type=Path, help="Optional new destination for derived statistics")
     args = parser.parse_args()
     results = summarize(args.session)
     generated = args.report / "generated"
@@ -224,7 +235,8 @@ if __name__ == "__main__":
     tables(results, generated)
     plots(results, figures)
     structures(figures)
-    (args.session / "summary.json").write_text(
-        json.dumps(dict(manifest_sha256=digest(args.session / "manifest.json"),
-                        analysis_sha256=digest(__file__), results=results), indent=2) + "\n",
-        encoding="utf-8", newline="\n")
+    if args.summary:
+        with args.summary.open("x", encoding="utf-8", newline="\n") as stream:
+            json.dump(dict(manifest_sha256=digest(args.session / "manifest.json"),
+                           analysis_sha256=digest(__file__), results=results), stream, indent=2)
+            stream.write("\n")

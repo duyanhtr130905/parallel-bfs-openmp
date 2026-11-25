@@ -9,6 +9,7 @@
 | Ba chương tiếng Việt | report/main.tex, report/chapters/, report/refs.bib | Có PDF bàn giao và quy trình tái tạo |
 | Workflow ba vai trò/review | CONTRIBUTING, DELIVERY_PLAN | Tài liệu |
 | Thuật toán/hiệu năng | src/, tests/test_integration.c, báo cáo Chương 3 | Ba hiện thực và hai phiên đo |
+| Khảo sát 1/2/4/8/12 luồng | scripts/benchmark_scaling.c, results/experiment-scaling-20261125/, tests/test_review_artifacts.py | Phiên riêng, có kiểm đúng khoảng cách và số luồng |
 
 ## Phân công cuối cùng — chủ dự án chọn 05/11/2026
 

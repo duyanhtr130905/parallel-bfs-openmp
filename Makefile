@@ -60,6 +60,17 @@ figures:
 supplement-artifacts:
 	$(PYTHON) scripts/summarize_supplement.py results/experiment-20261125
 
+.PHONY: review-artifacts test-review
+review-artifacts:
+	$(PYTHON) scripts/review_artifacts.py --scaling results/experiment-scaling-20261125
+
+test-review: build/benchmark_scaling$(EXEEXT)
+	$(PYTHON) -m unittest discover -s tests -p test_review_artifacts.py -v
+
+build/benchmark_scaling$(EXEEXT): scripts/benchmark_scaling.c src/wall_timer.h $(BFS_SOURCES) include/bfs.h include/graph.h include/status.h
+	$(PYTHON) -c "from pathlib import Path; Path('build').mkdir(exist_ok=True)"
+	$(CC) $(CPPFLAGS) -Isrc $(CFLAGS) scripts/benchmark_scaling.c $(BFS_SOURCES) $(LDFLAGS) $(LDLIBS) -o $@
+
 test-supplement: build/benchmark_supplement$(EXEEXT)
 	$(PYTHON) -m unittest discover -s tests -p test_supplement.py -v
 

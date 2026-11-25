@@ -1,5 +1,12 @@
 # Kiểm toán tài liệu tham khảo ngày 25/11/2026
 
+## Rà soát bản nghiệm thu cuối
+
+- Giữ Barrett và cộng sự. Mục CRS trên Netlib mô tả cách lưu chỉ số cột theo hàng và dùng mảng chỉ số bắt đầu từng hàng, đúng phần được vận dụng trong ví dụ CSR của Chương 2. Báo cáo giải thích riêng quy tắc nhân đôi cạnh vô hướng theo mã dự án.
+- Đối chiếu bản tác giả của Agarwal, Petrini, Pasetto và Bader, *Scalable Graph Exploration on Multicore Processors*, SC 2010, DOI 10.1109/SC.2010.46. Abstract và mục thiết kế mô tả tối ưu truy cập bộ nhớ cùng chiến lược riêng cho nền tảng nhiều socket. Phép đo của đề tài không thu bộ đếm phần cứng hay kiểm soát NUMA, nên giữ Barrett để dẫn trực tiếp cách biểu diễn dữ liệu. [Bản tác giả](https://davidbader.net/publication/2010-appb/2010-appb.pdf)
+- Hai mục OpenMP năm 2024 chỉ được dùng trong phạm vi đã đọc: abstract và metadata công khai của Wiley và ScienceDirect, đối chiếu DOI 10.1002/cpe.8119 và 10.1016/j.procs.2024.03.203. Nhận định về cấu trúc bag và quy mô mạng lấy từ các phần này. Các chỉ số phổ biến thiếu nguồn nhất quán được giữ ở trạng thái chưa xác minh.
+- Intel xác nhận 4 P-core, 4 E-core, 12 luồng logic và thông số ghi là 12 MB Intel Smart Cache. Bản cuối dùng đơn vị của hãng. Tổng L2 chưa đối chiếu độc lập, nên bỏ trị số khỏi phần cấu hình đã xác minh. [Đặc tả Intel](https://www.intel.com/content/www/us/en/products/sku/228794/intel-core-i512450hx-processor-12m-cache-up-to-4-40-ghz/specifications.html)
+
 Các con số trong cột cuối là dữ liệu công khai khi tra cứu. Các nền tảng dùng phạm vi đếm khác nhau.
 
 | Tài liệu | Bằng chứng và phạm vi đọc | Quyết định và vị trí dùng | Số liệu công khai |

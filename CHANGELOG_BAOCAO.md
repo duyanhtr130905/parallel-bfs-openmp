@@ -1,5 +1,11 @@
 # Nhật ký biên tập báo cáo Parallel BFS
 
+## Nghiệm thu cuối ngày 25/11/2026
+
+- Tích hợp Chương 3, chuẩn hóa chỉ số CSR, thêm ví dụ C/OpenMP, phóng lớn hình CSR và chia minh họa đồ thị thành hai nhóm có hướng cung.
+- Tái tính bảng 12 đồ thị và 36 cặp thống kê từ dữ liệu gốc. Thêm phiên khảo sát số luồng độc lập với 396 mẫu chính thức, phân biệt hệ số so với Serial và so với OpenMP một luồng.
+- PDF bàn giao có 41 trang, 3 chương, 13 hình, 15 bảng và 10 tài liệu tham khảo. Xem [hồ sơ nghiệm thu](docs/FINAL_REVIEW_20261125.md) để đối chiếu hash, kiểm tra và lệnh tái lập.
+
 ## Cập nhật ngày 25/11/2026
 
 - Lời cảm ơn ghi Hà Nội, thứ Ba, ngày 24 tháng 11 năm 2026 và đặt dòng ngày cùng chữ ký sát lề phải.
