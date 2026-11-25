@@ -16,9 +16,9 @@ Nhóm sinh viên thực hiện
 \frontsection{Tóm tắt}
 Duyệt đồ thị theo chiều rộng (BFS) xác định khoảng cách ngắn nhất từ một đỉnh nguồn trên đồ thị không trọng số. Việc xử lý nhiều đỉnh cùng tầng bằng OpenMP có thể rút ngắn thời gian duyệt, nhưng mỗi tầng cũng phát sinh công việc điều phối. Báo cáo khảo sát sự đánh đổi này qua ba phiên bản trên cùng biểu diễn CSR: Serial dùng hàng đợi, Basic ghi đỉnh mới qua một bộ đếm chung và Optimized tập hợp đỉnh mới trong bộ đệm riêng của từng luồng.
 
-Nhóm đo sáu đồ thị tổng hợp có hướng, lấy 12 mẫu chính thức cho mỗi cặp đồ thị và phiên bản, rồi báo cáo trung vị cùng khoảng giữa hai tứ phân vị. Serial có trung vị thấp nhất ở bốn trong sáu đồ thị. Trên chu trình, thang và lưới, bản OpenMP nhanh hơn trong hai bản vẫn mất khoảng 604 đến 30\,768 lần thời gian của Serial. Trên cây nhị phân lớn và cây bậc bốn lớn, Optimized đạt hệ số tăng tốc tương ứng 2,35 và 1,26. Trung vị Serial trên cây nhị phân lớn nhạy với sự phân tách giữa các vòng đo. Nếu dùng tứ phân vị dưới của Serial, hệ số tăng tốc của Optimized trên cây này còn khoảng 1,20.
+Nhóm thực hiện hai phiên đo trên tổng cộng 12 đồ thị tổng hợp có hướng và vô hướng. Mỗi phiên bản có 12 mẫu chính thức trên mỗi đồ thị. Trong phiên ngày 24/11, Serial có trung vị thấp nhất ở bốn đồ thị và Optimized dẫn đầu ở hai cây lớn. Phiên bổ sung ngày 25/11 ghi nhận Serial dẫn đầu trên đường đi, sao và lưới tách rời. Optimized dẫn đầu trên đồ thị vòng có cung ngẫu nhiên và hai đồ thị phân tầng, với hệ số tăng tốc từ \num{1.17} đến \num{2.12}.
 
-Kết quả thuộc một máy thử, với tám luồng OpenMP và chính sách lập lịch tĩnh.
+Kết quả trên đồ thị sao cho thấy tầng rộng vẫn có thể đi kèm phân việc mất cân đối: riêng đỉnh nguồn đã chứa toàn bộ cung cần xét. Các phép đo dùng cùng laptop, tám luồng OpenMP và lịch tĩnh. Kết luận giới hạn ở cấu hình và các đầu vào đã khảo sát.
 
 \begingroup\fontsize{11}{13}\selectfont\singlespacing\tableofcontents\endgroup
 \listmedia

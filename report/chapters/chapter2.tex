@@ -51,7 +51,7 @@ Hai độ dời liên tiếp bằng nhau khi đỉnh tương ứng không có cu
 Trong Hình~\ref{fig:csr}, đỉnh $0$ dùng đoạn $[0,2)$ của \texttt{col\_indices} và đỉnh $1$ dùng đoạn $[2,3)$. Hai độ dời cuối đều bằng $3$, vì đỉnh $2$ có hàng rỗng. Ví dụ cũng minh họa vai trò của phần tử canh ở cuối \texttt{row\_offsets}.
 
 \section{OpenMP và các chính sách lập lịch}
-OpenMP tạo nhóm luồng (thread team) trong vùng \texttt{parallel}, sau đó phân chia các vòng lặp bằng \texttt{omp for}. Trong hai phiên bản của nhóm, một vùng song song tồn tại suốt lời gọi BFS. Mỗi tầng có một vòng lặp chia việc theo chỉ số đỉnh trong tập đỉnh biên. Do số cung đi ra có thể chênh lệch giữa các đỉnh, hai luồng được cấp cùng số đỉnh vẫn có thể nhận lượng việc khác nhau \cite{openmp52}.
+OpenMP tạo nhóm luồng thực thi (thread team) trong vùng \texttt{parallel}, sau đó phân chia các vòng lặp bằng \texttt{omp for} \cite{trobec2018,openmp52}. Trong hai phiên bản của nhóm, một vùng song song phục vụ toàn bộ quá trình duyệt theo tầng. Công việc được chia theo chỉ số đỉnh trong frontier. Các đỉnh có thể có bậc ra khác nhau, nên hai luồng nhận cùng số đỉnh vẫn có thể phải xét số cung rất khác nhau.
 
 Chính sách lập lịch (schedule) quyết định cách giao các lượt lặp. Với \texttt{static}, việc phân đoạn được xác định trước. Với \texttt{dynamic}, luồng nhận thêm đoạn khi hoàn thành đoạn trước. Với \texttt{guided}, kích thước đoạn giảm dần khi số lượt lặp chưa được cấp giảm. Hai chính sách cấp phát theo nhu cầu có thể hữu ích khi bậc ra chênh lệch, nhưng cần điều phối khi giao đoạn \cite{openmp52}. Mã hỗ trợ cả ba chính sách. Dữ liệu ở Chương~\ref{chap:experiment} dùng \texttt{static}.
 

@@ -1,9 +1,16 @@
 # Hướng dẫn bộ nộp Parallel BFS
 
-Trạng thái 16/11/2026: PR #7 đã merge tại `38842829`; CI sau merge PASS 3/3.
-Issues #3, #4, #5 đã đóng. Issue #2 đang chờ PR cập nhật tài liệu được review
-và merge. Bộ nộp sẽ được đóng gói lại từ mã nguồn main sau PR đó; giữ nguyên PDF
-nghiệm thu 42 trang. Xem HANDOFF.md để lấy commit nguồn và SHA-256 cuối cùng.
+Phiên bản 25/11/2026 dùng báo cáo ba chương tại [report/published/main.pdf](../report/published/main.pdf).
+Mã nguồn, báo cáo và dữ liệu nằm trên [PR #13](https://github.com/duyanhtr130905/parallel-bfs-openmp/pull/13).
+Phiên [24/11](../results/experiment-20261124/) và phiên [25/11](../results/experiment-20261125/)
+có hồ sơ riêng. Dữ liệu ngày 12/11 và bộ bàn giao cũ được trình bày trong
+[hồ sơ lịch sử](FINAL_HANDOFF_20261114.md).
+
+Tái tạo báo cáo từ dữ liệu đã lưu bằng `make tables figures supplement-artifacts report`
+với Python 3.11+, Matplotlib, psutil, XeLaTeX và BibTeX. Trên Windows UCRT64 dùng
+`mingw32-make`. Chạy `make test-supplement` để kiểm trình đo và bộ phân tích bổ sung.
+
+## Ghi chú từ bộ bàn giao trước ngày 24/11
 
 PDF là bản báo cáo để đọc/nộp. ZIP nguồn gồm mã nguồn, LaTeX, tests, README,
 số liệu tổng hợp và biểu đồ cần thiết; không chứa .git, build tạm, token, raw

@@ -26,7 +26,7 @@ mingw32-make CC=gcc PYTHON=python build test check-openmp
 
 Trên Windows chạy `./build/bfs.exe`. Tệp đồ thị chứa một cặp đỉnh trên mỗi dòng. Đỉnh được đánh số từ 0. Dùng đúng một trong hai cờ `--directed` và `--undirected`. Ví dụ trên đi tới 4 đỉnh. Chương trình xuất JSON gồm trạng thái, số luồng thực tế, số đỉnh đi tới được và thời gian tính bằng giây. Thời gian chỉ tính lời gọi BFS.
 
-## Kết quả thực nghiệm
+## Phiên đo ngày 24/11/2026
 
 Đo trên laptop Intel Core i5-12450HX, Windows 11, GCC 16.2.0. Mỗi ô là trung vị của 12 lượt đo sau khởi động, tính bằng ms. Hai bản OpenMP chạy 8 luồng với `static`.
 
@@ -41,14 +41,31 @@ Trên Windows chạy `./build/bfs.exe`. Tệp đồ thị chứa một cặp đ�
 
 Optimized đạt **2,35×** trên cây nhị phân lớn và **1,26×** trên cây bậc 4 lớn. Serial nhanh nhất trên bốn đồ thị còn lại. Xem cách tái lập và dữ liệu từng lượt trong [thư mục thực nghiệm](results/experiment-20261124/).
 
+## Phiên đo bổ sung ngày 25/11/2026
+
+Cùng ba phiên bản và cấu hình 1/8 luồng, lịch tĩnh, nguồn 0. Mỗi ô là trung vị 12 mẫu, tính bằng ms. Các lượt được kiểm chứng toàn bộ khoảng cách với BFS tham chiếu.
+
+| Đồ thị tổng hợp | Serial | Basic | Optimized | Nhanh nhất |
+|---|---:|---:|---:|---|
+| Đường đi | 0,0048 | 105,218 | 174,767 | Serial |
+| Sao | 0,7051 | 3,858 | 3,290 | Serial |
+| Hai lưới rời | 0,1293 | 60,829 | 104,869 | Serial |
+| Vòng và cung ngẫu nhiên | 22,785 | 25,015 | 19,487 | Optimized |
+| Phân tầng hội tụ | 51,802 | 48,431 | 37,575 | Optimized |
+| Phân tầng hoán vị | 151,158 | 85,308 | 71,168 | Optimized |
+
+Xem [dữ liệu, manifest và lệnh tái lập](results/experiment-20261125/README.md).
+
 ## Báo cáo
 
 Mã LaTeX ở [report/](report/). Chạy `make report` với XeLaTeX và BibTeX để tạo `report/main.pdf`. Báo cáo có ba chương. Xem thêm [giao diện lập trình](docs/CONTRACT.md) và [thiết kế](docs/ARCHITECTURE.md).
 
 [Bản PDF bàn giao](report/published/main.pdf) và [nhật ký biên tập](CHANGELOG_BAOCAO.md).
-Dùng `make tables` để tái tạo bảng từ CSV gốc. Dùng `make figures` để tái tạo hình với Python 3.11+, Matplotlib và XeLaTeX.
+Dùng `make tables figures supplement-artifacts report` để tái tạo từ dữ liệu đã lưu. Cần Python 3.11+, Matplotlib, psutil, XeLaTeX và BibTeX. Trong UCRT64, dùng `mingw32-make` thay cho `make`.
 
-## Phép đo mở rộng
+## Kịch bản khảo sát đồ thị SNAP
+
+Kịch bản này dùng CLI trong tiến trình mới cho mỗi mẫu. Hai phiên trong báo cáo đo nhiều lần trên một CSR trong cùng tiến trình. Chưa có số liệu SNAP hoặc scaling trong báo cáo.
 
 Xem kế hoạch mà chưa gọi BFS:
 

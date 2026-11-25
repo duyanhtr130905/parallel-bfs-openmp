@@ -28,8 +28,12 @@ jobs:
       - name: Verify optional plotting tools with synthetic unit fixtures
         run: |
           python3 -m venv build/plot-venv
-          build/plot-venv/bin/python -m pip install matplotlib
-          make PYTHON=build/plot-venv/bin/python test-plots
+          build/plot-venv/bin/python -m pip install matplotlib psutil
+          make PYTHON=build/plot-venv/bin/python test-plots test-supplement
+      - name: Verify regenerated report tables from committed samples
+        run: |
+          make PYTHON=build/plot-venv/bin/python tables supplement-artifacts
+          git diff --exit-code -- report/generated/
 
   windows:
     name: bootstrap-windows-ucrt64

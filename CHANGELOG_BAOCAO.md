@@ -115,3 +115,12 @@ Get-CimInstance Win32_OperatingSystem | Select Caption,Version,BuildNumber
 powercfg /getactivescheme
 ```
 
+## 25/11/2026 — Thực nghiệm bổ sung và nghiệm thu báo cáo
+
+- Giữ sáu đồ thị phiên 24/11 và dữ liệu CSV SHA-256 `aa557801b81e9eefd6807d799d8228e83bb9dce0115ebfefe86c0515bb898920`. Giữ ba sơ đồ lý thuyết, các bảng và biểu đồ phiên trước.
+- Đo sáu đồ thị tổng hợp bổ sung với 216 mẫu chính thức và 36 warm-up. Serial và Optimized mỗi bản dẫn đầu ở ba đầu vào. Thêm bảng, hình thời gian/IQR, speedup, frontier và hình minh họa cấu trúc cho cả hai đợt.
+- Bổ sung kiểm chứng toàn mảng khoảng cách sau mỗi lời gọi, hồ sơ băm, kiểm thử parser, generator, và tái tạo bảng trong CI. Giao thức dùng một CSR trong mỗi tiến trình; phép khảo sát SNAP qua CLI hiện có dùng giao thức khác.
+- Biên tập ba chương, cập nhật danh mục tài liệu được trích và làm rõ giới hạn dữ liệu môi trường lịch sử. [Hồ sơ nguồn](docs/REFERENCE_AUDIT_20261125.md) và [hồ sơ phép đo](results/experiment-20261125/README.md) ghi bằng chứng.
+- Bản bàn giao có 39 trang, ba chương, 11 hình, 11 bảng và 10 mục tham khảo. SHA-256 PDF là `9c692007d668bb3fc42a4f3d5d0753afaa9ec3057a6bf2e9100bc0fb617be407`. Cấu hình bìa và ngày ký giữ theo bản gốc.
+- UCRT64 đã chạy build, test, check-openmp, test-plots và test-supplement. Windows thiếu lệnh xelatex độc lập, nên bản PDF cục bộ được biên dịch bằng XeTeX và BibTeX đi kèm Tectonic, với cùng font Latin Modern Roman và gói TeX đã có. Quy trình XeLaTeX/BibTeX của Makefile được giữ để chạy trên CI.
+

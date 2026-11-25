@@ -1,0 +1,13 @@
+csr_arcs,2450000
+scanned_arcs,2450000
+frontier,0,1
+frontier,1,7
+frontier,2,49
+frontier,3,343
+frontier,4,2388
+frontier,5,16211
+frontier,6,91974
+frontier,7,203533
+frontier,8,35338
+frontier,9,155
+frontier,10,1

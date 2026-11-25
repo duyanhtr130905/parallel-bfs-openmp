@@ -28,7 +28,6 @@
 \algrenewcommand\algorithmicreturn{\textbf{trả về}}
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X}
 \newcommand{\frontsection}[1]{\chapter*{#1}\phantomsection\addcontentsline{toc}{chapter}{#1}}
-\newcommand{\needcheck}{\textbf{[CẦN XÁC NHẬN]}}
 \makeatletter
 \newcommand{\listmedia}{%
   \frontsection{\listfigurename}%
@@ -46,7 +45,7 @@
   \caption[#2]{#3}\label{#4}%
   \smallskip
   \begin{minipage}{\textwidth}\small
-    \textbf{Nhận xét.} #5
+    #5
   \end{minipage}%
   \end{figure}%
 }

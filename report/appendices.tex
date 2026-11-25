@@ -9,6 +9,8 @@ Lịch sử dự án lưu bộ dữ liệu thực nghiệm khác để đối ch
 \begin{itemize}
 \item Trình đo \path{scripts/benchmark_six_graphs.c}.
 \item Số liệu \path{results/experiment-20261124/raw.csv}.
+\item Trình đo bổ sung \path{scripts/benchmark_supplement.c} và trình sinh đầu vào \path{scripts/run_supplement.py}.
+\item Kế hoạch, manifest, CSV theo đồ thị và hồ sơ frontier trong \path{results/experiment-20261125/}.
 \end{itemize}
 
 \section{Lệnh biên dịch và chạy trên máy của nhóm}
@@ -28,12 +30,22 @@ if ($LASTEXITCODE -ne 0) { throw 'Loi phep do' }
 \end{quote}
 Khi lặp phép đo, ghi lại cấu hình thực tế tại thời điểm chạy và giữ từng tệp CSV theo phiên riêng. Trên một máy khác, kết quả thu được thuộc một môi trường khác và cần trình bày riêng.
 
+Phiên 25/11 dùng mã BFS tại \texttt{0d5a53b}. Để lặp phiên này, chạy
+\path{scripts/run_supplement.py} với Python, \texttt{psutil} và GCC có OpenMP.
+Tham số \texttt{--commit} ghi commit mã BFS, còn \texttt{--output} chỉ đến thư mục mới.
+Manifest chứa SHA-256 đầu vào, trình đo, nhị phân và dữ liệu từng đồ thị.
+
 \section{Tạo lại bảng, hình và báo cáo}
-Từ gốc thư mục bàn giao, chạy \texttt{make tables} để tạo bảng với Python,
-\texttt{make figures} để tạo PDF vector với Matplotlib và TikZ.
-Lệnh \texttt{make report} cập nhật các bảng, hình rồi sinh \path{report/main.pdf}
-bằng XeLaTeX và BibTeX. Kịch bản \path{scripts/benchmark_extended.py}
-dành cho phép đo mở rộng. Tài liệu kèm mã nguồn ghi cách gọi.
+Quy trình cần Python với Matplotlib và \texttt{psutil}, cùng XeLaTeX và BibTeX.
+Từ thư mục gốc, chạy lệnh sau để tái tạo các bảng, hình và PDF từ dữ liệu đã lưu.
+\begin{quote}\small
+\begin{verbatim}
+make tables figures supplement-artifacts report
+\end{verbatim}
+\end{quote}
+Khi bảng và hình đã có sẵn, có thể chạy riêng \texttt{make report}.
+Kịch bản \path{scripts/benchmark_extended.py} dùng CLI trong tiến trình mới cho mỗi lần đo.
+Giao thức này khác hai phiên trong báo cáo.
 
 \chapter{Thống kê đầy đủ của từng cấu hình}
 \label{app:quartiles}

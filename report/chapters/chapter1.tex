@@ -8,19 +8,20 @@ BFS có thể chia việc duyệt các đỉnh cùng tầng cho nhiều luồng.
 
 \section{Các nghiên cứu liên quan}
 \subsection{Đổi hướng duyệt}
-Beamer, Asanović và Patterson \cite{beamer2013} kết hợp duyệt từ tập đỉnh biên sang các đỉnh kề (top-down) với duyệt từ các đỉnh chưa thăm để tìm hàng xóm thuộc tập đỉnh biên (bottom-up). Khi tầng rộng trên đồ thị có đường kính nhỏ, cách thứ hai có thể dừng sớm ở mỗi đỉnh và giảm số cung phải xét. Nhóm tác giả thường ghi nhận hiệu năng xấp xỉ gấp đôi hoặc hơn so với các cài đặt đa lõi và GPU trước đó trong phép so sánh của họ. Bộ chuẩn GAP của cùng nhóm công bố một hiện thực BFS đổi hướng dùng OpenMP để đối chiếu các thiết kế trên cùng bộ dữ liệu \cite{gap2015}.
+Beamer, Asanović và Patterson \cite{beamer2013} kết hợp duyệt từ tập đỉnh biên sang các đỉnh kề (top-down) với duyệt từ các đỉnh chưa thăm để tìm hàng xóm thuộc tập đỉnh biên (bottom-up). Cách thứ hai có thể dừng ngay khi tìm thấy một hàng xóm phù hợp, từ đó giảm số cung phải xét trên các đồ thị có tầng rộng. Bộ chuẩn GAP của cùng nhóm quy định đầu vào và phương pháp đánh giá, đồng thời cung cấp một hiện thực BFS đổi hướng làm mốc tham chiếu \cite{gap2015}.
 
 \subsection{Tập hợp đỉnh mới và hiệu năng}
 Leiserson và Schardl \cite{leiserson2010} dùng cấu trúc đa tập (\textit{bag}) để tập hợp đỉnh biên trong cài đặt song song bằng Cilk++. Một cách tập hợp khác xuất hiện trong dự án học phần ParallelBFS trên GitHub \cite{parallelbfs}: dự án dùng tổng tiền tố bậc ra để dự trù đoạn ghi cho các luồng. Optimized dùng cùng ý tưởng phân đoạn, với tổng tiền tố tính từ số đỉnh mới mà mỗi luồng đã thu được. Kết quả của dự án đó là tài liệu kỹ thuật công khai chưa qua bình duyệt.
 
-Bhaskar và Kanakagiri \cite{bhaskar2025} khảo sát các tối ưu BFS trên Intel Xeon và AMD EPYC. Họ ghi nhận hiệu quả của các tối ưu thay đổi theo phần cứng và đường kính đồ thị, kể cả trường hợp hiệu năng giảm trên một số đồ thị có đường kính lớn.
+Gonzaga de Oliveira và cộng sự \cite{oliveira2024} hiện thực BFS dùng cấu trúc bag trong OpenMP. Công trình này minh họa một cách tổ chức frontier cho BFS trên bộ nhớ chia sẻ. Phiên bản Optimized của nhóm dùng mảng riêng cho từng luồng và ghép các mảng theo tổng tiền tố.
 
-\paragraph{Vị trí của đề tài.}
-Đề tài dùng BFS top-down để khảo sát khi nào việc chia tầng bằng OpenMP có lợi và khi nào chi phí chia việc lấn át phần thời gian tiết kiệm được. Các phiên bản giữ chung CSR và đầu ra khoảng cách để tập trung vào cách điều phối luồng và thu thập đỉnh mới. GAP là một hiện thực tham chiếu cho thiết kế đổi hướng, được xem xét trong hướng phát triển của đề tài.
+Juneja và Khurana \cite{juneja2024} thử nghiệm một hiện thực BFS dùng OpenMP trên mạng từ 100 đến 1\,000 đỉnh với bộ xử lý hai và bốn lõi. Bài báo của họ bổ sung một trường hợp thực nghiệm OpenMP ở quy mô nhỏ. Báo cáo này khảo sát thêm các đầu vào lớn với cấu trúc tầng khác nhau và dùng Serial của nhóm làm mốc.
+
+Cả ba phiên bản trong đề tài duyệt theo hướng top-down và trả cùng mảng khoảng cách trên một CSR. Nhờ giữ chung đầu vào và đầu ra, phép so sánh tập trung vào cách chia việc trong tầng, đánh dấu đỉnh mới và tập hợp frontier kế tiếp.
 
 \section{Phát biểu bài toán}
 \subsection{Đầu vào}
-Cho đồ thị có hướng không trọng số $G=(V,A)$ với $n=|V|$, $m=|A|$ và đỉnh nguồn $s\in V$. Nhãn đỉnh thuộc $\{0,\ldots,n-1\}$. Mỗi cung $(u,v)\in A$ cho phép đi từ $u$ đến $v$. Độ dài một đường đi bằng số cung của nó.
+Cho đồ thị không trọng số và đỉnh nguồn $s\in V$. Nhãn đỉnh thuộc $\{0,\ldots,n-1\}$, với $n=|V|$. CSR biểu diễn mỗi cung có hướng bằng một mục và mỗi cạnh vô hướng bằng hai cung ngược chiều. Khuyên tại một đỉnh chiếm một mục. Trong phần phân tích thuật toán, $m$ là số cung được lưu trong CSR, còn các bảng dữ liệu ghi riêng số cạnh đầu vào khi có đồ thị vô hướng. Độ dài đường đi bằng số cung đi qua.
 
 \subsection{Đầu ra}
 Với mỗi $v\in V$, đặt
@@ -44,12 +45,12 @@ Nhóm cài đặt ba phiên bản C11 trên cùng CSR, kiểm tra khoảng cách
 Câu hỏi thứ ba được trả lời bằng cách đối chiếu cấu trúc, thời gian tổng và mã thực thi. Mức đóng góp riêng của từng yếu tố cần thí nghiệm kiểm soát tương ứng.
 
 \section{Phạm vi và phương pháp}
-Nhóm khảo sát đồ thị có hướng, sáu họ cấu trúc, với một nguồn cố định $s=0$. Ba phiên bản dùng chung cách lưu và chỉ khác phần duyệt. So sánh hiệu năng dựa trên các phép đo lặp, dùng trung vị để mô tả thời gian điển hình và hai tứ phân vị để thể hiện độ phân tán. Chương~\ref{chap:experiment} mô tả cách chọn và kiểm chứng các đầu vào độc lập với cài đặt BFS.
+Nhóm khảo sát 12 đồ thị tổng hợp, mỗi đồ thị dùng nguồn $s=0$. Hai phiên đo dùng chung phương pháp tính khoảng cách và cùng số luồng cho từng phiên bản. Trung vị mô tả thời gian điển hình, còn khoảng giữa hai tứ phân vị thể hiện độ phân tán. Chương~\ref{chap:experiment} mô tả cách kiểm chứng toàn bộ mảng khoảng cách trong mỗi phiên.
 
 \section{Đóng góp chính}
 \begin{enumerate}
   \item Hiện thực ba cách tổ chức BFS trên cùng CSR và chỉ ra bất biến bảo đảm các bản song song trả về khoảng cách đúng.
-  \item Xây dựng sáu trường hợp có hình dạng tầng khác nhau, với công thức kiểm chứng khoảng cách từ quy tắc sinh.
+  \item Xây dựng hai bộ đồ thị có độ sâu, bề rộng và mẫu kết nối khác nhau. Đối chiếu khoảng cách bằng công thức của đồ thị hoặc bằng BFS tham chiếu độc lập.
   \item Đối chiếu thời gian, hệ số tăng tốc và độ phân tán của các phiên bản. Phân tích độ nhạy trên hai cây lớn cho thấy kết luận về độ lớn của hệ số tăng tốc phụ thuộc vào phân bố mẫu Serial.
 \end{enumerate}
 

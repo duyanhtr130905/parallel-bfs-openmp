@@ -1,4 +1,12 @@
-# Trạng thái dự án — 16/11/2026
+# Trạng thái dự án
+
+## Bản báo cáo ngày 25/11/2026
+
+- Bản ba chương được cập nhật trên [PR #13](https://github.com/duyanhtr130905/parallel-bfs-openmp/pull/13). Xem [PDF bàn giao](../report/published/main.pdf).
+- Hai phiên đo có 12 đồ thị tổng hợp, 72 lượt khởi động và 432 mẫu chính thức. CSV 24/11 được bảo toàn. Thư mục [phiên 25/11](../results/experiment-20261125/) lưu CSV, kế hoạch, cấu hình và kết quả kiểm chứng.
+- Hồ sơ tháng 11 bên dưới mô tả các mốc trước. [Hướng dẫn bàn giao hiện hành](SUBMISSION_README.md) ghi các lệnh tái lập.
+
+## Hồ sơ lịch sử — 16/11/2026
 
 PR #7 đã merge vào `main` bằng commit
 [`38842829ddaa9211789bdd3ff2035bf54762ceca`](https://github.com/duyanhtr130905/parallel-bfs-openmp/commit/38842829ddaa9211789bdd3ff2035bf54762ceca).
